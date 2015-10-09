@@ -31,6 +31,13 @@ class EdenHandlebarsIndexTest extends PHPUnit_Framework_TestCase
 		$this->assertInstanceOf('Eden\\Handlebars\\Engine', $engine);
 	}
 	
+	public function testGetHelpers()
+	{
+		$helpers = eden('handlebars')->getHelpers();
+		
+		$this->assertTrue(is_array($helpers));
+	}
+	
 	public function testGetOptions()
 	{
 		$options = eden('handlebars')->getOptions();
@@ -84,6 +91,16 @@ class EdenHandlebarsIndexTest extends PHPUnit_Framework_TestCase
 	
     public function testRegisterHelper() 
     {
+		//simple helper
+		$template = eden('handlebars')
+			->registerHelper('root', function($absolute = false) {
+				return '/some/root';
+			})
+			->compile('{{root}}/bower_components/eve-font-awesome/awesome.css');
+			
+		$results = $template();
+		$this->assertEquals('/some/root/bower_components/eve-font-awesome/awesome.css', $results); 
+		
 		$found = false;
 		$self = $this;
 		$template = eden('handlebars')
@@ -161,7 +178,7 @@ class EdenHandlebarsIndexTest extends PHPUnit_Framework_TestCase
 		
 		$results = $template(array('zoo' => 'foobar'));
 		$this->assertTrue($found);
-		$this->assertEquals(5, $results); 
+		$this->assertEquals(5, $results);
 	}
 	
 	public function testRegisterPartial()

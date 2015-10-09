@@ -25,6 +25,7 @@ class Index extends Base
 	protected $context = null;
 	protected $template = null;
 	protected $partials = array();
+	protected $helpers = array();
 	
 	/**
 	 * Returns a callback that binds the data with the template
@@ -98,6 +99,16 @@ class Index extends Base
 	}
 	
 	/**
+	 * Returns all the registered helpers
+	 *
+	 * @return array
+	 */
+	public function getHelpers()
+	{
+		return $this->helpers;
+	}
+	
+	/**
 	 * Generates options used for helpers and partials
 	 *
 	 * @param string $source the template block
@@ -155,12 +166,12 @@ class Index extends Base
 					$data = $context->last();
 				}
 				
-				$context->push($data);
-				
 				//if no source or lambda
 				if(!$sourceSuccess || !$lambda) {
 					return '';
 				}
+				
+				$context->push($data);
 				
 				$results = $lambda->render($sourceSuccess);
 				
@@ -179,12 +190,12 @@ class Index extends Base
 					$data = $context->last();
 				}
 				
-				$context->push($data);
-				
 				//if no source or lambda
 				if(!$sourceFail || !$lambda) {
 					return '';
 				}
+				
+				$context->push($data);
 				
 				$results = $lambda->render($sourceFail);
 				
@@ -300,6 +311,8 @@ class Index extends Base
 			return call_user_func_array($bound, $args);
 		};
 		
+		$this->helpers[$name] = $callback;
+		
 		//get engine add helper wrapper
 		$this->getEngine()->addHelper($name, $callback);
 		
@@ -367,6 +380,34 @@ class Index extends Base
 		$this->template = $template;
 		
 		return $this;
+	}
+	
+	/**
+	 * The opposite of registerHelper
+	 *
+	 * @param string $name the helper name
+	 *
+	 * @return Eden\Handlebars\Index
+	 */
+	public function unregisterHelper($name)
+	{
+		$this->getEngine()->removeHelper($name);
+		
+		return $this;
+	}
+	
+	/**
+	 * The opposite of registerPartial
+	 *
+	 * @param string $name the partial name
+	 *
+	 * @return Eden\Handlebars\Index
+	 */
+	public function unregisterPartial($name)
+	{
+		if(isset($this->partials[$name])) {
+			unset($this->partials[$name]);
+		}
 	}
 	
 	/**
@@ -443,33 +484,5 @@ class Index extends Base
 		$string = preg_replace('#\s*\{\{\~\s*#is', '{{', $string);
 		$string = preg_replace('#\s*\~\}\}\s*#is', '}}', $string);
 		return $string;
-	}
-	
-	/**
-	 * The opposite of registerHelper
-	 *
-	 * @param string $name the helper name
-	 *
-	 * @return Eden\Handlebars\Index
-	 */
-	protected function unregisterHelper($name)
-	{
-		$this->getEngine()->removeHelper($name);
-		
-		return $this;
-	}
-	
-	/**
-	 * The opposite of registerPartial
-	 *
-	 * @param string $name the partial name
-	 *
-	 * @return Eden\Handlebars\Index
-	 */
-	protected function unregisterPartial($name)
-	{
-		if(isset($this->partials[$name])) {
-			unset($this->partials[$name]);
-		}
 	}
 }

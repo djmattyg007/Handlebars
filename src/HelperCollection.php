@@ -71,7 +71,23 @@ class HelperCollection extends \Mustache_HelperCollection
 		//CUSTOM
 		//if the name is a key
 		if(isset($this->helpers[$name])) {
-			//then return it
+			//if it's handlebars
+			if($this->handlebars) {
+				//get the engine helpers
+				$helpers = $this->handlebars->getHelpers();
+				
+				//if this is a handlebars helper
+				if(isset($helpers[$name])) {
+					//make it so it works with handlebars
+					$helper = $this->helpers[$name];
+				
+					return function($source = null, $lambda = null) use ($helper) {
+						return $helper('', $source, $lambda);
+					};
+				}
+			}
+			
+			//because it could be a mustache helper
 			return $this->helpers[$name];
 		}
 		

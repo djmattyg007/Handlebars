@@ -33,7 +33,7 @@ class NoopCache extends \Mustache_Cache_NoopCache
 			'extends \\Eden\\Handlebars\\Template', 
 			$value);
 		//END CUSTOM
-		
+
 		parent::cache($key, $value);
     }
 }
