@@ -1,0 +1,22 @@
+{
+    "name": "eden/handlebars",
+    "type": "library",
+    "description": "Handlebars simplified as it was suppose to be.",
+    "keywords": ["eden", "library"],
+    "homepage": "http://eden-php.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Christian Blanquera",
+            "email": "cblanquera@openovate.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.1",
+		"eden/core": "4.x-dev",
+		"mustache/mustache": "dev-master"
+    },
+    "autoload": {
+         "psr-4": { "Eden\\Handlebars\\": "src/" }
+    }
+}
