@@ -29,7 +29,7 @@ class Context extends \Mustache_Context
      *
      * @param mixed $context Default rendering context (default: null)
      */
-    public function __construct($context = null, $handlebars = null)
+    public function __construct($context = null)
     {
         if ($context !== null) {
             $this->stack = array($context);
@@ -103,6 +103,14 @@ class Context extends \Mustache_Context
      */
     public function find($id)
     {
+		//CUSTOM
+		$value = $this->findVariants($id);
+		
+		if($value !== false) {
+			return $value;
+		}
+		//END CUSTOM
+		
         return $this->findVariableInStack($id, $this->stack);
     }
 
@@ -134,20 +142,10 @@ class Context extends \Mustache_Context
     public function findDot($id)
     {
 		//CUSTOM
-		//if we are requesting for the parent
-		if(strpos($id, '../') === 0) {
-			return $this->find($id);
-		}
+		$value = $this->findVariants($id);
 		
-		//if literal value
-		//see {{./noop}} handlebars.js
-		if(strpos($id, './') === 0) {
-			return $this->find($id);
-		}
-		
-		//if there are spaces
-		if(strpos($id, ' ') !== false) {
-			return $this->find($id);
+		if($value !== false) {
+			return $value;
 		}
 		//END CUSTOM
 		
@@ -184,13 +182,14 @@ class Context extends \Mustache_Context
     public function findAnchoredDot($id)
     {
 		//CUSTOM
-		//if there are spaces
-		if(strpos($id, ' ') !== false) {
-			return $this->find($id);
+		$value = $this->findVariants($id);
+		
+		if($value !== false) {
+			return $value;
 		}
 		//END CUSTOM
 		
-        $chunks = explode('.', $id);
+		$chunks = explode('.', $id);
         $first  = array_shift($chunks);
         if ($first !== '') {
             throw new Exception(sprintf('Unexpected id for findAnchoredDot: %s', $id));
@@ -208,6 +207,168 @@ class Context extends \Mustache_Context
 
         return $value;
     }
+	
+	/**
+	 * Finds only exclusive to literal values
+	 * as opposed to helpers
+	 *
+	 * @param string $id    the varaiable name
+	 * @param array  $stack the prescribed stack
+	 * 
+	 * @return string
+	 */
+	public function findLiteral($id, array $stack = null)
+	{
+		if(is_null($stack)) {
+			$stack = $this->stack;
+		}
+		
+		//if it starts with a ./
+		if(strpos($id, './') === 0) {
+			//we already understand it means get the literal value
+			$id = substr($id, 2);
+		}
+		
+		//we can safely use findVariableInStack because
+		//we are suggesting the stack as opposed to the
+		//original stack with helpers
+		$chunks = explode('.', $id);
+        $first  = array_shift($chunks);
+        $value  = $this->findVariableInStack($first, $stack, true);
+
+        foreach ($chunks as $chunk) {
+            if ($value === '') {
+                return $value;
+            }
+
+            $value = $this->findVariableInStack($chunk, array($value), true);
+        }
+
+        return $value;
+	}
+	
+	/**
+	 * Finds only exclusive to helpers
+	 * as opposed to literal values
+	 *
+	 * @param string $id    the varaiable name
+	 * @param array  $stack the prescribed stack
+	 * 
+	 * @return string
+	 */
+	public function findHelper($id, array $stack = null)
+	{
+		if(is_null($stack)) {
+			$stack = $this->stack;
+		}
+		
+		$end = strpos($id, ' ');
+		$method = $id;
+		if($end !== false) {
+			$method = substr($id, 0, $end);
+		}
+		
+		for ($i = count($stack) - 1; $i >= 0; $i--) {
+            $frame = &$stack[$i];
+			
+			if(!is_object($frame)) {
+				continue;
+			}
+			
+			if(method_exists($frame, $method)) {
+				return $frame->$id();
+			}
+			
+			if (isset($frame->$method)) {
+				return $frame->$id;
+			}
+        }
+		
+		return '';
+	}
+	
+	/**
+	 * Finds only exclusive to parents
+	 * then finds the literal value as opposed to helpers
+	 *
+	 * @param string $id    the varaiable name
+	 * @param array  $stack the prescribed stack
+	 * 
+	 * @return string
+	 */
+	public function findParent($id, array $stack = null)
+	{
+		if(is_null($stack)) {
+			$stack = $this->stack;
+		}
+		
+		//loop through the stack
+		for ($i = count($stack) - 1; $i >= 0; $i--) {
+            $frame = &$stack[$i];
+			
+			//if frame is array access and exists
+			if($frame instanceof \ArrayAccess && isset($frame[$id])) {
+				//we got it
+				return $frame[$id];
+			}
+			
+			//if frame is not an array
+			if (!is_array($frame)) {
+				//skip it
+				continue;
+			}
+			
+			//if it exists (yes even if it has a ../)
+			//this is usually the end of this method.
+			if (array_key_exists($id, $frame)) {
+				//we got it
+				return $frame[$id];
+			}
+			
+			//if it starts with a ../
+			if(strpos($id, '../') === 0) {
+				//remove it
+				$id = substr($id, 3);
+				//and keep traversing
+				continue;
+			}
+			
+			//if there's a .
+			if(strpos($id, '.') !== 0 && strpos($id, '.') !== false) {
+				//then we still got it
+				return $this->findLiteral($id, array($frame));
+			}
+			
+			//keep traversing
+        }
+		
+		//um we didn't find it :(
+		return '';
+	}
+	
+	public function findVariants($id)
+	{
+		//if there are spaces
+		if(strpos($id, ' ') !== false) {
+			return $this->findHelper($id);
+		}
+		
+		//if we are requesting for the parent
+		if(strpos($id, '../') === 0) {
+			return $this->findParent($id);
+		}
+		
+		//if literal value
+		//see {{./noop}} handlebars.js
+		if(strpos($id, './') === 0 
+			|| (strpos($id, '.') !== false
+			&& strpos($id, '.') !== 0)
+		) {
+			return $this->findLiteral($id);
+		}
+		
+		return false;
+	}
 
     /**
      * Find an argument in the block context stack.
@@ -237,41 +398,30 @@ class Context extends \Mustache_Context
      *
      * @return mixed Variable value, or '' if not found
      */
-    private function findVariableInStack($id, array $stack)
+    private function findVariableInStack($id, array $stack, $literal = false)
     {
 		//CUSTOM
 		//if id is [0]
 		if(preg_match('/^\[[^\]]+\]$/', $id)) {
 			$id = substr($id, 1, -1);
 		}
+		//END CUSTOM
 		
-		//CUSTOM
-		$inParent = strpos($id, '../') === 0;
-		//see {{./noop}} handlebars.js
-		$literally = strpos($id, './') === 0;
-		
-		if($literally) {
-			$id = substr($id, 2);
-		}
-		
-		//The original Mustache.php findVariableInStack traverses upwards to
-		//find the variable if it's not found in the current level
-		//this has undesired results when doing ../ though it is nice, it's not
-		//really how Handlebars works. 
         for ($i = count($stack) - 1; $i >= 0; $i--) {
             $frame = &$stack[$i];
-			
-			switch (gettype($frame)) {
+
+            switch (gettype($frame)) {
                 case 'object':
-					//CUSTOM: if we are requesting for the parent
-					//or it literally
-					if($inParent || $literally) {
-						//it's not asking for a context evaluation
-						break;		
+					//if looking for the literal value
+					if($literal) {
+						if ($frame instanceof \ArrayAccess && isset($frame[$id])) {
+                            return $frame[$id];
+                        }
+						
+						break;
 					}
-					//END CUSTOM
-					
-                    if (!($frame instanceof Closure)) {
+                    
+					if (!($frame instanceof Closure)) {
                         // Note that is_callable() *will not work here*
                         // See https://github.com/bobthecow/mustache.php/wiki/Magic-Methods
                         if (method_exists($frame, $id)) {
@@ -281,7 +431,7 @@ class Context extends \Mustache_Context
                         if (isset($frame->$id)) {
                             return $frame->$id;
                         }
-						
+
                         if ($frame instanceof \ArrayAccess && isset($frame[$id])) {
                             return $frame[$id];
                         }
@@ -289,17 +439,6 @@ class Context extends \Mustache_Context
                     break;
 
                 case 'array':
-					//START CUSTOM: if we are requesting for the parent
-					if(strpos($id, '../') === 0) {
-						$id = substr($id, 3);
-						break;
-					}
-					
-					if($inParent && !array_key_exists($id, $frame)) {
-						return '';
-					}
-					//END CUSTOM
-					
                     if (array_key_exists($id, $frame)) {
                         return $frame[$id];
                     }
@@ -311,6 +450,24 @@ class Context extends \Mustache_Context
 		//if is a number
 		if(is_numeric($id)) {
 			return (float) $id;
+		}
+		
+		//length is used in JS and is  
+		//put here for compatibility
+		if($id === 'length' && isset($stack[0])) {
+			if(is_array($stack[0])) {
+				return count($stack[0]);
+			}
+			
+			if(is_string($stack[0])) {
+				return strlen($stack[0]);
+			}
+			
+			if(is_numeric($stack[0])) {
+				return (float) $stack[0];
+			}
+			
+			return 0;
 		}
 		//END CUSTOM
 		

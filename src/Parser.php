@@ -198,7 +198,7 @@ class Parser extends \Mustache_Parser
 			
             throw new Exception($msg);
         }
-
+		
         return $nodes;
     }
 

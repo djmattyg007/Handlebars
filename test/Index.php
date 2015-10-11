@@ -38,6 +38,13 @@ class EdenHandlebarsIndexTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue(is_array($helpers));
 	}
 	
+	public function testGetLambdaHelper()
+	{
+		$lambda = eden('handlebars')->getLambdaHelper();
+		
+		$this->assertInstanceOf('Mustache_LambdaHelper', $lambda);
+	}
+	
 	public function testGetOptions()
 	{
 		$options = eden('handlebars')->getOptions();
@@ -75,10 +82,17 @@ class EdenHandlebarsIndexTest extends PHPUnit_Framework_TestCase
 	
 	public function testParseArguments()
 	{
+		//basic
+		$args = eden('handlebars')->parseArguments("'merchant' query.profile_type");
+		
+		$this->assertCount(2, $args[0]);
+		
+		//advanced
 		$args = eden('handlebars')->parseArguments(
 			'4bar4 4.5 \'some"thi " ng\' 4 "some\'thi \' ng" '
 			.'dog=false cat="meow" mouse=\'squeak squeak\'');
 		
+		$this->assertCount(5, $args[0]);
 		$this->assertEquals('', $args[0][0]);
 		$this->assertEquals(4.5, $args[0][1]);
 		$this->assertEquals('some"thi " ng', $args[0][2]);

@@ -9,6 +9,8 @@
 
 namespace Eden\Handlebars;
 
+use Mustache_Tokenizer as Token;
+
 /**
  * Welcome to Eden\Handlebars!
  * 
@@ -26,6 +28,7 @@ class Index extends Base
 	protected $template = null;
 	protected $partials = array();
 	protected $helpers = array();
+	protected $modifiedHelpers = array();
 	
 	/**
 	 * Returns a callback that binds the data with the template
@@ -103,9 +106,29 @@ class Index extends Base
 	 *
 	 * @return array
 	 */
-	public function getHelpers()
+	public function getHelpers($modified = false)
 	{
+		if($modified) {
+			return $this->modifiedHelpers;
+		}
+		
 		return $this->helpers;
+	}
+	
+	/**
+	 * Factory for Mustache_LambdaHelper
+	 *
+	 * @return array
+	 */
+	public function getLambdaHelper()
+	{
+		//we need the engine
+		$engine = $this->getEngine();
+		
+		//we need the existing context
+		$context = $this->getContext();
+		
+		return new \Mustache_LambdaHelper($engine, $context);
 	}
 	
 	/**
@@ -128,8 +151,9 @@ class Index extends Base
 	) {
 		$sourceSuccess = $source;
 		$sourceFail = '';
+		
 		if(strpos($source, '{{else}}') !== false) {
-			list($sourceSuccess, $sourceFail) = explode('{{else}}', $source, 2);
+			list($sourceSuccess, $sourceFail) = $this->getSourceStates($source);
 		}
 		
 		if(!$helper) {
@@ -227,6 +251,60 @@ class Index extends Base
 	}
 	
 	/**
+     * Helper method for recursively building a parse tree.
+     *
+     * @param array $tokens Stream of tokens
+     *
+     * @return array 
+     */
+    private function getSourceStates($source)
+    {
+		//these are buffers
+		//just append to them
+		$success = '';
+		$fail = '';
+		
+		//find global else (!inside of a block) vs
+		//ignore #any <thing> {{else}} /any
+		//preg match is impossible for this FYI
+		//tokenize the source
+		$tokens = $this->getEngine()->getTokenizer()->scan($source);
+		
+		//and walk the dog
+		$open = 0;
+		$found = false;
+		foreach($tokens as $token) {
+			//the open and close hat trick
+			if($token[Token::TYPE] === Token::T_SECTION) {
+				$open ++;
+			} else if($token[Token::TYPE] === Token::T_END_SECTION) {
+				$open --;
+			}
+			
+			//if we already found it
+			if($found) {
+				$fail .= $this->detokenize($token);
+				continue;
+			}
+			
+			//if it's the else we've been
+			//possibly searching for..
+			if(isset($token[Token::NAME]) 
+				&& $token[Token::NAME] === 'else'
+				&& !$open
+			) {
+				//yay, lets now get the else part
+				$found = true;
+				continue;
+			}
+			
+			$success .= $this->detokenize($token);
+		}
+
+        return array($success, $fail);
+    }
+	
+	/**
 	 * Mustache will give arguments in a string
 	 * This will transform them into a legit argument
 	 * array
@@ -271,6 +349,11 @@ class Index extends Base
 			
 			//it's a variable name
 			//lets find it in the context
+			if(strpos($arg, '.')) {
+				$args[] = $this->getContext()->findDot($arg);
+				continue;
+			}
+			
 			$args[] = $this->getContext()->find($arg);
 		}
 		
@@ -311,7 +394,8 @@ class Index extends Base
 			return call_user_func_array($bound, $args);
 		};
 		
-		$this->helpers[$name] = $callback;
+		$this->helpers[$name] = $helper;
+		$this->modifiedHelpers[$name] = $callback;
 		
 		//get engine add helper wrapper
 		$this->getEngine()->addHelper($name, $callback);
@@ -481,8 +565,52 @@ class Index extends Base
 	 */
 	protected function trimBars($string)
 	{
+		$string = preg_replace('#\s*\{\{\{\~\s*#is', '{{{', $string);
+		$string = preg_replace('#\s*\~\}\}\}\s*#is', '}}}', $string);
 		$string = preg_replace('#\s*\{\{\~\s*#is', '{{', $string);
 		$string = preg_replace('#\s*\~\}\}\s*#is', '}}', $string);
 		return $string;
+	}
+	
+	/**
+	 * Turns a token back to a string
+	 *
+	 * @param array $token
+	 *
+	 * @return string
+	 */
+	protected function detokenize($token)
+	{
+		if(isset($token[Token::VALUE])) {
+			return $token[Token::VALUE];
+		}
+		
+		switch($token[Token::TYPE]) {
+			case Token::T_UNESCAPED:    //= '{';
+				return '{'
+					. $token[Token::OTAG]
+					. $token[Token::NAME]
+					. $token[Token::CTAG].'}';
+			case Token::T_ESCAPED:      //= '_v';
+				return  $token[Token::OTAG]
+					. $token[Token::NAME]
+					. $token[Token::CTAG];
+			case Token::T_END_SECTION:  //= '/';
+			case Token::T_SECTION:      //= '#';
+			case Token::T_INVERTED:     //= '^';
+			case Token::T_COMMENT:      //= '!';
+			case Token::T_PARTIAL:      //= '>';
+			case Token::T_PARENT:       //= '<';
+			case Token::T_DELIM_CHANGE: //= '=';
+			case Token::T_UNESCAPED_2:  //= '&';
+			case Token::T_PRAGMA:       //= '%';
+			case Token::T_BLOCK_VAR:    //= '$';
+			case Token::T_BLOCK_ARG:    //= '$arg';
+			default:
+				return $token[Token::OTAG]
+					. $token[Token::TYPE]
+					. $token[Token::NAME]
+					. $token[Token::CTAG];
+		}
 	}
 }
