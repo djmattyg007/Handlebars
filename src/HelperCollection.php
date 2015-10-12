@@ -1,29 +1,30 @@
 <?php
-/*
- * This file is part of the System package of the Eden PHP Library.
- * (c) 2013-2014 Openovate Labs
+/**
+ * This file is part of the Eden package.
+ * (c) 2014-2016 Openovate Labs
  *
- * Copyright and license information can be found at LICENSE
+ * Copyright and license information can be found at LICENSE.txt
  * distributed with this package.
  */
 
 namespace Eden\Handlebars;
 
 /**
- * The HelperCollection has that nasty private $helpers 
- * property that can't be inherited. Mostly all is the 
- * same as Mustache_HelperCollection. I just needed to 
+ * The HelperCollection has that nasty private $helpers
+ * property that can't be inherited. Mostly all is the
+ * same as Mustache_HelperCollection. I just needed to
  * customize the get and has methods
  *
- * @vendor Eden
- * @package Handlebars
- * @author Christian Blanquera cblanquera@openovate.com
+ * @vendor   Eden
+ * @package  Handlebars
+ * @author   Christian Blanquera <cblanquera@openovate.com>
+ * @standard PSR-2
  */
 class HelperCollection extends \Mustache_HelperCollection
 {
     private $helpers = array();
-	protected $handlebars = null;
-	
+    protected $handlebars = null;
+    
     /**
      * Helper Collection constructor.
      *
@@ -35,13 +36,13 @@ class HelperCollection extends \Mustache_HelperCollection
      */
     public function __construct($helpers = null, $handlebars = null)
     {
-		//CUSTOM
-		$this->handlebars = $handlebars;
-		//CUSTOM END
-		
+        //CUSTOM
+        $this->handlebars = $handlebars;
+        //CUSTOM END
+        
         parent::__construct($helpers);
     }
-	
+    
     /**
      * Add a helper to this collection.
      *
@@ -65,51 +66,51 @@ class HelperCollection extends \Mustache_HelperCollection
     public function get($name)
     {
         if (!$this->has($name)) {
-			throw new Exception($name);
+            throw new Exception($name);
         }
-		
-		//CUSTOM
-		//if the name is a key
-		if(isset($this->helpers[$name])) {
-			//if it's handlebars
-			if($this->handlebars) {
-				//get the engine helpers
-				$helpers = $this->handlebars->getHelpers();
-				
-				//if this is a handlebars helper
-				if(isset($helpers[$name])) {
-					//make it so it works with handlebars
-					$helper = $this->helpers[$name];
-				
-					return function($source = null, $lambda = null) use ($helper) {
-						return $helper('', $source, $lambda);
-					};
-				}
-			}
-			
-			//because it could be a mustache helper
-			return $this->helpers[$name];
-		}
-		
-		//the same logic for has
-		$start = strpos($name, ' ');
-		
-		//if there is no spaces
-		//or the name is not a key
-		if($start === false
-			|| !isset($this->helpers[substr($name, 0, $start)])
-		) {
-			//uhh... something went wrong
-			throw new Exception($name);
-		}
-	
+        
+        //CUSTOM
+        //if the name is a key
+        if (isset($this->helpers[$name])) {
+            //if it's handlebars
+            if ($this->handlebars) {
+                //get the engine helpers
+                $helpers = $this->handlebars->getHelpers();
+                
+                //if this is a handlebars helper
+                if (isset($helpers[$name])) {
+                    //make it so it works with handlebars
+                    $helper = $this->helpers[$name];
+                
+                    return function ($source = null, $lambda = null) use ($helper) {
+                        return $helper('', $source, $lambda);
+                    };
+                }
+            }
+            
+            //because it could be a mustache helper
+            return $this->helpers[$name];
+        }
+        
+        //the same logic for has
+        $start = strpos($name, ' ');
+        
+        //if there is no spaces
+        //or the name is not a key
+        if ($start === false
+            || !isset($this->helpers[substr($name, 0, $start)])
+        ) {
+            //uhh... something went wrong
+            throw new Exception($name);
+        }
+    
         $helper = $this->helpers[substr($name, 0, $start)];
-		$argString = substr($name, $start + 1);
-		
-		return function($source = null, $lambda = null) use ($helper, $argString) {
-			return $helper($argString, $source, $lambda);
-		};
-		//END CUSTOM
+        $argString = substr($name, $start + 1);
+        
+        return function ($source = null, $lambda = null) use ($helper, $argString) {
+            return $helper($argString, $source, $lambda);
+        };
+        //END CUSTOM
     }
 
     /**
@@ -121,24 +122,24 @@ class HelperCollection extends \Mustache_HelperCollection
      */
     public function has($name)
     {
-		//CUSTOM
-		$start = strpos($name, ' ');
-		$first = $name;
-		
-		//if there is no spaces
-		if($start !== false) {
-			$first = substr($name, 0, $start);
-		}
-		
-		if(!array_key_exists($first, $this->helpers) 
-			&& $this->handlebars instanceof Index
-		) {
-			//some eden sugar
-			$this->handlebars->trigger('handlebars-unknown', $first, substr($name, $start + 1));
-		}
-		//END CUSTOM
-		
-		return array_key_exists($first, $this->helpers);
+        //CUSTOM
+        $start = strpos($name, ' ');
+        $first = $name;
+        
+        //if there is no spaces
+        if ($start !== false) {
+            $first = substr($name, 0, $start);
+        }
+        
+        if (!array_key_exists($first, $this->helpers)
+            && $this->handlebars instanceof Index
+        ) {
+            //some eden sugar
+            $this->handlebars->trigger('handlebars-unknown', $first, substr($name, $start + 1));
+        }
+        //END CUSTOM
+        
+        return array_key_exists($first, $this->helpers);
     }
 
     /**

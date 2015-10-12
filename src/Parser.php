@@ -1,9 +1,9 @@
 <?php //-->
-/*
- * This file is part of the System package of the Eden PHP Library.
- * (c) 2013-2014 Openovate Labs
+/**
+ * This file is part of the Eden package.
+ * (c) 2014-2016 Openovate Labs
  *
- * Copyright and license information can be found at LICENSE
+ * Copyright and license information can be found at LICENSE.txt
  * distributed with this package.
  */
 
@@ -15,20 +15,21 @@ use Mustache_Tokenizer as Tokenizer;
  * Yes I did copy the Mustache_Parser class just for line 126
  * there was no other way to do this...
  *
- * @vendor Eden
- * @package Handlebars
- * @author Christian Blanquera cblanquera@openovate.com
+ * @vendor   Eden
+ * @package  Handlebars
+ * @author   Christian Blanquera <cblanquera@openovate.com>
+ * @standard PSR-2
  */
 class Parser extends \Mustache_Parser
 {
-	private $lineNum;
+    private $lineNum;
     private $lineTokens;
     private $pragmas;
     private $defaultPragmas = array();
 
     private $pragmaFilters;
     private $pragmaBlocks;
-	
+    
     /**
      * Process an array of Mustache tokens and convert them into a parse tree.
      *
@@ -47,8 +48,8 @@ class Parser extends \Mustache_Parser
 
         return $this->buildTree($tokens);
     }
-	
-	/**
+    
+    /**
      * Enable pragmas across all templates, regardless of the presence of pragma
      * tags in the individual templates.
      *
@@ -117,23 +118,23 @@ class Parser extends \Mustache_Parser
                             $token[Tokenizer::NAME],
                             $token[Tokenizer::LINE]
                         );
-						
+                        
                         throw new Exception($msg);
                     }
 
                     if ($token[Tokenizer::NAME] !== $parent[Tokenizer::NAME]
-						//This is the only thing I needed. This is why people need
-						//to strategize better when declaring things private ....
-						&& strpos($parent[Tokenizer::NAME], $token[Tokenizer::NAME]) !== 0
-					) {
-						$msg = sprintf(
+                        //This is the only thing I needed. This is why people need
+                        //to strategize better when declaring things private ....
+                        && strpos($parent[Tokenizer::NAME], $token[Tokenizer::NAME]) !== 0
+                    ) {
+                        $msg = sprintf(
                             'Nesting error: %s (on line %d) vs. %s (on line %d)',
                             $parent[Tokenizer::NAME],
                             $parent[Tokenizer::LINE],
                             $token[Tokenizer::NAME],
                             $token[Tokenizer::LINE]
                         );
-						
+                        
                         throw new Exception($msg);
                     }
 
@@ -195,10 +196,10 @@ class Parser extends \Mustache_Parser
                 $parent[Tokenizer::NAME],
                 $parent[Tokenizer::LINE]
             );
-			
+            
             throw new Exception($msg);
         }
-		
+        
         return $nodes;
     }
 
