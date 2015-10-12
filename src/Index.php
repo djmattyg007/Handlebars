@@ -1,9 +1,9 @@
 <?php //-->
-/*
- * This file is part of the Template package of the Eden PHP Library.
- * (c) 2013-2014 Openovate Labs
+/**
+ * This file is part of the Eden package.
+ * (c) 2014-2016 Openovate Labs
  *
- * Copyright and license information can be found at LICENSE
+ * Copyright and license information can be found at LICENSE.txt
  * distributed with this package.
  */
 
@@ -135,11 +135,11 @@ class Index extends Base
     /**
      * Generates options used for helpers and partials
      *
-     * @param string $source the template block
-     * @param function|null $helper the raw helper handler
-     * @param Mustache_LambdaHelper|null $lambda the lambda helper renderer
-     * @param string $argString the raw argument string
-     * @param array $hash any key/value to pass along
+     * @param string                     $source    The template block
+     * @param function|null              $helper    The raw helper handler
+     * @param Mustache_LambdaHelper|null $lambda    The lambda helper renderer
+     * @param string                     $argString The raw argument string
+     * @param array                      $hash      Any key/value to pass along
      *
      * @return array
      */
@@ -253,9 +253,9 @@ class Index extends Base
     }
     
     /**
-     * Helper method for recursively building a parse tree.
+     * Helper method for spliting a template with an else
      *
-     * @param array $tokens Stream of tokens
+     * @param string $source Template string
      *
      * @return array
      */
@@ -444,7 +444,7 @@ class Index extends Base
     /**
      * You may set the entire engine if you wish
      *
-     * @param Eden\Handlebars\Engine $context The prescribed engine
+     * @param Eden\Handlebars\Engine $engine The prescribed engine
      *
      * @return Eden\Handlebrs\Index
      */
