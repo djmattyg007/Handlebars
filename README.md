@@ -1,5 +1,7 @@
 ![logo](http://eden.openovate.com/assets/images/cloud-social.png) Eden Handlebars
 ====
+[![Build Status](https://api.travis-ci.org/Eden-PHP/Handlebars.png)](https://travis-ci.org/Eden-PHP/Handlebars)
+====
 
 - [Install](#install)
 - [Introduction](#intro)

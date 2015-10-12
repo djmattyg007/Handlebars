@@ -1,9 +1,9 @@
 <?php
-/*
- * This file is part of the System package of the Eden PHP Library.
- * (c) 2013-2014 Openovate Labs
+/**
+ * This file is part of the Eden package.
+ * (c) 2014-2016 Openovate Labs
  *
- * Copyright and license information can be found at LICENSE
+ * Copyright and license information can be found at LICENSE.txt
  * distributed with this package.
  */
 
@@ -13,9 +13,10 @@ namespace Eden\Handlebars;
  * I need to hijack the cache method to replace the static
  * declaration of Mustache_Template to my custom Template
  *
- * @vendor Eden
- * @package Handlebars
- * @author Christian Blanquera cblanquera@openovate.com
+ * @vendor   Eden
+ * @package  Handlebars
+ * @author   Christian Blanquera <cblanquera@openovate.com>
+ * @standard PSR-2
  */
 class NoopCache extends \Mustache_Cache_NoopCache
 {
@@ -27,13 +28,14 @@ class NoopCache extends \Mustache_Cache_NoopCache
      */
     public function cache($key, $value)
     {
-		//CUSTOM
-		$value = str_replace(
-			'extends Mustache_Template', 
-			'extends \\Eden\\Handlebars\\Template', 
-			$value);
-		//END CUSTOM
-		
-		parent::cache($key, $value);
+        //CUSTOM
+        $value = str_replace(
+            'extends Mustache_Template',
+            'extends \\Eden\\Handlebars\\Template',
+            $value
+        );
+        //END CUSTOM
+
+        parent::cache($key, $value);
     }
 }

@@ -11,6 +11,7 @@ class EdenHandlebarsfunctionalTest extends PHPUnit_Framework_TestCase
 	//functional tests
 	public function testLiterally()
 	{
+		//helper vs property
 		$template = eden('handlebars')
 			->registerHelper('zoo', function($float) {
 				return $float + 1;
@@ -19,6 +20,16 @@ class EdenHandlebarsfunctionalTest extends PHPUnit_Framework_TestCase
 		
 		$results = $template(array('zoo' => 'foobar'));
 		$this->assertEquals('5.5 foobar', $results); 
+		
+		//helper vs property rd2
+		$template = eden('handlebars')
+			->registerHelper('query', function($keyword) {
+				return 'foobar';
+			})
+			->compile('{{query \'keyword\'}} {{query.keyword}}');
+		
+		$results = $template(array('query' => array('keyword' => 'foobar')));
+		$this->assertEquals('foobar foobar', $results); 
 	}
 	
 	public function testTrim()
@@ -77,5 +88,14 @@ class EdenHandlebarsfunctionalTest extends PHPUnit_Framework_TestCase
 		$results = $template();
 		
 		$this->assertEquals(5, $results);
+	}
+	
+	public function testLength()
+	{
+		$template = eden('handlebars')->compile('{{foo.length}}');
+		
+		$results = $template(array('foo' => array(1, 2, 3)));
+		
+		$this->assertEquals(3, $results); 
 	}
 }

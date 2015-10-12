@@ -187,6 +187,13 @@ class EdenHandlebarshelpersTest extends PHPUnit_Framework_TestCase
 			'NO'
 		);
 		
+		//nested if
+		$case3 = array(
+			'{{#if foo}}{{#if bar}}{{foo}} {{bar}}{{/if}}{{foo}}{{/if}}',
+			array('foo' => 'bar', 'bar' => 'foo'),
+			'bar foobar'
+		);
+		
 		$template = eden('handlebars')->compile($case1[0]);
 		$results = $template($case1[1]);
 		$this->assertEquals($case1[2], $results); 
@@ -194,6 +201,10 @@ class EdenHandlebarshelpersTest extends PHPUnit_Framework_TestCase
 		$template = eden('handlebars')->compile($case2[0]);
 		$results = $template($case2[1]);
 		$this->assertEquals($case2[2], $results); 
+		
+		$template = eden('handlebars')->compile($case3[0]);
+		$results = $template($case3[1]);
+		$this->assertEquals($case3[2], $results); 
 	}
 	
 	public function testUnless()
@@ -233,5 +244,41 @@ class EdenHandlebarshelpersTest extends PHPUnit_Framework_TestCase
 		$template = eden('handlebars')->compile($case1[0]);
 		$results = $template($case1[1]);
 		$this->assertEquals($case1[2], $results); 
+	}
+	
+	public function testCombinations()
+	{
+		$contents = '{{#if merchants.length~}}
+			{{{query.profile_id~}}}
+			{{#each merchants~}}
+				{{profile_name~}}
+				{{#if ../query.profile_id.length~}}
+					Yes1
+				{{~else~}}
+					{{#if ../query.profile_name.length~}}
+						{{!-- This Works --~}}
+						Yes2
+					{{~else~}}
+						NO2
+						{{~query.profile_id~}}
+					{{/if~}}
+				{{/if~}}
+			{{/each~}}
+		{{else~}}
+		NO1
+		{{~/if}}';
+				
+		$template = eden('handlebars')->compile($contents);
+		$results = $template(array(
+			'merchants' => array(
+				array('profile_name' => 'John'),
+				array('profile_name' => 'Jane'),
+				array('profile_name' => 'Jill')
+			),
+			'query' => array('profile_id' => '123', 'profile_name' => 'John')
+		));
+		
+		$this->assertEquals('123JohnYes1JaneYes1JillYes1', $results); 
+		
 	}
 }

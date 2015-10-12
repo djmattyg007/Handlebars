@@ -13,7 +13,7 @@
     ],
     "require": {
         "php": ">=5.4.1",
-		"eden/core": "4.x-dev",
+		"eden/core": "4.*",
 		"mustache/mustache": "dev-master"
     },
     "autoload": {

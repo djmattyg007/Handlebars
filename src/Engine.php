@@ -1,9 +1,9 @@
 <?php
-/*
- * This file is part of the System package of the Eden PHP Library.
- * (c) 2013-2014 Openovate Labs
+/**
+ * This file is part of the Eden package.
+ * (c) 2014-2016 Openovate Labs
  *
- * Copyright and license information can be found at LICENSE
+ * Copyright and license information can be found at LICENSE.txt
  * distributed with this package.
  */
 
@@ -13,22 +13,23 @@ namespace Eden\Handlebars;
  * Again, The engine is riddled with private methods
  * and properties that can't be inherited. Not that bad here
  * however. I just needed to mod the helpers to use my extended
- * helper collection class and cache to replace the compiled 
+ * helper collection class and cache to replace the compiled
  * code to extend my extended abstract template
  *
- * @vendor Eden
- * @package Handlebars
- * @author Christian Blanquera cblanquera@openovate.com
+ * @vendor   Eden
+ * @package  Handlebars
+ * @author   Christian Blanquera <cblanquera@openovate.com>
+ * @standard PSR-2
  */
 class Engine extends \Mustache_Engine
 {
-	protected $handlebars;
-	
+    protected $handlebars;
+    
     private $helpers;
-	private $cache;
-	private $lambdaCache;
-	
-	/**
+    private $cache;
+    private $lambdaCache;
+    
+    /**
      * Mustache class constructor.
      *
      * Passing an $options array allows overriding certain Mustache options during instantiation:
@@ -100,10 +101,10 @@ class Engine extends \Mustache_Engine
      */
     public function __construct(array $options = array(), $handlebars = null)
     {
-		$this->handlebars = $handlebars;
+        $this->handlebars = $handlebars;
         parent::__construct($options);
     }
-	
+    
     /**
      * Set an array of Mustache helpers.
      *
@@ -117,10 +118,10 @@ class Engine extends \Mustache_Engine
      */
     public function setHelpers($helpers)
     {
-		if($helpers instanceof \Mustache_HelperCollection) {
-			$this->helpers = $helpers;
-			return $helpers;
-		} else if (!is_array($helpers) && !$helpers instanceof Traversable) {
+        if ($helpers instanceof \Mustache_HelperCollection) {
+            $this->helpers = $helpers;
+            return $helpers;
+        } else if (!is_array($helpers) && !$helpers instanceof Traversable) {
             throw new Exception('setHelpers expects an array of helpers');
         }
 
@@ -129,10 +130,10 @@ class Engine extends \Mustache_Engine
         foreach ($helpers as $name => $helper) {
             $this->addHelper($name, $helper);
         }
-		
-		return $helpers;
-	}
-	
+        
+        return $helpers;
+    }
+    
     /**
      * Get the current set of Mustache helpers.
      *
@@ -158,7 +159,7 @@ class Engine extends \Mustache_Engine
      * @param mixed  $helper
      */
     public function addHelper($name, $helper)
-    {	
+    {
         $this->getHelpers()->add($name, $helper);
     }
 
@@ -172,13 +173,13 @@ class Engine extends \Mustache_Engine
     public function getCache()
     {
         if (!isset($this->cache)) {
-			$this->cache = new NoopCache();
+            $this->cache = new NoopCache();
             $this->setCache($this->cache);
         }
 
         return $this->cache;
     }
-	
+    
     /**
      * Get the current Lambda Cache instance.
      *
@@ -196,8 +197,8 @@ class Engine extends \Mustache_Engine
 
         return $this->lambdaCache;
     }
-	
-	
+    
+    
 
     /**
      * Load a Mustache partial Template by name.
@@ -211,71 +212,71 @@ class Engine extends \Mustache_Engine
      */
     public function loadPartial($name)
     {
-		if(!$this->handlebars) {
-			return parent::loadPartial($name);
-		}
-		
-		//the partial list from handlebars
-		$partials = $this->handlebars->getPartials();
-		
-		$partial = $name;
-		//if there's a space, it means they are trying to 
-		//pass a scope into the partial. We need a different
-		//way to do this
-		if(strpos($name, ' ') !== false) {
-			list($partial, $scope) = explode(' ', $name, 2);
-			
-			//get the scope by evaluating
-			list($args, $hash) = $this->handlebars->parseArguments($scope);
-			
-			//if there are no arguments
-			if(empty($args)) {
-				//args 0 will be the scope
-				$args[] = array();
-			}
-			
-			//merge the hash with the scope
-			$args[0] = array_merge($args[0], $hash);
-		//if there are no arguments, but the partial is 
-		//a callback, we still need another way to do this
-		} else if(isset($partials[$name])
-			&& is_callable($partials[$name])
-		) {
-			$args = array();
-		}
-		
-		//if there are arguments, it must have
-		//come from the above if statements
-		if(isset($partials[$partial]) && isset($args)) {
-			//assume that the partial is callable
-			$source = '';
-			$helper = $partials[$partial];
-			
-			//but if the partial is a string
-			if(is_string($partials[$partial])) {
-				//the source is the partial
-				$source = $partials[$partial];
-				//create the helper
-				$helper = function($scope, $options) use ($source) {
-					$args = func_get_args();
-					$options = array_pop($args);
-					
-					return $options['fn']($scope);
-				};
-			}
-			
-			//use a helper to resolve the case
-			
-			//add in the options
-			$args[] = $this->handlebars->getOptions($source, $helper);
-			
-			//bind the context
-			return new Partial($this, $helper, $args);
-		}
-		
-		return parent::loadPartial($partial);
+        if (!$this->handlebars) {
+            return parent::loadPartial($name);
+        }
+        
+        //the partial list from handlebars
+        $partials = $this->handlebars->getPartials();
+        
+        $partial = $name;
+        //if there's a space, it means they are trying to
+        //pass a scope into the partial. We need a different
+        //way to do this
+        if (strpos($name, ' ') !== false) {
+            list($partial, $scope) = explode(' ', $name, 2);
+            
+            //get the scope by evaluating
+            list($args, $hash) = $this->handlebars->parseArguments($scope);
+            
+            //if there are no arguments
+            if (empty($args)) {
+                //args 0 will be the scope
+                $args[] = array();
+            }
+            
+            //merge the hash with the scope
+            $args[0] = array_merge($args[0], $hash);
+        //if there are no arguments, but the partial is
+        //a callback, we still need another way to do this
+        } else if (isset($partials[$name])
+            && is_callable($partials[$name])
+        ) {
+            $args = array();
+        }
+        
+        //if there are arguments, it must have
+        //come from the above if statements
+        if (isset($partials[$partial]) && isset($args)) {
+            //assume that the partial is callable
+            $source = '';
+            $helper = $partials[$partial];
+            
+            //but if the partial is a string
+            if (is_string($partials[$partial])) {
+                //the source is the partial
+                $source = $partials[$partial];
+                //create the helper
+                $helper = function ($scope, $options) use ($source) {
+                    $args = func_get_args();
+                    $options = array_pop($args);
+                    
+                    return $options['fn']($scope);
+                };
+            }
+            
+            //use a helper to resolve the case
+            
+            //add in the options
+            $args[] = $this->handlebars->getOptions($source, $helper);
+            
+            //bind the context
+            return new Partial($this, $helper, $args);
+        }
+        
+        return parent::loadPartial($partial);
     }
-	
+    
     /**
      * Set the Mustache Cache instance.
      *
@@ -284,7 +285,7 @@ class Engine extends \Mustache_Engine
     public function setCache(\Mustache_Cache $cache)
     {
         $this->cache = $cache;
-    	
-		return $this;
-	}
+        
+        return $this;
+    }
 }
