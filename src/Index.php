@@ -186,10 +186,9 @@ class Index extends Base
                 $lambda,
                 $context
             ) {
-                //if what they gave us was the context back
-                if ($data === $context || is_null($data)) {
-                    //set it to the last in the stack
-                    $data = $context->last();
+                //if what they gave us was not the context back
+                if ($data !== $context && !is_null($data)) {
+                    $context->push($data);
                 }
                 
                 //if no source or lambda
@@ -197,11 +196,12 @@ class Index extends Base
                     return '';
                 }
                 
-                $context->push($data);
-                
                 $results = $lambda->render($sourceSuccess);
                 
-                $context->pop();
+                //we also need to pop
+                if ($data !== $context && !is_null($data)) {
+                    $context->pop();
+                }
                 
                 return $results;
             },
@@ -210,10 +210,9 @@ class Index extends Base
                 $lambda,
                 $context
             ) {
-                //if what they gave us was the context back
-                if ($data === $context || is_null($data)) {
-                    //set it to the last in the stack
-                    $data = $context->last();
+                //if what they gave us was not the context back
+                if ($data !== $context && !is_null($data)) {
+                    $context->push($data);
                 }
                 
                 //if no source or lambda
@@ -221,11 +220,12 @@ class Index extends Base
                     return '';
                 }
                 
-                $context->push($data);
-                
                 $results = $lambda->render($sourceFail);
                 
-                $context->pop();
+                //we also need to pop
+                if ($data !== $context && !is_null($data)) {
+                    $context->pop();
+                }
                 
                 return $results;
             }

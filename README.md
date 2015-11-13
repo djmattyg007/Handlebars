@@ -3,12 +3,29 @@
 [![Build Status](https://api.travis-ci.org/Eden-PHP/Handlebars.png)](https://travis-ci.org/Eden-PHP/Handlebars)
 ====
 
-- [Install](#install)
-- [Introduction](#intro)
-- [Usage](#usage)
-- [Features](#features)
-- [De-Features](#defeatures)
-- [Contributing](#contributing)
+ - [Install](#install)
+ - [Introduction](#intro)
+ - [Usage](#usage)
+ - [Features](#features)
+ - [De-Features](#defeatures)
+ - [API](#api)
+    - [compile](#compile)
+    - [getContext](#getContext)
+    - [getEngine](#getEngine)
+    - [getHelpers](#getHelpers)
+    - [getLambdaHelper](#getLambdaHelper)
+    - [getOptions](#getOptions)
+    - [getPartials](#getPartials)
+    - [getTemplate](#getTemplate)
+    - [parseArguments](#parseArguments)
+    - [registerHelper](#registerHelper)
+    - [registerPartial](#registerPartial)
+    - [setContext](#setContext)
+    - [setEngine](#setEngine)
+    - [setTemplate](#setTemplate)
+    - [unregisterHelper](#unregisterHelper)
+    - [unregisterPartial](#unregisterPartial)
+ - [Contributing](#contributing)
 
 ====
 
@@ -139,6 +156,377 @@ echo $template(array('foo' => 'BAR'));
  	 - TODO
 
 ====
+
+<a name="api"></a>
+## API
+
+==== 
+
+<a name="compile"></a>
+
+### compile
+
+Returns a callback that binds the data with the template 
+
+#### Usage
+
+```
+eden('handlebars')->compile(string $string);
+```
+
+#### Parameters
+
+ - `string $string` - the template string
+
+Returns `function` - the template binding handler
+
+#### Example
+
+```
+eden('handlebars')->compile();
+```
+
+==== 
+
+<a name="getContext"></a>
+
+### getContext
+
+Returns the current context 
+
+#### Usage
+
+```
+eden('handlebars')->getContext();
+```
+
+#### Parameters
+
+Returns `Eden\Handlebars\Context`
+
+==== 
+
+<a name="getEngine"></a>
+
+### getEngine
+
+Returns the current Mustache/Handlebars Engine 
+
+#### Usage
+
+```
+eden('handlebars')->getEngine();
+```
+
+#### Parameters
+
+Returns `Eden\Handlebars\Engine`
+
+==== 
+
+<a name="getHelpers"></a>
+
+### getHelpers
+
+Returns all the registered helpers 
+
+#### Usage
+
+```
+eden('handlebars')->getHelpers();
+```
+
+#### Parameters
+
+Returns `array`
+
+==== 
+
+<a name="getLambdaHelper"></a>
+
+### getLambdaHelper
+
+Factory for Mustache_LambdaHelper 
+
+#### Usage
+
+```
+eden('handlebars')->getLambdaHelper();
+```
+
+#### Parameters
+
+Returns `array`
+
+==== 
+
+<a name="getOptions"></a>
+
+### getOptions
+
+Generates options used for helpers and partials 
+
+#### Usage
+
+```
+eden('handlebars')->getOptions(string $source, function|null $helper, Mustache_LambdaHelper|null $lambda, string $argString, array $hash);
+```
+
+#### Parameters
+
+ - `string $source` - The template block
+ - `function|null $helper` - The raw helper handler
+ - `Mustache_LambdaHelper|null $lambda` - The lambda helper renderer
+ - `string $argString` - The raw argument string
+ - `array $hash` - Any key/value to pass along
+
+Returns `array`
+
+#### Example
+
+```
+eden('handlebars')->getOptions();
+```
+
+==== 
+
+<a name="getPartials"></a>
+
+### getPartials
+
+Returns all the registered partials 
+
+#### Usage
+
+```
+eden('handlebars')->getPartials();
+```
+
+#### Parameters
+
+Returns `array`
+
+==== 
+
+<a name="getTemplate"></a>
+
+### getTemplate
+
+Returns the initial string template 
+
+#### Usage
+
+```
+eden('handlebars')->getTemplate();
+```
+
+#### Parameters
+
+Returns `string`
+
+==== 
+
+<a name="parseArguments"></a>
+
+### parseArguments
+
+Mustache will give arguments in a string This will transform them into a legit argument array 
+
+#### Usage
+
+```
+eden('handlebars')->parseArguments();
+```
+
+#### Parameters
+
+Returns `array`
+
+==== 
+
+<a name="registerHelper"></a>
+
+### registerHelper
+
+The famous register helper matching the Handlebars API 
+
+#### Usage
+
+```
+eden('handlebars')->registerHelper(string $name, function $helper);
+```
+
+#### Parameters
+
+ - `string $name` - the name of the helper
+ - `function $helper` - the helper handler
+
+Returns `Eden\Handlebrs\Index`
+
+#### Example
+
+```
+eden('handlebars')->registerHelper();
+```
+
+==== 
+
+<a name="registerPartial"></a>
+
+### registerPartial
+
+Delays registering partials to the engine because there is no add partial method... 
+
+#### Usage
+
+```
+eden('handlebars')->registerPartial(string $name, string $partial);
+```
+
+#### Parameters
+
+ - `string $name` - the name of the helper
+ - `string $partial` - the helper handler
+
+Returns `Eden\Handlebrs\Index`
+
+#### Example
+
+```
+eden('handlebars')->registerPartial();
+```
+
+==== 
+
+<a name="setContext"></a>
+
+### setContext
+
+You may set the initial context if you wish 
+
+#### Usage
+
+```
+eden('handlebars')->setContext(array|Eden\Handlebars\Context $context);
+```
+
+#### Parameters
+
+ - `array|Eden\Handlebars\Context $context` - The prescribed context
+
+Returns `Eden\Handlebrs\Index`
+
+#### Example
+
+```
+eden('handlebars')->setContext();
+```
+
+==== 
+
+<a name="setEngine"></a>
+
+### setEngine
+
+You may set the entire engine if you wish 
+
+#### Usage
+
+```
+eden('handlebars')->setEngine(Eden\Handlebars\Engine $engine);
+```
+
+#### Parameters
+
+ - `Eden\Handlebars\Engine $engine` - The prescribed engine
+
+Returns `Eden\Handlebrs\Index`
+
+#### Example
+
+```
+eden('handlebars')->setEngine();
+```
+
+==== 
+
+<a name="setTemplate"></a>
+
+### setTemplate
+
+You may set the initial template if you wish 
+
+#### Usage
+
+```
+eden('handlebars')->setTemplate(string $template);
+```
+
+#### Parameters
+
+ - `string $template` - The prescribed tempalte
+
+Returns `Eden\Handlebrs\Index`
+
+#### Example
+
+```
+eden('handlebars')->setTemplate();
+```
+
+==== 
+
+<a name="unregisterHelper"></a>
+
+### unregisterHelper
+
+The opposite of registerHelper 
+
+#### Usage
+
+```
+eden('handlebars')->unregisterHelper(string $name);
+```
+
+#### Parameters
+
+ - `string $name` - the helper name
+
+Returns `Eden\Handlebars\Index`
+
+#### Example
+
+```
+eden('handlebars')->unregisterHelper();
+```
+
+==== 
+
+<a name="unregisterPartial"></a>
+
+### unregisterPartial
+
+The opposite of registerPartial 
+
+#### Usage
+
+```
+eden('handlebars')->unregisterPartial(string $name);
+```
+
+#### Parameters
+
+ - `string $name` - the partial name
+
+Returns `Eden\Handlebars\Index`
+
+#### Example
+
+```
+eden('handlebars')->unregisterPartial();
+```
+
+==== 
 
 <a name="contributing"></a>
 #Contributing to Eden
