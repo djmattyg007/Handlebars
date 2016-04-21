@@ -30,6 +30,7 @@ class Index extends Base
     protected $partials = array();
     protected $helpers = array();
     protected $modifiedHelpers = array();
+	protected $cache = null;
     
     /**
      * Returns a callback that binds the data with the template
@@ -96,7 +97,7 @@ class Index extends Base
     public function getEngine()
     {
         if (!$this->engine) {
-            $this->setEngine(new Engine(array(), $this));
+            $this->setEngine(new Engine(array('template_class_prefix' => '__Handlebars_'), $this));
         }
         
         return $this->engine;
@@ -420,6 +421,25 @@ class Index extends Base
         $this->partials[$name] = $partial;
         return $this;
     }
+	
+	/**
+	 * Enables the cache option
+	 *
+	 * @param *string The cache path
+	 * @return this
+	 */
+	public function setCache($path)
+	{
+		if(is_string($path) && file_exists($path)) {
+			$path = new FilesystemCache($path, null);
+		}
+		
+		if($path instanceof \Mustache_Cache) {
+			$this->getEngine()->setCache($path);
+		}
+		
+		return $this;
+	}
     
     /**
      * You may set the initial context if you wish
