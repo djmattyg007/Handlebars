@@ -8,6 +8,7 @@
  - [Usage](#usage)
  - [Features](#features)
  - [De-Features](#defeatures)
+ - [Production Ready](#production)
  - [API](#api)
     - [compile](#compile)
     - [getContext](#getContext)
@@ -33,6 +34,30 @@
 ## Install
 
 `composer install eden/handlebars`
+
+====
+
+## Enable Eden
+
+The following documentation uses `eden()` in its example reference. Enabling this function requires an extra step as descirbed in this section which is not required if you access this package using the following.
+
+```
+Eden\Handlebars\Index::i();
+```
+
+When using composer, there is not an easy way to access functions from packages. As a workaround, adding this constant in your code will allow `eden()` to be available after. 
+
+```
+Eden::DECORATOR;
+```
+
+For example:
+
+```
+Eden::DECORATOR;
+
+eden()->inspect('Hello World');
+```
 
 ====
 
@@ -154,6 +179,17 @@ echo $template(array('foo' => 'BAR'));
  	 - TODO
  - Frames
  	 - TODO
+
+====
+
+<a name="production"></a>
+## Production Ready
+
+When your templates are ready for a production (live) environment, it is recommended that caching be used. To enable cache:
+
+ - Create a cache folder and make sure permissions are properly set for handlebars to write files to it.
+ - Enable cache by using `eden('handlebars')->setCache(__DIR__.'/your/cache/folder/location');`
+ - If the folder location does not exist, caching will be disabled.
 
 ====
 
