@@ -19,7 +19,7 @@ namespace Eden\Handlebars;
  * @standard PSR-2
  */
 class FilesystemCache extends \Mustache_Cache_FilesystemCache
-{
+{ 
     /**
      * Loads the compiled Mustache Template class without caching.
      *
