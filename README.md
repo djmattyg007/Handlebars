@@ -11,19 +11,15 @@
  - [Production Ready](#production)
  - [API](#api)
     - [compile](#compile)
-    - [getContext](#getContext)
-    - [getEngine](#getEngine)
+    - [getCache](#getCache)
+    - [getHelper](#getHelper)
     - [getHelpers](#getHelpers)
-    - [getLambdaHelper](#getLambdaHelper)
-    - [getOptions](#getOptions)
+    - [getPartial](#getPartial)
     - [getPartials](#getPartials)
-    - [getTemplate](#getTemplate)
-    - [parseArguments](#parseArguments)
     - [registerHelper](#registerHelper)
     - [registerPartial](#registerPartial)
-    - [setContext](#setContext)
-    - [setEngine](#setEngine)
-    - [setTemplate](#setTemplate)
+    - [setPrefix](#setPrefix)
+    - [setCache](#getPartials)
     - [unregisterHelper](#unregisterHelper)
     - [unregisterPartial](#unregisterPartial)
  - [Contributing](#contributing)
@@ -64,38 +60,9 @@ eden()->inspect('Hello World');
 <a name="intro"></a>
 ## Introduction
 
-We formerly used Xamin/Handlebars, however after a few projects, attempting to contribute some fixes 
-and the greater need for handlebars.js intermediate features to work, we decided to completely reinvent 
-Handlebars for PHP. Upon looking at other possible libraries and their respective implementation, 
-we did not agree completely with the underlying design. Most try to copy the files Mustache.php and 
-use that as a base or trying to build handlebars completely from scratch. Even Mustache.php is not 
-without its design flaws. Our approach is to extend the existing library of Mustache.php adding in 
-only the things we need to turn mustache into handlebars matching the exact API of both handlebars.js
-and mustache.js alike. The result is less files to maintain as our own code is just for handlebars.
-
-Because of the mentioned design flaws of Mustache.php there were a few classes that needed to be 
-copied to our library and slightly customized in which they have the changes documented appropriately.
-
- - Mustache_Context to Context.php
-     - findVariableInStack() - add in cases for helpers and arguments
-	 - findAnchoredDot() - add in cases for helper arguments
-	 - findDot() - add in cases for literal values (vs helpers), parent variables and helper arguments
- - Mustache_Engine to Engine.php
-     - getHelpers() - needed to use our HelperCollection instead
-	 - getLambdaCache() - needed to use our NoopCache
-	 - loadPartial() - needed a way for partials to pass arguments and partials to be callable
- - Mustache_HelperCollection to HelperCollection.php
-     - get() - pass helpers with arguments
-	 - has() - pass helpers with arguments
- - Mustache_Cache_NoopCache to NoopCache.php
-     - cache() - needed to extend Eden\Handlebars\Template instead of Mustache_Template
- - Mustache_Parser to Parser.php 
-     - buildTree() - just needed to allow helpers with arguments
- - Mustache_Template to Template.php
-     - prepareContextStack() - needed a way to accept Eden\Handlebars\Context instead of just a raw array
-
-On top of this list each file has been marked with what exactly we changed within each class to make it 
-easier to compare against the original Mustache.php code and ours.
+PHP Handlebars with JS interface to match with compile time helper support and super nice compile 
+time error reporting. This version of Handlebars is based on caching the compiled templates and 
+inheritently made the overall compile times faster. Loading at ~50ms uncached and ~30ms cached. 
 
 ====
 
@@ -142,9 +109,13 @@ echo $template(array('foo' => 'BAR'));
      - Literals like `{{./foo}}` and `{{../bar}}` are evaluated properly
      - Comments like `{{!-- Something --}}` and `{{! Something }}` supported
 	 - Trims like `{{~#each}}` and `{{~foo~}}` supported
-	 - Partials accepts arguments
+	 - Mustache backwards compatibility `{{#foo}}{{this}}{{/foo}}`
+	 - Tokenizer helpers to optimize custom code generation to cache
+	 - Event handlers for unknown helpers and unknown partials
  - Default Helpers matching handlebars.js
      - each - and `{{#each foo as |value, key|}}`
+	     - Please note that there is an issue with `each` being slow depending on the size of the object
+		 - We need help optimizing this
 	 - with
 	 - unless
 	 - if 
@@ -222,41 +193,41 @@ Returns `function` - the template binding handler
 eden('handlebars')->compile();
 ```
 
-==== 
+====
 
-<a name="getContext"></a>
+<a name="getCache"></a>
 
-### getContext
+### getCache
 
-Returns the current context 
-
-#### Usage
-
-```
-eden('handlebars')->getContext();
-```
-
-#### Parameters
-
-Returns `Eden\Handlebars\Context`
-
-==== 
-
-<a name="getEngine"></a>
-
-### getEngine
-
-Returns the current Mustache/Handlebars Engine 
+Returns the active cache path
 
 #### Usage
 
 ```
-eden('handlebars')->getEngine();
+eden('handlebars')->getCache();
+```
+
+Returns `Closure`
+
+==== 
+
+<a name="getHelper"></a>
+
+### getHelper
+
+Returns a helper given the name
+
+#### Usage
+
+```
+eden('handlebars')->getHelper('if');
 ```
 
 #### Parameters
 
-Returns `Eden\Handlebars\Engine`
+- `string $name` - the name of the helper
+
+Returns `Closure`
 
 ==== 
 
@@ -276,53 +247,25 @@ eden('handlebars')->getHelpers();
 
 Returns `array`
 
-==== 
+====
 
-<a name="getLambdaHelper"></a>
+<a name="getPartial"></a>
 
-### getLambdaHelper
+### getPartial
 
-Factory for Mustache_LambdaHelper 
-
-#### Usage
-
-```
-eden('handlebars')->getLambdaHelper();
-```
-
-#### Parameters
-
-Returns `array`
-
-==== 
-
-<a name="getOptions"></a>
-
-### getOptions
-
-Generates options used for helpers and partials 
+Returns a partial given the name
 
 #### Usage
 
 ```
-eden('handlebars')->getOptions(string $source, function|null $helper, Mustache_LambdaHelper|null $lambda, string $argString, array $hash);
+eden('handlebars')->getPartial('foobar');
 ```
 
 #### Parameters
 
- - `string $source` - The template block
- - `function|null $helper` - The raw helper handler
- - `Mustache_LambdaHelper|null $lambda` - The lambda helper renderer
- - `string $argString` - The raw argument string
- - `array $hash` - Any key/value to pass along
+- `string $name` - the name of the partial
 
-Returns `array`
-
-#### Example
-
-```
-eden('handlebars')->getOptions();
-```
+Returns `string`
 
 ==== 
 
@@ -336,42 +279,6 @@ Returns all the registered partials
 
 ```
 eden('handlebars')->getPartials();
-```
-
-#### Parameters
-
-Returns `array`
-
-==== 
-
-<a name="getTemplate"></a>
-
-### getTemplate
-
-Returns the initial string template 
-
-#### Usage
-
-```
-eden('handlebars')->getTemplate();
-```
-
-#### Parameters
-
-Returns `string`
-
-==== 
-
-<a name="parseArguments"></a>
-
-### parseArguments
-
-Mustache will give arguments in a string This will transform them into a legit argument array 
-
-#### Usage
-
-```
-eden('handlebars')->parseArguments();
 ```
 
 #### Parameters
@@ -434,80 +341,54 @@ eden('handlebars')->registerPartial();
 
 ==== 
 
-<a name="setContext"></a>
+<a name="setCache"></a>
 
-### setContext
+### setCache
 
-You may set the initial context if you wish 
+Enables the cache option
 
 #### Usage
 
 ```
-eden('handlebars')->setContext(array|Eden\Handlebars\Context $context);
+eden('handlebars')->setCache(string $path);
 ```
 
 #### Parameters
 
- - `array|Eden\Handlebars\Context $context` - The prescribed context
+ - `string $path` - The cache path
 
 Returns `Eden\Handlebrs\Index`
 
 #### Example
 
 ```
-eden('handlebars')->setContext();
+eden('handlebars')->setCache('/path/to/cache/folder');
 ```
 
-==== 
+====  
 
-<a name="setEngine"></a>
+<a name="setPrefix"></a>
 
-### setEngine
+### setPrefix
 
-You may set the entire engine if you wish 
+Sets the file name prefix for caching
 
 #### Usage
 
 ```
-eden('handlebars')->setEngine(Eden\Handlebars\Engine $engine);
+eden('handlebars')->setPrefix(string $prefix);
 ```
 
 #### Parameters
 
- - `Eden\Handlebars\Engine $engine` - The prescribed engine
+ - `string $prefix` - Custom prefix name
 
 Returns `Eden\Handlebrs\Index`
 
 #### Example
 
 ```
-eden('handlebars')->setEngine();
-```
-
-==== 
-
-<a name="setTemplate"></a>
-
-### setTemplate
-
-You may set the initial template if you wish 
-
-#### Usage
-
-```
-eden('handlebars')->setTemplate(string $template);
-```
-
-#### Parameters
-
- - `string $template` - The prescribed tempalte
-
-Returns `Eden\Handlebrs\Index`
-
-#### Example
-
-```
-eden('handlebars')->setTemplate();
+eden('handlebars')->setPrefix('special-template-');
 ```
 
 ==== 

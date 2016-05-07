@@ -13,14 +13,13 @@
 >
   <testsuites>
     <testsuite name="Eden Handlebars Test Suite">
-      <file>test/Context.php</file>
-      <file>test/Engine.php</file>
-      <file>test/HelperCollection.php</file>
+      <file>test/Data.php</file>
+      <file>test/Tokenizer.php</file>
+      <file>test/Compiler.php</file>
+	  <file>test/Runtime.php</file>
       <file>test/Index.php</file>
-      <file>test/Parser.php</file>
-      <file>test/Template.php</file>
-	  <file>test/functional.php</file>
 	  <file>test/helpers.php</file>
+      <file>test/functional.php</file>
     </testsuite>
   </testsuites>
 
