@@ -1,8 +1,9 @@
 {
     "name": "eden/handlebars",
     "type": "library",
-    "description": "Handlebars simplified as it was suppose to be.",
-    "keywords": ["eden", "library"],
+    "description": "PHP Handlebars with JS interface to match with compile time helper support and super nice compile 
+time error reporting.",
+    "keywords": ["hamdlebars", "eden", "library", "template", "templating"],
     "homepage": "http://eden-php.com",
     "license": "MIT",
     "authors": [
@@ -13,8 +14,7 @@
     ],
     "require": {
         "php": ">=5.4.1",
-		"eden/core": "4.*",
-		"mustache/mustache": "dev-master"
+		"eden/core": "4.*"
     },
     "autoload": {
          "psr-4": { "Eden\\Handlebars\\": "src/" }

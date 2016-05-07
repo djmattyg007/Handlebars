@@ -6,7 +6,7 @@
  * Copyright and license information can be found at LICENSE.txt
  * distributed with this package.
  */
-class EdenHandlebarsIndexTest extends PHPUnit_Framework_TestCase
+class Eden_Handlebars_Index_Test extends PHPUnit_Framework_TestCase
 {
 	public function testCompile() 
     {
@@ -17,18 +17,16 @@ class EdenHandlebarsIndexTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals('&lt;strong&gt;foo&lt;/strong&gt;<strong>foo</strong>', $results); 
 	}
 	
-	public function testGetContext()
+	public function testSetAndGetCache()
 	{
-		$context = eden('handlebars')->getContext();
-		
-		$this->assertInstanceOf('Eden\\Handlebars\\Context', $context);
+		$this->assertNull(eden('handlebars')->getCache());
+		$this->assertEquals('/foo/bar', eden('handlebars')->setCache('/foo/bar')->getCache());
 	}
 	
-	public function testGetEngine()
+	public function testGetHelper()
 	{
-		$engine = eden('handlebars')->getEngine();
-		
-		$this->assertInstanceOf('Eden\\Handlebars\\Engine', $engine);
+		$this->assertInstanceOf('Closure', eden('handlebars')->getHelper('if'));
+		$this->assertNull(eden('handlebars')->getHelper('foobar'));
 	}
 	
 	public function testGetHelpers()
@@ -38,32 +36,10 @@ class EdenHandlebarsIndexTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue(is_array($helpers));
 	}
 	
-	public function testGetLambdaHelper()
+	public function testGetPartial()
 	{
-		$lambda = eden('handlebars')->getLambdaHelper();
-		
-		$this->assertInstanceOf('Mustache_LambdaHelper', $lambda);
-	}
-	
-	public function testGetOptions()
-	{
-		$options = eden('handlebars')->getOptions();
-		
-		$this->assertTrue(is_array($options));
-		$this->assertTrue(is_array($options['hash']));
-		
-		$this->assertTrue(is_string($options['source']));
-		$this->assertTrue(is_string($options['success']));
-		$this->assertTrue(is_string($options['fail']));
-		$this->assertTrue(is_string($options['args']));
-		
-		$this->assertTrue(is_callable($options['fn']));
-		$this->assertTrue(is_callable($options['inverse']));
-		$this->assertTrue(is_callable($options['helper']));
-		
-		$this->assertInstanceOf('Eden\\Handlebars\\Index', $options['handlebars']);
-		$this->assertInstanceOf('Mustache_LambdaHelper', $options['lambda']);
-		
+		$this->assertTrue(is_string(eden('handlebars')->registerPartial('foo', 'bar')->getPartial('foo')));
+		$this->assertNull(eden('handlebars')->getPartial('foobar'));
 	}
 	
 	public function testGetPartials()
@@ -73,44 +49,16 @@ class EdenHandlebarsIndexTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue(is_array($partials));
 	}
 	
-	public function testGetTemplate()
-	{
-		$template = eden('handlebars')->getTemplate();
-		
-		$this->assertNull($template);
-	}
-	
-	public function testParseArguments()
-	{
-		//basic
-		$args = eden('handlebars')->parseArguments("'merchant' query.profile_type");
-		
-		$this->assertCount(2, $args[0]);
-		
-		//advanced
-		$args = eden('handlebars')->parseArguments(
-			'4bar4 4.5 \'some"thi " ng\' 4 "some\'thi \' ng" '
-			.'dog=false cat="meow" mouse=\'squeak squeak\'');
-		
-		$this->assertCount(5, $args[0]);
-		$this->assertEquals('', $args[0][0]);
-		$this->assertEquals(4.5, $args[0][1]);
-		$this->assertEquals('some"thi " ng', $args[0][2]);
-		$this->assertEquals(4, $args[0][3]);
-		$this->assertEquals("some'thi ' ng", $args[0][4]);
-		$this->assertFalse($args[1]['dog']);
-		$this->assertEquals('meow', $args[1]['cat']);
-		$this->assertEquals('squeak squeak', $args[1]['mouse']);
-	}
-	
     public function testRegisterHelper() 
     {
+		$handlebars = eden('handlebars');
+			
 		//simple helper
-		$template = eden('handlebars')
-			->registerHelper('root', function($absolute = false) {
-				return '/some/root';
-			})
-			->compile('{{root}}/bower_components/eve-font-awesome/awesome.css');
+		$handlebars->registerHelper('root', function() {
+			return '/some/root';
+		});
+		
+		$template = $handlebars->compile('{{root}}/bower_components/eve-font-awesome/awesome.css');
 			
 		$results = $template();
 		$this->assertEquals('/some/root/bower_components/eve-font-awesome/awesome.css', $results); 
@@ -228,24 +176,28 @@ class EdenHandlebarsIndexTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals('This is FOO ... Foo is not Amazing', $results);
 	}
 	
-	public function testSetContext()
+	public function testSetPrefix()
 	{
-		$handlebars = eden('handlebars')->setContext(array('Foo' => 'Bar'));
-		$this->assertInstanceOf('Eden\\Handlebars\\Index', $handlebars);
+		$instance = eden('handlebars')->setPrefix('foobar');
+		$this->assertInstanceOf('Eden\\Handlebars\\Index', $instance);
+	}
+
+	public function testUnregisterHelper()
+	{
+		$instance = eden('handlebars')->unregisterHelper('if');
+		$this->assertInstanceOf('Eden\\Handlebars\\Index', $instance);
+		
+		$this->assertNull($instance->getHelper('if'));
+	}
+
+	public function testUnregisterPartial()
+	{
+		$instance = eden('handlebars')
+			->registerPartial('foo', 'bar')
+			->unregisterPartial('foo');
 			
-		$handlebars = eden('handlebars')->setContext(new Eden\Handlebars\Context(array('Foo' => 'Bar')));
-		$this->assertInstanceOf('Eden\\Handlebars\\Index', $handlebars);
-	}
-	
-	public function testSetEngine()
-	{
-		$handlebars = eden('handlebars')->setEngine(new Eden\Handlebars\Engine);
-		$this->assertInstanceOf('Eden\\Handlebars\\Index', $handlebars);
-	}
-	
-	public function testSetTemplate()
-	{
-		$handlebars = eden('handlebars')->setTemplate('foo bar');
-		$this->assertInstanceOf('Eden\\Handlebars\\Index', $handlebars);
+		$this->assertInstanceOf('Eden\\Handlebars\\Index', $instance);
+		
+		$this->assertNull($instance->getPartial('foo'));
 	}
 }

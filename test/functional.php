@@ -7,7 +7,12 @@
  * distributed with this package.
  */
 class EdenHandlebarsfunctionalTest extends PHPUnit_Framework_TestCase
-{	
+{
+	public function setUp() {
+		//reset the helpers and partials after every test
+		eden('handlebars')->reset();
+	}
+
 	//functional tests
 	public function testLiterally()
 	{
@@ -44,6 +49,7 @@ class EdenHandlebarsfunctionalTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals('456', $results); 
 		
 		$template = eden('handlebars')
+			->reset()
 			->compile('{{zoo}} {{~#each foo~}} 456 {{~bar}} {{/each~}} ');
 		
 		$results = $template(array(
@@ -75,21 +81,6 @@ class EdenHandlebarsfunctionalTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals('bar', $results); 
 	}
 	
-	public function testUnknownTrigger()
-	{
-		$template = eden('handlebars')->on('handlebars-unknown', function($name, $args) {
-			$args = $this->parseArguments($args);
-			
-			$this->registerHelper($name, function($value) {
-				return $value + 1;
-			});
-		})->compile('{{unknown_test 4 "foo bar"}}');
-		
-		$results = $template();
-		
-		$this->assertEquals(5, $results);
-	}
-	
 	public function testLength()
 	{
 		$template = eden('handlebars')->compile('{{foo.length}}');
@@ -97,5 +88,13 @@ class EdenHandlebarsfunctionalTest extends PHPUnit_Framework_TestCase
 		$results = $template(array('foo' => array(1, 2, 3)));
 		
 		$this->assertEquals(3, $results); 
+	}
+	
+	public function testMustache()
+	{
+		$template = eden('handlebars')->compile('{{#foo}}{{this}}{{/foo}}');
+		
+		$results = $template(array('foo' => array(1, 2, 3)));
+		$this->assertEquals('123', $results); 
 	}
 }

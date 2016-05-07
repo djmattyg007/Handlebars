@@ -1,0 +1,15 @@
+<?php //-->
+use \Eden\Handlebars\Data as Data;
+use \Eden\Handlebars\Runtime as Runtime;
+
+return function($data = array()) {
+    $noop = function() {};
+    Runtime::optimize();
+    $context = $data = Data::i($data);
+    $helper = Runtime::getHelpers($data);
+	
+    $buffer = ''; 
+%s
+
+    return $buffer;
+};

@@ -1,0 +1,65 @@
+<div class="product-fields">
+	<div class="form-group{{#if errors.product_title}} has-error{{/if}} clearfix">
+        <label class="control-label">{{_ 'Title'}}</label>
+        <div>
+            <input
+                type="text"
+                class="form-control"
+                name="product_title"
+                placeholder="{{_ 'What is the name of this product?'}}"
+                value="{{item.product_title}}" />
+
+            {{#if errors.product_title}}
+            <span class="help-text text-danger">{{errors.product_title}}</span>
+            {{/if}}
+        </div>
+    </div>
+
+    <div class="form-group{{#if errors.product_detail}} has-error{{/if}} clearfix">
+        <label class="control-label">{{_ 'Detail'}}</label>
+        <div>
+            <textarea
+                class="form-control"
+                name="product_detail"
+                placeholder="{{_ 'Enter some details about this product.'}}">{{{item.product_detail}}}</textarea>
+
+            {{#if errors.product_detail}}
+            <span class="help-text text-danger">{{errors.product_detail}}</span>
+            {{/if}}
+        </div>
+    </div>
+
+    <div class="form-group{{#if errors.product_brand}} has-error{{/if}} clearfix">
+        <label class="control-label">{{_ 'Brand'}}</label>
+        <div>
+            <input
+                type="text"
+                class="form-control"
+                name="product_brand"
+                placeholder="{{_ 'What brand is this?'}}"
+                value="{{item.product_brand}}" />
+
+            {{#if errors.product_brand}}
+            <span class="help-text text-danger">{{errors.product_brand}}</span>
+            {{/if}}
+        </div>
+    </div>
+
+    <div class="form-group{{#if errors.product_price}} has-error{{/if}} clearfix">
+        <label class="control-label">{{_ 'Price'}}</label>
+        <div>
+            <input
+                type="number"
+                class="form-control"
+                name="product_price"
+                min = "0"
+				step = "0.01"
+                placeholder="{{_ 'How much do you want to sell it for?'}}"
+                value="{{item.product_price}}" />
+
+            {{#if errors.product_price}}
+            <span class="help-text text-danger">{{errors.product_price}}</span>
+            {{/if}}
+        </div>
+    </div>
+</div>

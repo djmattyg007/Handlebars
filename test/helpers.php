@@ -8,6 +8,11 @@
  */
 class EdenHandlebarshelpersTest extends PHPUnit_Framework_TestCase
 {
+	public function setUp() {
+		//reset the helpers and partials after every test
+		eden('handlebars')->reset();
+	}
+	
 	public function testEach()
 	{
 		//simple loop
