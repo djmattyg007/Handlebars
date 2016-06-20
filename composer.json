@@ -1,8 +1,7 @@
 {
     "name": "eden/handlebars",
     "type": "library",
-    "description": "PHP Handlebars with JS interface to match with compile time helper support and super nice compile 
-time error reporting.",
+    "description": "PHP Handlebars with JS interface to match with compile time helper support and super nice compile time error reporting.",
     "keywords": ["hamdlebars", "eden", "library", "template", "templating"],
     "homepage": "http://eden-php.com",
     "license": "MIT",
