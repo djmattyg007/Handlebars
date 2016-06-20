@@ -1,4 +1,5 @@
 <?php //-->
+declare(strict_types=1);
 /**
  * This file is part of the Eden PHP Library.
  * (c) 2014-2016 Openovate Labs
@@ -45,12 +46,12 @@ class Tokenizer extends Base
     const TYPE_SECTION_CLOSE = 'close';
 
     /**
-     * @var string $source
+     * @var string
      */
-    protected $source = null;
+    protected $source;
 
     /**
-     * @var string $buffer
+     * @var string
      */
     protected $buffer = '';
 
@@ -67,9 +68,9 @@ class Tokenizer extends Base
     /**
      * Just load the source template
      *
-     * @param *string $source
+     * @param string $source
      */
-    public function __construct($source)
+    public function __construct(string $source)
     {
         $this->source = $source;
     }
@@ -79,8 +80,7 @@ class Tokenizer extends Base
      * callback tokens instead of storing them in memory
      *
      * @param callable|null $callback
-     *
-     * @return Eden\Handlebars\Tokenizer
+     * @return Tokenizer
      */
     public function tokenize($callback = null)
     {
@@ -134,13 +134,13 @@ class Tokenizer extends Base
     /**
      * Forms the node and passes to the callback
      *
-     * @param *int      $start
-     * @param *string   $type
-     * @param *function $callback
-     *
-     * @return Eden\Handlebars\Tokenizer
+     * TODO: Look at all parameters
+     * @param int $start
+     * @param string $type
+     * @param function $callback
+     * @return Tokenizer
      */
-    protected function addNode($start, $type, $line, $offset1, $offset2, $callback)
+    protected function addNode(int $start, string $type, $line, $offset1, $offset2, $callback)
     {
         $this->flushText($start, $callback);
         
@@ -182,17 +182,16 @@ class Tokenizer extends Base
      * forms a node and passes it to
      * the callback
      *
-     * @param *int      $i
-     * @param *function $callback
-     *
-     * @return Eden\Handlebars\Tokenizer
+     * @param int $i
+     * @param function $callback
+     * @return Tokenizer
      */
-    protected function flushText($i, $callback)
+    protected function flushText(int $i, $callback)
     {
         if ($this->type !== self::TYPE_TEXT || !strlen($this->buffer)) {
             return $this;
         }
-        
+
         call_user_func($callback, array(
             'type'  => $this->type,
             'start' => $i - strlen($this->buffer),
@@ -203,20 +202,19 @@ class Tokenizer extends Base
 
         //flush
         $this->buffer = '';
-        
+
         return $this;
     }
-    
+
     /**
      * Since we know where the start is,
      * we need to find the end in the source
      *
-     * @param *int  $i
-     * @param *bool $escape
-     *
+     * @param int $i
+     * @param bool $escape
      * @return int
      */
-    protected function findVariable($i, $escape)
+    protected function findVariable(int $i, bool $escape) : int
     {
         $close = '}}';
         if ($escape) {

@@ -1,4 +1,5 @@
 <?php //-->
+declare(strict_types=1);
 /**
  * This file is part of the Eden PHP Library.
  * (c) 2014-2016 Openovate Labs
@@ -19,6 +20,9 @@ namespace Eden\Handlebars;
  */
 class Data extends Base
 {
+    /**
+     * @var array
+     */
     protected $tree = array();
 
     /**
@@ -26,7 +30,7 @@ class Data extends Base
      *
      * @param array $data
      */
-    public function __construct($data = array())
+    public function __construct(array $data = array())
     {
         $this->tree[] = $data;
     }
@@ -36,19 +40,12 @@ class Data extends Base
      * Based on the given path we need to return the
      * correct results
      *
-     * @param *string $path Dot notated path
-     * @param int     $i    Current context
-     *
+     * @param string $path Dot notated path
+     * @param int $i    Current context
      * @return mixed
      */
-    public function find($path, $i = 0)
+    public function find(string $path, int $i = 0)
     {
-        Argument::i()
-            //Argument 1 must be a string
-            ->test(1, 'string')
-            //Argument 2 must be an integer
-            ->test(2, 'int');
-        
         if ($i >= count($this->tree)) {
             return null;
         }
@@ -130,9 +127,8 @@ class Data extends Base
     /**
      * Pushes a new context in the tree
      *
-     * @param *array $data
-     *
-     * @return Eden\Handlebars\Data
+     * @param array $data
+     * @return Data
      */
     public function push(array $data)
     {
@@ -143,7 +139,7 @@ class Data extends Base
     /**
      * Pops the last context
      *
-     * @return Eden\Handlebars\Data
+     * @return Data
      */
     public function pop()
     {

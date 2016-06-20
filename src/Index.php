@@ -1,4 +1,5 @@
 <?php //-->
+declare(strict_types=1);
 /**
  * This file is part of the Eden PHP Library.
  * (c) 2014-2016 Openovate Labs
@@ -52,7 +53,7 @@ class Index extends Base
      */
     public function __construct()
     {
-        $helpers = include __DIR__.'/helpers.php';
+        $helpers = require(__DIR__ . '/helpers.php');
         
         foreach ($helpers as $name => $helper) {
             $this->registerHelper($name, $helper);
@@ -62,11 +63,10 @@ class Index extends Base
     /**
      * Returns a callback that binds the data with the template
      *
-     * @param *string $template the template string
-     *
+     * @param string $template the template string
      * @return function The template binding handler
      */
-    public function compile($template)
+    public function compile(string $template)
     {
         $name = md5($template);
         
@@ -108,11 +108,10 @@ class Index extends Base
     /**
      * Returns a specific helper
      *
-     * @param *string $name The name of the helper
-     *
+     * @param string $name The name of the helper
      * @return function|null
      */
-    public function getHelper($name)
+    public function getHelper(string $name)
     {
         return Runtime::getHelper($name);
     }
@@ -122,7 +121,7 @@ class Index extends Base
      *
      * @return array
      */
-    public function getHelpers()
+    public function getHelpers() : array
     {
         return Runtime::getHelpers();
     }
@@ -130,11 +129,10 @@ class Index extends Base
     /**
      * Returns a specific partial
      *
-     * @param *string $name The name of the helper
-     *
+     * @param string $name The name of the helper
      * @return string|null
      */
-    public function getPartial($name)
+    public function getPartial(string $name)
     {
         return Runtime::getPartial($name);
     }
@@ -144,7 +142,7 @@ class Index extends Base
      *
      * @return array
      */
-    public function getPartials()
+    public function getPartials() : array
     {
         return Runtime::getPartials();
     }
@@ -152,12 +150,11 @@ class Index extends Base
     /**
      * The famous register helper matching the Handlebars API
      *
-     * @param *string   $name   The name of the helper
-     * @param *function $helper The helper handler
-     *
-     * @return Eden\Handlebrs\Index
+     * @param string $name   The name of the helper
+     * @param function $helper The helper handler
+     * @return Index
      */
-    public function registerHelper($name, $helper)
+    public function registerHelper(string $name, $helper) : Index
     {
         Runtime::registerHelper($name, $helper);
         return $this;
@@ -167,12 +164,11 @@ class Index extends Base
      * Delays registering partials to the engine
      * because there is no add partial method...
      *
-     * @param *string $name    The name of the helper
-     * @param *string $partial The helper handler
-     *
-     * @return Eden\Handlebrs\Index
+     * @param string $name The name of the helper
+     * @param string $partial The helper handler
+     * @return Index
      */
-    public function registerPartial($name, $partial)
+    public function registerPartial(string $name, string $partial) : Index
     {
         Runtime::registerPartial($name, $partial);
         return $this;
@@ -181,9 +177,9 @@ class Index extends Base
     /**
      * Resets the helpers and partials
      *
-     * @return Eden\Handlebrs\Index
+     * @return Index
      */
-    public function reset()
+    public function reset() : Index
     {
          Runtime::flush();
          $this->__construct();
@@ -193,32 +189,23 @@ class Index extends Base
     /**
      * Enables the cache option
      *
-     * @param *string The cache path
-     *
-     * @return Eden\Handlebars\Index
+     * @param string The cache path
+     * @return Index
      */
-    public function setCache($path)
+    public function setCache(string $path) : Index
     {
-        //Argument 1 must be a string
-        Argument::i()->test(1, 'string');
-
         $this->cache = $path;
-        
         return $this;
     }
 
     /**
      * Sets the file name prefix
      *
-     * @param *string $prefix
-     *
-     * @return Eden\Handlebars\Index
+     * @param string $prefix
+     * @return Index
      */
-    public function setPrefix($prefix)
+    public function setPrefix(string $prefix) : Index
     {
-        //Argument 1 must be a string
-        Argument::i()->test(1, 'string');
-
         $this->prefix = $prefix;
         return $this;
     }
@@ -226,11 +213,10 @@ class Index extends Base
     /**
      * The opposite of registerHelper
      *
-     * @param *string $name the helper name
-     *
-     * @return Eden\Handlebars\Index
+     * @param string $name the helper name
+     * @return Index
      */
-    public function unregisterHelper($name)
+    public function unregisterHelper(string $name) : Index
     {
         Runtime::unregisterHelper($name);
         return $this;
@@ -239,27 +225,25 @@ class Index extends Base
     /**
      * The opposite of registerPartial
      *
-     * @param *string $name the partial name
-     *
-     * @return Eden\Handlebars\Index
+     * @param string $name the partial name
+     * @return Index
      */
-    public function unregisterPartial($name)
+    public function unregisterPartial(string $name) : Index
     {
         Runtime::unregisterPartial($name);
         return $this;
     }
-    
+
     /**
      * Returns a very nice error message
      *
-     * @param *string $code
-     *
-     * @return Eden\Handlebars\Index
+     * @param string $code
+     * @return Index
      */
-    protected function checkEval($code)
+    protected function checkEval(string $code) : Index
     {
         $error = error_get_last();
-            
+
         if (isset($error['message']) 
 			&& isset($error['line'])
 			&& $error['message'] === 'parse error'
@@ -269,13 +253,13 @@ class Index extends Base
             if ($start < 0) {
                 $start = 0;
             }
-            
+
             $code = array_splice($code, $start, 50);
-            
+
             foreach ($code as $i => $line) {
                 $code[$i] = (++$start) . ': ' . $line;
             }
-            
+
             Exception::i(self::COMPILE_ERROR)
                 ->setType('COMPILE')
                 ->addVariable($error['message'])
@@ -283,7 +267,7 @@ class Index extends Base
                 ->addVariable(implode("\n", $code))
                 ->trigger();
         }
-        
+
         return $this;
     }
 }

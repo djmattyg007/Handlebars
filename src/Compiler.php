@@ -1,4 +1,5 @@
 <?php //-->
+declare(strict_types=1);
 /**
  * This file is part of the Eden PHP Library.
  * (c) 2014-2016 Openovate Labs
@@ -220,32 +221,32 @@ class Compiler extends Base
     const ERROR_UNKNOWN_END = 'Unknown close tag: "%s" on line %s';
     
     /**
-     * @var string|null $layout
+     * @var string
      */
     protected static $layout = null;
 
     /**
-     * @var Eden\Handlebars\Index|null $handlebars
+     * @var Index
      */
     protected $handlebars = null;
 
     /**
-     * @var string $source
+     * @var string
      */
     protected $source = '';
 
     /**
-     * @var int $offset
+     * @var int
      */
     protected $offset = 1;
 
     /**
      * Just load the source template
      *
-     * @param *Eden\Handlebars\Index $handlebars
-     * @param *string                $source
+     * @param Eden\Handlebars\Index $handlebars
+     * @param string $source
      */
-    public function __construct(Index $handlebars, $source)
+    public function __construct(Index $handlebars, string $source)
     {
         $this->source = $source;
         $this->handlebars = $handlebars;
@@ -260,7 +261,7 @@ class Compiler extends Base
      *
      * @return string
      */
-    public function getSource()
+    public function getSource() : string
     {
         return $this->source;
     }
@@ -270,10 +271,9 @@ class Compiler extends Base
      * that can be used independently
      *
      * @param bool $layout Whether to use the layout or raw code
-     *
      * @return string
      */
-    public function compile($layout = true)
+    public function compile(bool $layout = true)
     {
         $code = $this->trim($this->source);
         $buffer = '';
@@ -319,15 +319,11 @@ class Compiler extends Base
     /**
      * Returns a code snippet
      *
-     * @param *int $offset This is to preset the tabbing when generating the code
-     *
-     * @return Eden\Handlebars\Compiler
+     * @param int $offset This is to preset the tabbing when generating the code
+     * @return Compiler
      */
-    public function setOffset($offset)
+    public function setOffset(int $offset) : Compiler
     {
-        //Argument 1 must be an integer
-        Argument::i()->test(1, 'int');
-        
         $this->offset = $offset;
         return $this;
     }
@@ -335,12 +331,11 @@ class Compiler extends Base
     /**
      * Partially renders the text tokens
      *
-     * @param *array $node
-     * @param *array $open
-     *
+     * @param array $node
+     * @param array $open
      * @return string
      */
-    protected function generateText($node)
+    protected function generateText(array $node) : string
     {
         $buffer = '';
         
@@ -364,12 +359,11 @@ class Compiler extends Base
     /**
      * Partially renders the unescaped variable tokens
      *
-     * @param *array $node
-     * @param *array $open
-     *
+     * @param array $node
+     * @param array $open
      * @return string
      */
-    protected function generateVariable($node, &$open)
+    protected function generateVariable(array $node, array &$open) : string
     {
         $node['value'] = trim($node['value']);
         
@@ -425,12 +419,11 @@ class Compiler extends Base
     /**
      * Partially renders the escaped variable tokens
      *
-     * @param *array $node
-     * @param *array $open
-     *
+     * @param array $node
+     * @param array $open
      * @return string
      */
-    protected function generateEscape($node, &$open)
+    protected function generateEscape(array $node, array &$open) : string
     {
         $node['value'] = trim($node['value']);
         
@@ -471,12 +464,11 @@ class Compiler extends Base
     /**
      * Partially renders the section open tokens
      *
-     * @param *array $node
-     * @param *array $open
-     *
+     * @param array $node
+     * @param array $open
      * @return string
      */
-    protected function generateOpen($node, &$open)
+    protected function generateOpen(array $node, array &$open) : string
     {
         $node['value'] = trim($node['value']);
         
@@ -515,12 +507,11 @@ class Compiler extends Base
     /**
      * Partially renders the section close tokens
      *
-     * @param *array $node
-     * @param *array $open
-     *
+     * @param array $node
+     * @param array $open
      * @return string
      */
-    protected function generateClose($node, &$open)
+    protected function generateClose(array $node, array &$open) : string
     {
         $node['value'] = trim($node['value']);
         
@@ -561,7 +552,7 @@ class Compiler extends Base
      *
      * @return string
      */
-    protected function generateHelpers()
+    protected function generateHelpers() : string
     {
         $helpers = $this->handlebars->getHelpers();
         
@@ -597,7 +588,7 @@ class Compiler extends Base
      *
      * @return string
      */
-    protected function generatePartials()
+    protected function generatePartials() : string
     {
         $partials = $this->handlebars->getPartials();
         
@@ -620,15 +611,11 @@ class Compiler extends Base
      * This will transform them into a legit argument
      * array
      *
-     * @param *string $string The argument string
-     *
+     * @param string $string The argument string
      * @return array
      */
-    protected function parseArguments($string)
+    protected function parseArguments(string $string) : array
     {
-        //Argument 1 must be a string
-        Argument::i()->test(1, 'string');
-
         $args = array();
         $hash = array();
         
@@ -673,11 +660,10 @@ class Compiler extends Base
      * If there's a quote, null, bool,
      * int, float... it's the literal value
      *
-     * @param *string $value One string argument value
-     *
+     * @param string $value One string argument value
      * @return mixed
      */
-    protected function parseArgument($arg)
+    protected function parseArgument(string $arg)
     {
         //if it's a literal string value
         if (strpos($arg, '"') === 0
@@ -703,11 +689,10 @@ class Compiler extends Base
     /**
      * Calls an alternative helper to add on to the compiled code
      *
-     * @param *array  $node
-     *
+     * @param array $node
      * @return string|false
      */
-    protected function tokenize($node)
+    protected function tokenize(array $node)
     {
         //lookout for pre processors helper
         $value = explode(' ', $node['value']);
@@ -738,13 +723,12 @@ class Compiler extends Base
     /**
      * Makes code look nicely spaced
      *
-     * @param *string $code
-     * @param *int    $before Used to set the token before spacing
-     * @param *int    $after Used to set the token after spacing
-     *
+     * @param string $code
+     * @param int $before Used to set the token before spacing
+     * @param int $after Used to set the token after spacing
      * @return string
      */
-    protected function prettyPrint($code, $before = 0, $after = 0)
+    protected function prettyPrint(string $code, int $before = 0, int $after = 0) : string
     {
         $this->offset += $before;
         
@@ -784,12 +768,11 @@ class Compiler extends Base
     /**
      * Finds a particular node in the open sections
      *
-     * @param *array  $open The open nodes
-     * @param *string $name The last name of the node we are looking for
-     *
-     * @return int The index where the section is found
+     * @param array $open The open nodes
+     * @param string $name The last name of the node we are looking for
+     * @return int|false The index where the section is found
      */
-    protected function findSection($open, $name = self::LAST_OPEN)
+    protected function findSection(array $open, string $name = self::LAST_OPEN)
     {
         foreach ($open as $i => $item) {
             $item = explode(' ', $item['value']);
@@ -809,11 +792,10 @@ class Compiler extends Base
     /**
      * Quick trim script
      *
-     * @param *string $string
-     *
+     * @param string $string
      * @return string
      */
-    protected function trim($string)
+    protected function trim(string $string) : string
     {
         $string = preg_replace('#\s*\{\{\{\~\s*#is', '{{{', $string);
         $string = preg_replace('#\s*\~\}\}\}\s*#is', '}}}', $string);

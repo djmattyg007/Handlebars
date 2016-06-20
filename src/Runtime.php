@@ -1,4 +1,5 @@
 <?php //-->
+declare(strict_types=1);
 /**
  * This file is part of the Eden PHP Library.
  * (c) 2014-2016 Openovate Labs
@@ -23,12 +24,16 @@ namespace Eden\Handlebars;
 class Runtime extends Base
 {
     /**
-     * @var array $partials A raw list of partials
+     * A raw list of partials
+     *
+     * @var array
      */
     protected static $partials = array();
     
     /**
-     * @var array $helpers A raw list of helpers
+     * A raw list of helpers
+     *
+     * @var array
      */
     protected static $helpers = array();
 
@@ -44,15 +49,12 @@ class Runtime extends Base
     /**
      * Returns a specific helper
      *
-     * @param *string $name The name of the helper
-     *
+     * TODO: Look at $bind parameter
+     * @param string $name The name of the helper
      * @return function|null
      */
-    public static function getHelper($name, Data $bind = null)
+    public static function getHelper(string $name, Data $bind = null)
     {
-        //Argument 1 must be a string
-        Argument::i()->test(1, 'string');
-        
         if (isset(self::$helpers[$name])) {
             return self::$helpers[$name];
         }
@@ -63,39 +65,36 @@ class Runtime extends Base
     /**
      * Returns all the registered helpers
      *
+     * TODO: Look at $bind parameter
      * @return array
      */
-    public static function getHelpers(Data $bind = null)
+    public static function getHelpers(Data $bind = null) : array
     {
         if (is_null($bind)) {
             return self::$helpers;
         }
-        
+
         $helpers = array();
-        
+
         foreach (self::$helpers as $name => $helper) {
             $helpers[$name] = $helper->bindTo($bind, '\\Eden\\Handlebars\\Data');
         }
-        
+
         return $helpers;
     }
 
     /**
      * Returns a specific partial
      *
-     * @param *string $name The name of the helper
-     *
+     * @param string $name The name of the helper
      * @return string|null
      */
-    public static function getPartial($name)
+    public static function getPartial(string $name)
     {
-        //Argument 1 must be a string
-        Argument::i()->test(1, 'string');
-        
         if (isset(self::$partials[$name])) {
             return self::$partials[$name];
         }
-        
+
         return null;
     }
 
@@ -104,30 +103,20 @@ class Runtime extends Base
      *
      * @return array
      */
-    public static function getPartials()
+    public static function getPartials() : array
     {
         return self::$partials;
     }
 
     /**
-     * Turns off eden argument handlers
-     */
-    public static function optimize()
-    {
-        Argument::i()->stop();
-    }
-
-    /**
      * The famous register helper matching the Handlebars API
      *
-     * @param *string   $name   The name of the helper
-     * @param *function $helper The helper handler
+     * @param string $name The name of the helper
+     * @param function $helper The helper handler
      */
-    public static function registerHelper($name, $helper)
+    public static function registerHelper(string $name, $helper)
     {
         Argument::i()
-            //Argument 1 must be a string
-            ->test(1, 'string')
             //Argument 2 must be a Closure of some kind
             ->test(2, 'Closure');
         
@@ -138,30 +127,21 @@ class Runtime extends Base
      * Delays registering partials to the engine
      * because there is no add partial method...
      *
-     * @param *string $name    The name of the helper
-     * @param *string $partial The helper handler
+     * @param string $name The name of the helper
+     * @param string $partial The helper handler
      */
-    public static function registerPartial($name, $partial)
+    public static function registerPartial(string $name, string $partial)
     {
-        Argument::i()
-            //Argument 1 must be a string
-            ->test(1, 'string')
-            //Argument 2 must be a string
-            ->test(2, 'string');
-
         self::$partials[$name] = $partial;
     }
 
     /**
      * The opposite of registerHelper
      *
-     * @param *string $name the helper name
+     * @param string $name the helper name
      */
-    public static function unregisterHelper($name)
+    public static function unregisterHelper(string $name)
     {
-        //Argument 1 must be a string
-        Argument::i()->test(1, 'string');
-
         if (isset(self::$helpers[$name])) {
             unset(self::$helpers[$name]);
         }
@@ -170,13 +150,10 @@ class Runtime extends Base
     /**
      * The opposite of registerPartial
      *
-     * @param *string $name the partial name
+     * @param string $name the partial name
      */
-    public static function unregisterPartial($name)
+    public static function unregisterPartial(string $name)
     {
-        //Argument 1 must be a string
-        Argument::i()->test(1, 'string');
-
         if (isset(self::$partials[$name])) {
             unset(self::$partials[$name]);
         }
