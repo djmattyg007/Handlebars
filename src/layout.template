@@ -9,6 +9,5 @@ return function($data = array()) {
 
     $buffer = ''; 
 %s
-
     return $buffer;
 };

@@ -319,5 +319,4 @@
     $buffer .= "\n";
     $buffer .= '        </div>'."\n";
     $buffer .= '    </div>'."\n";
-    $buffer .= '</div>'."\n";
-    $buffer .= '';
+    $buffer .= '</div>';

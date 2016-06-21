@@ -329,8 +329,7 @@ return function($data = array()) {
     $buffer .= "\n";
     $buffer .= '        </div>'."\n";
     $buffer .= '    </div>'."\n";
-    $buffer .= '</div>'."\n";
-    $buffer .= '';
+    $buffer .= '</div>';
 
     return $buffer;
 };

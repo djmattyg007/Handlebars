@@ -149,6 +149,7 @@ class Compiler extends Base
                     break;
             }
         });
+        $buffer .= "\n";
 
         //START: This is more to help troubleshooting
         if (count($open)) {

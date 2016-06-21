@@ -29,7 +29,7 @@ class Eden_Handlebars_Compiler_Test extends PHPUnit_Framework_TestCase
     public function testCompile()
     {
         //load the source
-        $source = file_get_contents(__DIR__.'/assets/tokenizer.html');
+        $source = trim(file_get_contents(__DIR__.'/assets/tokenizer.html'));
         $template1 = file_get_contents(__DIR__.'/assets/template1.php');
         $template2 = file_get_contents(__DIR__.'/assets/template2.php');
 
