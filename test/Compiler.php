@@ -22,7 +22,7 @@ class Eden_Handlebars_Compiler_Test extends PHPUnit_Framework_TestCase
         $index = IndexStub::i();
 
         $template = Eden\Handlebars\Compiler::i($index, $source)->getSource();
-        
+
         $this->assertEquals($source, $template);
     }
 
@@ -36,11 +36,11 @@ class Eden_Handlebars_Compiler_Test extends PHPUnit_Framework_TestCase
         $index = IndexStub::i();
 
         $code = Eden\Handlebars\Compiler::i($index, $source)->compile();
-        
+
         $this->assertEquals($template1, $code);
-        
+
         $code = Eden\Handlebars\Compiler::i($index, $source)->compile(false);
-        
+
         $this->assertEquals($template2, $code);
     }
 
@@ -51,28 +51,28 @@ class Eden_Handlebars_Compiler_Test extends PHPUnit_Framework_TestCase
         $index = IndexStub::i();
 
         $instance = Eden\Handlebars\Compiler::i($index, $source)->setOffset(3);
-        
+
         $this->assertInstanceOf('Eden\\Handlebars\\Compiler', $instance);
     }
-    
+
     public function testParseArguments()
     {
         $source = file_get_contents(__DIR__.'/assets/tokenizer.html');
-        
+
         $index = IndexStub::i();
-        
+
         $compiler = CompilerStub::i($index, $source);
-        
+
         //basic
         list($name, $args, $hash) = $compiler->parseArgumentsStub("foobar 'merchant' query.profile_type");
-        
+
         $this->assertCount(2, $args);
-        
+
         //advanced
         list($name, $args, $hash) = $compiler->parseArgumentsStub(
             'foobar 4bar4 4.5 \'some"thi " ng\' 4 "some\'thi \' ng" '
             .'dog=false cat="meow" mouse=\'squeak squeak\'');
-        
+
         $this->assertCount(5, $args);
         $this->assertEquals('$data->find(\'4bar4\')', $args[0]);
         $this->assertEquals(4.5, $args[1]);
@@ -82,10 +82,10 @@ class Eden_Handlebars_Compiler_Test extends PHPUnit_Framework_TestCase
         $this->assertEquals('false', $hash['dog']);
         $this->assertEquals('\'meow\'', $hash['cat']);
         $this->assertEquals('\'squeak squeak\'', $hash['mouse']);
-        
+
         //BUG: '_ \'TODAY\'S BEST DEALS\''
         list($name, $args, $hash) = $compiler->parseArgumentsStub('_ \'TODAY\'S BEST DEALS\'');
-        
+
         $this->assertCount(4, $args);
         $this->assertEquals('\'TODAY\'', $args[0]);
         $this->assertEquals('$data->find(\'S\')', $args[1]);
@@ -99,7 +99,6 @@ if(!class_exists('IndexStub')) {
     {
     }
 }
-
 
 if(!class_exists('CompilerStub')) {
     class CompilerStub extends Eden\Handlebars\Compiler

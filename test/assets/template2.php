@@ -1,6 +1,6 @@
 
     $buffer .= '<div class="product-fields">'."\n";
-    $buffer .= '	<div class="form-group';
+    $buffer .= '    <div class="form-group';
     $buffer .= $helper['if'](
         $data->find('errors.product_title'), 
         array(
@@ -8,14 +8,14 @@
             'args' => 'if errors.product_title',
             'hash' => array(),
             'fn' => function($context = null) use ($noop, $data, &$helper) {
-                if(is_array($context)) {
+                if (is_array($context)) {
                     $data->push($context);
                 }
 
                 $buffer = '';
                 $buffer .= ' has-error';
 
-                if(is_array($context)) {
+                if (is_array($context)) {
                     $data->pop();
                 }
 
@@ -53,7 +53,7 @@
             'args' => 'if errors.product_title',
             'hash' => array(),
             'fn' => function($context = null) use ($noop, $data, &$helper) {
-                if(is_array($context)) {
+                if (is_array($context)) {
                     $data->push($context);
                 }
 
@@ -65,7 +65,7 @@
                 $buffer .= '</span>'."\n";
                 $buffer .= '            ';
 
-                if(is_array($context)) {
+                if (is_array($context)) {
                     $data->pop();
                 }
 
@@ -88,14 +88,14 @@
             'args' => 'if errors.product_detail',
             'hash' => array(),
             'fn' => function($context = null) use ($noop, $data, &$helper) {
-                if(is_array($context)) {
+                if (is_array($context)) {
                     $data->push($context);
                 }
 
                 $buffer = '';
                 $buffer .= ' has-error';
 
-                if(is_array($context)) {
+                if (is_array($context)) {
                     $data->pop();
                 }
 
@@ -131,7 +131,7 @@
             'args' => 'if errors.product_detail',
             'hash' => array(),
             'fn' => function($context = null) use ($noop, $data, &$helper) {
-                if(is_array($context)) {
+                if (is_array($context)) {
                     $data->push($context);
                 }
 
@@ -143,7 +143,7 @@
                 $buffer .= '</span>'."\n";
                 $buffer .= '            ';
 
-                if(is_array($context)) {
+                if (is_array($context)) {
                     $data->pop();
                 }
 
@@ -166,14 +166,14 @@
             'args' => 'if errors.product_brand',
             'hash' => array(),
             'fn' => function($context = null) use ($noop, $data, &$helper) {
-                if(is_array($context)) {
+                if (is_array($context)) {
                     $data->push($context);
                 }
 
                 $buffer = '';
                 $buffer .= ' has-error';
 
-                if(is_array($context)) {
+                if (is_array($context)) {
                     $data->pop();
                 }
 
@@ -211,7 +211,7 @@
             'args' => 'if errors.product_brand',
             'hash' => array(),
             'fn' => function($context = null) use ($noop, $data, &$helper) {
-                if(is_array($context)) {
+                if (is_array($context)) {
                     $data->push($context);
                 }
 
@@ -223,7 +223,7 @@
                 $buffer .= '</span>'."\n";
                 $buffer .= '            ';
 
-                if(is_array($context)) {
+                if (is_array($context)) {
                     $data->pop();
                 }
 
@@ -246,14 +246,14 @@
             'args' => 'if errors.product_price',
             'hash' => array(),
             'fn' => function($context = null) use ($noop, $data, &$helper) {
-                if(is_array($context)) {
+                if (is_array($context)) {
                     $data->push($context);
                 }
 
                 $buffer = '';
                 $buffer .= ' has-error';
 
-                if(is_array($context)) {
+                if (is_array($context)) {
                     $data->pop();
                 }
 
@@ -275,7 +275,7 @@
     $buffer .= '                class="form-control"'."\n";
     $buffer .= '                name="product_price"'."\n";
     $buffer .= '                min = "0"'."\n";
-    $buffer .= '				step = "0.01"'."\n";
+    $buffer .= '                step = "0.01"'."\n";
     $buffer .= '                placeholder="';
     $buffer .= htmlspecialchars($data->find('_ \'How much do you want to sell it for?\''), ENT_COMPAT, 'UTF-8');
 
@@ -293,7 +293,7 @@
             'args' => 'if errors.product_price',
             'hash' => array(),
             'fn' => function($context = null) use ($noop, $data, &$helper) {
-                if(is_array($context)) {
+                if (is_array($context)) {
                     $data->push($context);
                 }
 
@@ -305,7 +305,7 @@
                 $buffer .= '</span>'."\n";
                 $buffer .= '            ';
 
-                if(is_array($context)) {
+                if (is_array($context)) {
                     $data->pop();
                 }
 
@@ -319,4 +319,5 @@
     $buffer .= "\n";
     $buffer .= '        </div>'."\n";
     $buffer .= '    </div>'."\n";
-    $buffer .= '</div>';
+    $buffer .= '</div>'."\n";
+    $buffer .= '';

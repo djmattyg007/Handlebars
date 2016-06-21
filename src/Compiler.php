@@ -38,21 +38,21 @@ class Compiler extends Base
     const BLOCK_OPTIONS_CLOSE = '\r\t)';
 
     const BLOCK_OPTIONS_FN_OPEN = '\r\t\'fn\' => function($context = null) use ($noop, $data, &$helper) {';
-    const BLOCK_OPTIONS_FN_BODY_1 = '\r\t\1if(is_array($context)) {';
+    const BLOCK_OPTIONS_FN_BODY_1 = '\r\t\1if (is_array($context)) {';
     const BLOCK_OPTIONS_FN_BODY_2 = '\r\t\1\1$data->push($context);';
     const BLOCK_OPTIONS_FN_BODY_3 = '\r\t\1}';
     const BLOCK_OPTIONS_FN_BODY_4 = '\r\r\t\1$buffer = \'\';';
-    const BLOCK_OPTIONS_FN_BODY_5 = '\r\r\t\1if(is_array($context)) {';
+    const BLOCK_OPTIONS_FN_BODY_5 = '\r\r\t\1if (is_array($context)) {';
     const BLOCK_OPTIONS_FN_BODY_6 = '\r\t\1\1$data->pop();';
     const BLOCK_OPTIONS_FN_BODY_7 = '\r\t\1}';
     const BLOCK_OPTIONS_FN_CLOSE = '\r\r\t\1return $buffer;\r\t},\r';
 
     const BLOCK_OPTIONS_INVERSE_OPEN = '\r\t\'inverse\' => function($context = null) use ($noop, $data, &$helper) {';
-    const BLOCK_OPTIONS_INVERSE_BODY_1 = '\r\t\1if(is_array($context)) {';
+    const BLOCK_OPTIONS_INVERSE_BODY_1 = '\r\t\1if (is_array($context)) {';
     const BLOCK_OPTIONS_INVERSE_BODY_2 = '\r\t\1\1$data->push($context);';
     const BLOCK_OPTIONS_INVERSE_BODY_3 = '\r\t\1}';
     const BLOCK_OPTIONS_INVERSE_BODY_4 = '\r\r\t\1$buffer = \'\';';
-    const BLOCK_OPTIONS_INVERSE_BODY_5 = '\r\r\t\1if(is_array($context)) {';
+    const BLOCK_OPTIONS_INVERSE_BODY_5 = '\r\r\t\1if (is_array($context)) {';
     const BLOCK_OPTIONS_INVERSE_BODY_6 = '\r\t\1\1$data->pop();';
     const BLOCK_OPTIONS_INVERSE_BODY_7 = '\r\t\1}';
     const BLOCK_OPTIONS_INVERSE_CLOSE = '\r\r\t\1return $buffer;\r\t}\r';
