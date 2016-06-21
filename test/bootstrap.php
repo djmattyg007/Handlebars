@@ -6,6 +6,6 @@
  * Copyright and license information can be found at LICENSE.txt
  * distributed with this package.
  */
-//assuming we are in a composer vendor folder
+
 require_once __DIR__.'/../vendor/autoload.php';
 require_once __DIR__.'/../vendor/eden/core/src/Control.php';
