@@ -116,10 +116,6 @@ class Runtime extends Base
      */
     public static function registerHelper(string $name, $helper)
     {
-        Argument::i()
-            //Argument 2 must be a Closure of some kind
-            ->test(2, 'Closure');
-        
         self::$helpers[$name] = $helper;
     }
 

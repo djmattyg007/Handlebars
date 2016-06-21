@@ -69,30 +69,61 @@ class Index extends Base
     public function compile(string $template)
     {
         $name = md5($template);
-        
+
         if (isset(self::$callbacks[$name])) {
             return self::$callbacks[$name];
         }
-        
-        $file = $this->cache . '/' . $this->prefix . $name . '.php';
 
-        if (is_dir($this->cache) && file_exists($file)) {
-            $callback = include($file);
-        } else {
+        $callback = $this->loadCache($this->prefix . $name . '.php');
+        if (!$callback) {
             $code = Compiler::i($this, $template)->compile();
-            
-            if (is_dir($this->cache)) {
-                file_put_contents($file, $code);
-            }
-            
+
+            $this->saveCache($this->prefix . $name . '.php', $code);
+
             //called like: function($data) {};
             $callback = @eval('?>'.$code);
             //$this->checkEval($code);
         }
-        
+
         self::$callbacks[$name] = $callback;
-        
+
         return $callback;
+    }
+
+    /**
+     * @param string $filename
+     * @return function|null
+     */
+    protected function loadCache(string $filename)
+    {
+        if ($this->cache === null) {
+            return null;
+        }
+        if (is_dir($this->cache) === false) {
+            return null;
+        }
+        $fullFilename = $this->cache . DIRECTORY_SEPARATOR . $filename;
+        if (file_exists($fullFilename) === true) {
+            return include($fullFilename);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * @param string $filename
+     * @param string $code
+     */
+    protected function saveCache(string $filename, string $code)
+    {
+        if ($this->cache === null) {
+            return;
+        }
+        if (is_dir($this->cache) === false) {
+            return;
+        }
+        $fullFilename = $this->cache . DIRECTORY_SEPARATOR . $filename;
+        file_put_contents($filename, $code);
     }
 
     /**
