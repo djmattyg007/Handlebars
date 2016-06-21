@@ -20,206 +20,57 @@ namespace Eden\Handlebars;
  */
 class Compiler extends Base
 {
-    /**
-     * @const string BLOCK_TEXT_LINE
-     */
     const BLOCK_TEXT_LINE = '\r\t$buffer .= \'%s\'.\n;';
-
-    /**
-     * @const string BLOCK_TEXT_LAST
-     */
     const BLOCK_TEXT_LAST = '\r\t$buffer .= \'%s\';';
 
-    /**
-     * @const string BLOCK_ESCAPE_VALUE
-     */
     const BLOCK_ESCAPE_VALUE = '\r\t$buffer .= $data->find(\'%s\');\r';
-
-    /**
-     * @const string BLOCK_VARIABLE_VALUE
-     */
     const BLOCK_VARIABLE_VALUE = '\r\t$buffer .= htmlspecialchars($data->find(\'%s\'), ENT_COMPAT, \'UTF-8\');\r';
 
-    /**
-     * @const string BLOCK_ESCAPE_HELPER_OPEN
-     */
     const BLOCK_ESCAPE_HELPER_OPEN = '\r\t$buffer .= $helper[\'%s\'](';
-
-    /**
-     * @const string BLOCK_ESCAPE_HELPER_CLOSE
-     */
     const BLOCK_ESCAPE_HELPER_CLOSE = '\r\t);\r';
 
-    /**
-     * @const string BLOCK_VARIABLE_HELPER_OPEN
-     */
     const BLOCK_VARIABLE_HELPER_OPEN = '\r\t$buffer .= htmlspecialchars($helper[\'%s\'](';
-
-    /**
-     * @const string BLOCK_VARIABLE_HELPER_CLOSE
-     */
     const BLOCK_VARIABLE_HELPER_CLOSE = '\r\t), ENT_COMPAT, \'UTF-8\');\r';
 
-    /**
-     * @const string BLOCK_ARGUMENT_VALUE
-     */
     const BLOCK_ARGUMENT_VALUE = '$data->find(\'%s\')';
 
-    /**
-     * @const string BLOCK_OPTIONS_OPEN
-     */
     const BLOCK_OPTIONS_OPEN = 'array(';
-
-    /**
-     * @const string BLOCK_OPTIONS_CLOSE
-     */
     const BLOCK_OPTIONS_CLOSE = '\r\t)';
 
-    /**
-     * @const string BLOCK_OPTIONS_FN_OPEN
-     */
     const BLOCK_OPTIONS_FN_OPEN = '\r\t\'fn\' => function($context = null) use ($noop, $data, &$helper) {';
-
-    /**
-     * @const string BLOCK_OPTIONS_FN_BODY_1
-     */
     const BLOCK_OPTIONS_FN_BODY_1 = '\r\t\1if(is_array($context)) {';
-
-    /**
-     * @const string BLOCK_OPTIONS_FN_BODY_2
-     */
     const BLOCK_OPTIONS_FN_BODY_2 = '\r\t\1\1$data->push($context);';
-
-    /**
-     * @const string BLOCK_OPTIONS_FN_BODY_3
-     */
     const BLOCK_OPTIONS_FN_BODY_3 = '\r\t\1}';
-
-    /**
-     * @const string BLOCK_OPTIONS_FN_BODY_4
-     */
     const BLOCK_OPTIONS_FN_BODY_4 = '\r\r\t\1$buffer = \'\';';
-
-    /**
-     * @const string BLOCK_OPTIONS_FN_BODY_5
-     */
     const BLOCK_OPTIONS_FN_BODY_5 = '\r\r\t\1if(is_array($context)) {';
-
-    /**
-     * @const string BLOCK_OPTIONS_FN_BODY_6
-     */
     const BLOCK_OPTIONS_FN_BODY_6 = '\r\t\1\1$data->pop();';
-
-    /**
-     * @const string BLOCK_OPTIONS_FN_BODY_7
-     */
     const BLOCK_OPTIONS_FN_BODY_7 = '\r\t\1}';
-
-    /**
-     * @const string BLOCK_OPTIONS_FN_CLOSE
-     */
     const BLOCK_OPTIONS_FN_CLOSE = '\r\r\t\1return $buffer;\r\t},\r';
 
-    /**
-     * @const string BLOCK_OPTIONS_INVERSE_OPEN
-     */
     const BLOCK_OPTIONS_INVERSE_OPEN = '\r\t\'inverse\' => function($context = null) use ($noop, $data, &$helper) {';
-
-    /**
-     * @const string BLOCK_OPTIONS_INVERSE_BODY_1
-     */
     const BLOCK_OPTIONS_INVERSE_BODY_1 = '\r\t\1if(is_array($context)) {';
-
-    /**
-     * @const string BLOCK_OPTIONS_INVERSE_BODY_2
-     */
     const BLOCK_OPTIONS_INVERSE_BODY_2 = '\r\t\1\1$data->push($context);';
-
-    /**
-     * @const string BLOCK_OPTIONS_INVERSE_BODY_3
-     */
     const BLOCK_OPTIONS_INVERSE_BODY_3 = '\r\t\1}';
-
-    /**
-     * @const string BLOCK_OPTIONS_INVERSE_BODY_4
-     */
     const BLOCK_OPTIONS_INVERSE_BODY_4 = '\r\r\t\1$buffer = \'\';';
-
-    /**
-     * @const string BLOCK_OPTIONS_INVERSE_BODY_5
-     */
     const BLOCK_OPTIONS_INVERSE_BODY_5 = '\r\r\t\1if(is_array($context)) {';
-
-    /**
-     * @const string BLOCK_OPTIONS_INVERSE_BODY_6
-     */
     const BLOCK_OPTIONS_INVERSE_BODY_6 = '\r\t\1\1$data->pop();';
-
-    /**
-     * @const string BLOCK_OPTIONS_INVERSE_BODY_7
-     */
     const BLOCK_OPTIONS_INVERSE_BODY_7 = '\r\t\1}';
-
-    /**
-     * @const string BLOCK_OPTIONS_INVERSE_CLOSE
-     */
     const BLOCK_OPTIONS_INVERSE_CLOSE = '\r\r\t\1return $buffer;\r\t}\r';
 
-    /**
-     * @const string BLOCK_OPTIONS_FN_EMPTY
-     */
     const BLOCK_OPTIONS_FN_EMPTY = '\r\t\'fn\' => $noop,';
-
-    /**
-     * @const string BLOCK_OPTIONS_INVERSE_EMPTY
-     */
     const BLOCK_OPTIONS_INVERSE_EMPTY = '\r\t\'inverse\' => $noop';
-
-    /**
-     * @const string BLOCK_OPTIONS_NAME
-     */
     const BLOCK_OPTIONS_NAME = '\r\t\'name\' => \'%s\',';
-
-    /**
-     * @const string BLOCK_OPTIONS_ARGS
-     */
     const BLOCK_OPTIONS_ARGS = '\r\t\'args\' => \'%s\',';
-
-    /**
-     * @const string BLOCK_OPTIONS_HASH
-     */
     const BLOCK_OPTIONS_HASH = '\r\t\'hash\' => array(%s),';
-
-    /**
-     * @const string BLOCK_OPTIONS_HASH_KEY_VALUE
-     */
     const BLOCK_OPTIONS_HASH_KEY_VALUE = '\'%s\' => %s';
 
-    /**
-     * @const string LAST_OPEN
-     */
     const LAST_OPEN = ' LAST ';
-    
-    /**
-     * @const string ERROR_AND
-     */
+
     const ERROR_AND = ' AND ';
-    
-    /**
-     * @const string ERROR_LINE
-     */
     const ERROR_LINE = '"%s" on line %s';
-    
-    /**
-     * @const string ERROR_MISSING_CLOSING
-     */
     const ERROR_MISSING_CLOSING = 'Missing closing tags for: %s';
-    
-    /**
-     * @const string ERROR_UNKNOWN_END
-     */
     const ERROR_UNKNOWN_END = 'Unknown close tag: "%s" on line %s';
-    
+
     /**
      * @var string
      */
@@ -252,7 +103,7 @@ class Compiler extends Base
         $this->handlebars = $handlebars;
         
         if (is_null(self::$layout)) {
-            self::$layout = file_get_contents(__DIR__.'/layout.template');
+            self::$layout = file_get_contents(__DIR__ . '/layout.template');
         }
     }
 
@@ -298,7 +149,7 @@ class Compiler extends Base
                     break;
             }
         });
-        
+
         //START: This is more to help troubleshooting
         if (count($open)) {
             foreach ($open as $i => $item) {
@@ -308,7 +159,7 @@ class Compiler extends Base
             throw new Exception(sprintf(self::ERROR_MISSING_CLOSING, implode(self::ERROR_AND, $open)));
         }
         //END: This is more to help troubleshooting
-        
+
         if (!$layout) {
             return $buffer;
         }
@@ -503,7 +354,7 @@ class Compiler extends Base
         return $this->prettyPrint(sprintf(self::BLOCK_ESCAPE_HELPER_OPEN, $name), -2)
             . $this->prettyPrint('\r\t' . implode(', \r\t', $args), 1, 2);
     }
-    
+
     /**
      * Partially renders the section close tokens
      *
@@ -514,17 +365,17 @@ class Compiler extends Base
     protected function generateClose(array $node, array &$open) : string
     {
         $node['value'] = trim($node['value']);
-        
+
         //START: This is more to help troubleshooting
         if ($this->findSection($open, $node['value']) === false) {
             throw new Exception(sprintf(self::ERROR_UNKNOWN_END, $node['value'], $node['line']));
         }
         //END: This is more to help troubleshooting
-        
+
         $buffer = '';
-        
+
         $i = $this->findSection($open);
-        
+
         if (!isset($open[$i]['else'])) {
             $buffer .= $this->prettyPrint(self::BLOCK_OPTIONS_FN_BODY_5, -1);
             $buffer .= $this->prettyPrint(self::BLOCK_OPTIONS_FN_BODY_6);
@@ -537,15 +388,15 @@ class Compiler extends Base
             $buffer .= $this->prettyPrint(self::BLOCK_OPTIONS_INVERSE_BODY_7);
             $buffer .= $this->prettyPrint(self::BLOCK_OPTIONS_INVERSE_CLOSE, -1);
         }
-        
+
         unset($open[$i]);
-        
+
         $buffer .= $this->prettyPrint(self::BLOCK_OPTIONS_CLOSE, -1);
         $buffer .= $this->prettyPrint(self::BLOCK_ESCAPE_HELPER_CLOSE, -1);
-        
+
         return $buffer;
     }
-    
+
     /**
      * Generates helpers to add to the layout
      * This is a placeholder incase we want to add in the future

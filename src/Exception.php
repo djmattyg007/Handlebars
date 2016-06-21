@@ -17,6 +17,6 @@ namespace Eden\Handlebars;
  * @author   Christian Blanquera <cblanquera@openovate.com>
  * @standard PSR-2
  */
-class Exception extends \Eden\Core\Exception
+class Exception
 {
 }

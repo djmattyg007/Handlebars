@@ -80,7 +80,6 @@ class Index extends Base
 
             //called like: function($data) {};
             $callback = @eval('?>'.$code);
-            //$this->checkEval($code);
         }
 
         self::$callbacks[$name] = $callback;
@@ -261,43 +260,6 @@ class Index extends Base
     public function unregisterPartial(string $name) : Index
     {
         Runtime::unregisterPartial($name);
-        return $this;
-    }
-
-    /**
-     * Returns a very nice error message
-     *
-     * @param string $code
-     * @return Index
-     */
-    protected function checkEval(string $code) : Index
-    {
-        $error = error_get_last();
-
-        if (isset($error['message']) 
-            && isset($error['line'])
-            && $error['message'] === 'parse error'
-        ) {
-            $code = explode("\n", $code);
-            $start = $error['line'] - 25;
-            if ($start < 0) {
-                $start = 0;
-            }
-
-            $code = array_splice($code, $start, 50);
-
-            foreach ($code as $i => $line) {
-                $code[$i] = (++$start) . ': ' . $line;
-            }
-
-            Exception::i(self::COMPILE_ERROR)
-                ->setType('COMPILE')
-                ->addVariable($error['message'])
-                ->addVariable($error['line'])
-                ->addVariable(implode("\n", $code))
-                ->trigger();
-        }
-
         return $this;
     }
 }
