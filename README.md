@@ -11,15 +11,15 @@
  - [Production Ready](#production)
  - [API](#api)
     - [compile](#compile)
-    - [getCache](#getCache)
+    - [getCachePath](#getCachePath)
     - [getHelper](#getHelper)
     - [getHelpers](#getHelpers)
     - [getPartial](#getPartial)
     - [getPartials](#getPartials)
     - [registerHelper](#registerHelper)
     - [registerPartial](#registerPartial)
-    - [setPrefix](#setPrefix)
-    - [setCache](#getPartials)
+    - [setCacheFilePrefix](#setCacheFilePrefix)
+    - [setCachePath](#setCachePath)
     - [unregisterHelper](#unregisterHelper)
     - [unregisterPartial](#unregisterPartial)
  - [Contributing](#contributing)
@@ -159,7 +159,7 @@ echo $template(array('foo' => 'BAR'));
 When your templates are ready for a production (live) environment, it is recommended that caching be used. To enable cache:
 
  - Create a cache folder and make sure permissions are properly set for handlebars to write files to it.
- - Enable cache by using `eden('handlebars')->setCache(__DIR__.'/your/cache/folder/location');`
+ - Enable cache by using `eden('handlebars')->setCachePath(__DIR__.'/your/cache/folder/location');`
  - If the folder location does not exist, caching will be disabled.
 
 ====
@@ -195,16 +195,16 @@ eden('handlebars')->compile();
 
 ====
 
-<a name="getCache"></a>
+<a name="getCachePath"></a>
 
-### getCache
+### getCachePath
 
 Returns the active cache path
 
 #### Usage
 
 ```
-eden('handlebars')->getCache();
+eden('handlebars')->getCachePath();
 ```
 
 Returns `Closure`
@@ -341,54 +341,54 @@ eden('handlebars')->registerPartial();
 
 ==== 
 
-<a name="setCache"></a>
+<a name="setCachePath"></a>
 
-### setCache
+### setCachePath
 
 Enables the cache option
 
 #### Usage
 
 ```
-eden('handlebars')->setCache(string $path);
+eden('handlebars')->setCachePath(string $cachePath);
 ```
 
 #### Parameters
 
- - `string $path` - The cache path
+ - `string $cachePath` - The path to store cached copies of compiled templates
 
 Returns `Eden\Handlebrs\Index`
 
 #### Example
 
 ```
-eden('handlebars')->setCache('/path/to/cache/folder');
+eden('handlebars')->setCachePath('/path/to/cache/folder');
 ```
 
 ====  
 
-<a name="setPrefix"></a>
+<a name="setCacheFilePrefix"></a>
 
-### setPrefix
+### setCacheFilePrefix
 
-Sets the file name prefix for caching
+Sets the cache file name prefix for caching
 
 #### Usage
 
 ```
-eden('handlebars')->setPrefix(string $prefix);
+eden('handlebars')->setCacheFilePrefix(string $cacheFilePrefix);
 ```
 
 #### Parameters
 
- - `string $prefix` - Custom prefix name
+ - `string $cacheFilePrefix` - Custom prefix name
 
 Returns `Eden\Handlebrs\Index`
 
 #### Example
 
 ```
-eden('handlebars')->setPrefix('special-template-');
+eden('handlebars')->setCacheFilePrefix('special-template-');
 ```
 
 ==== 

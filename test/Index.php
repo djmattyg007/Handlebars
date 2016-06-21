@@ -19,8 +19,8 @@ class Eden_Handlebars_Index_Test extends PHPUnit_Framework_TestCase
 	
 	public function testSetAndGetCache()
 	{
-		$this->assertNull(eden('handlebars')->getCache());
-		$this->assertEquals('/foo/bar', eden('handlebars')->setCache('/foo/bar')->getCache());
+		$this->assertNull(eden('handlebars')->getCachePath());
+		$this->assertEquals('/foo/bar', eden('handlebars')->setCachePath('/foo/bar')->getCachePath());
 	}
 	
 	public function testGetHelper()
@@ -176,9 +176,9 @@ class Eden_Handlebars_Index_Test extends PHPUnit_Framework_TestCase
 		$this->assertEquals('This is FOO ... Foo is not Amazing', $results);
 	}
 	
-	public function testSetPrefix()
+	public function testSetCacheFilePrefix()
 	{
-		$instance = eden('handlebars')->setPrefix('foobar');
+		$instance = eden('handlebars')->setCacheFilePrefix('foobar');
 		$this->assertInstanceOf('Eden\\Handlebars\\Index', $instance);
 	}
 

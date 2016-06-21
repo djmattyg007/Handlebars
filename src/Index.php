@@ -23,28 +23,26 @@ namespace Eden\Handlebars;
  */
 class Index extends Base
 {
-    /**
-     * @const string FILE_PREFIX
-     */
     const COMPILE_ERROR = "%s on line %s \n```\n%s\n```\n";
 
-    /**
-     * @const string FILE_PREFIX
-     */
-    const FILE_PREFIX = '__HANDLEBARS__';
+    const DEFAULT_CACHEFILE_PREFIX = '__HANDLEBARS__';
 
     /**
-     * @var string $prefix You can change the file prefix with setPrefix()
+     * @var string
      */
-    protected $prefix = self::FILE_PREFIX;
+    protected $cacheFilePrefix = self::DEFAULT_CACHEFILE_PREFIX;
 
     /**
-     * @var string|null $cache The cache path location
+     * The cache path location
+     *
+     * @var string|null
      */
-    protected $cache = null;
+    protected $cachePath = null;
 
     /**
-     * @var array $callbacks A list of compiled template callbacks
+     * A list of compiled template callbacks
+     *
+     * @var array
      */
     protected static $callbacks = array();
     
@@ -54,7 +52,7 @@ class Index extends Base
     public function __construct()
     {
         $helpers = require(__DIR__ . '/helpers.php');
-        
+
         foreach ($helpers as $name => $helper) {
             $this->registerHelper($name, $helper);
         }
@@ -63,7 +61,7 @@ class Index extends Base
     /**
      * Returns a callback that binds the data with the template
      *
-     * @param string $template the template string
+     * @param string $template The template string
      * @return function The template binding handler
      */
     public function compile(string $template)
@@ -74,11 +72,11 @@ class Index extends Base
             return self::$callbacks[$name];
         }
 
-        $callback = $this->loadCache($this->prefix . $name . '.php');
+        $callback = $this->loadCache($this->cacheFilePrefix . $name . '.php');
         if (!$callback) {
             $code = Compiler::i($this, $template)->compile();
 
-            $this->saveCache($this->prefix . $name . '.php', $code);
+            $this->saveCache($this->cacheFilePrefix . $name . '.php', $code);
 
             //called like: function($data) {};
             $callback = @eval('?>'.$code);
@@ -96,13 +94,13 @@ class Index extends Base
      */
     protected function loadCache(string $filename)
     {
-        if ($this->cache === null) {
+        if ($this->cachePath === null) {
             return null;
         }
-        if (is_dir($this->cache) === false) {
+        if (is_dir($this->cachePath) === false) {
             return null;
         }
-        $fullFilename = $this->cache . DIRECTORY_SEPARATOR . $filename;
+        $fullFilename = $this->cachePath . DIRECTORY_SEPARATOR . $filename;
         if (file_exists($fullFilename) === true) {
             return include($fullFilename);
         } else {
@@ -116,13 +114,13 @@ class Index extends Base
      */
     protected function saveCache(string $filename, string $code)
     {
-        if ($this->cache === null) {
+        if ($this->cachePath === null) {
             return;
         }
-        if (is_dir($this->cache) === false) {
+        if (is_dir($this->cachePath) === false) {
             return;
         }
-        $fullFilename = $this->cache . DIRECTORY_SEPARATOR . $filename;
+        $fullFilename = $this->cachePath . DIRECTORY_SEPARATOR . $filename;
         file_put_contents($filename, $code);
     }
 
@@ -131,9 +129,9 @@ class Index extends Base
      *
      * @return string|null
      */
-    public function getCache()
+    public function getCachePath()
     {
-        return $this->cache;
+        return $this->cachePath;
     }
 
     /**
@@ -218,26 +216,27 @@ class Index extends Base
     }
 
     /**
-     * Enables the cache option
+     * Sets a path to store cached copies of compiled templates.
+     * Setting this enables caching.
      *
-     * @param string The cache path
+     * @param string $cachePath The cache path
      * @return Index
      */
-    public function setCache(string $path) : Index
+    public function setCachePath(string $cachePath) : Index
     {
-        $this->cache = $path;
+        $this->cachePath = $cachePath;
         return $this;
     }
 
     /**
-     * Sets the file name prefix
+     * Sets the cache file name prefix
      *
-     * @param string $prefix
+     * @param string $cacheFilePrefix
      * @return Index
      */
-    public function setPrefix(string $prefix) : Index
+    public function setCacheFilePrefix(string $cacheFilePrefix) : Index
     {
-        $this->prefix = $prefix;
+        $this->cacheFilePrefix = $cacheFilePrefix;
         return $this;
     }
 
@@ -276,9 +275,9 @@ class Index extends Base
         $error = error_get_last();
 
         if (isset($error['message']) 
-			&& isset($error['line'])
-			&& $error['message'] === 'parse error'
-		) {
+            && isset($error['line'])
+            && $error['message'] === 'parse error'
+        ) {
             $code = explode("\n", $code);
             $start = $error['line'] - 25;
             if ($start < 0) {
