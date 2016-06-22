@@ -49,11 +49,10 @@ class Runtime extends \Eden\Core\Base
     /**
      * Returns a specific helper
      *
-     * TODO: Look at $bind parameter
      * @param string $name The name of the helper
-     * @return function|null
+     * @return callable|null
      */
-    public static function getHelper(string $name, Data $bind = null)
+    public static function getHelper(string $name)
     {
         if (isset(self::$helpers[$name])) {
             return self::$helpers[$name];
@@ -65,22 +64,11 @@ class Runtime extends \Eden\Core\Base
     /**
      * Returns all the registered helpers
      *
-     * TODO: Look at $bind parameter
      * @return array
      */
-    public static function getHelpers(Data $bind = null) : array
+    public static function getHelpers() : array
     {
-        if (is_null($bind)) {
-            return self::$helpers;
-        }
-
-        $helpers = array();
-
-        foreach (self::$helpers as $name => $helper) {
-            $helpers[$name] = $helper->bindTo($bind, '\\Eden\\Handlebars\\Data');
-        }
-
-        return $helpers;
+        return self::$helpers;
     }
 
     /**
@@ -112,10 +100,13 @@ class Runtime extends \Eden\Core\Base
      * The famous register helper matching the Handlebars API
      *
      * @param string $name The name of the helper
-     * @param function $helper The helper handler
+     * @param callable $helper The helper handler
      */
     public static function registerHelper(string $name, $helper)
     {
+        if (is_callable($helper) === false) {
+            throw new Exception("All Handlebars helpers must be callable");
+        }
         self::$helpers[$name] = $helper;
     }
 

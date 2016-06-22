@@ -26,7 +26,7 @@ class Eden_Handlebars_Runtime_Test extends PHPUnit_Framework_TestCase
     public function testGetHelper()
     {
         Handlebars\Runtime::registerHelper('foo', function() {});
-        $this->assertInstanceOf('Closure', Handlebars\Runtime::getHelper('foo'));
+        $this->assertTrue(is_callable(Handlebars\Runtime::getHelper('foo')));
         $this->assertNull(Handlebars\Runtime::getHelper('bar'));
     }
 

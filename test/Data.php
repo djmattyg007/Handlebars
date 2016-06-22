@@ -76,7 +76,7 @@ class Eden_Handlebars_Data_Test extends PHPUnit_Framework_TestCase
         $this->assertEquals('this is good', $data->find('../comment1'));
         $this->assertEquals('this is great', $data->find('../../product_comments.comment2'));
         $this->assertEquals('this is epic', $data->find('comment6'));
-        
+
         $this->assertEquals('Hello World', $data->find('.././../product_title'));
         $this->assertEquals('this is good', $data->find('./../comment1'));
         $this->assertEquals('this is great', $data->find('../.././product_comments.comment2'));

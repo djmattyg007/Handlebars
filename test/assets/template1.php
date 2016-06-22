@@ -5,7 +5,7 @@ use \Eden\Handlebars\Runtime as Runtime;
 return function($data = array()) {
     $noop = function() {};
     $context = $data = Data::i($data);
-    $helper = Runtime::getHelpers($data);
+    $helper = Runtime::getHelpers();
 
     $buffer = ''; 
 
