@@ -99,7 +99,7 @@ class Compiler extends Base
      */
     public function __construct(Index $handlebars, string $source)
     {
-        $this->source = $source;
+        $this->source = $this->trim($source);
         $this->handlebars = $handlebars;
         
         if (is_null(self::$layout)) {
@@ -126,11 +126,10 @@ class Compiler extends Base
      */
     public function compile(bool $layout = true)
     {
-        $code = $this->trim($this->source);
         $buffer = '';
         $open = array();
         
-        Tokenizer::i($code)->tokenize(function ($node) use (&$buffer, &$open) {
+        Tokenizer::i($this->source)->tokenize(function ($node) use (&$buffer, &$open) {
             switch ($node['type']) {
                 case Tokenizer::TYPE_TEXT:
                     $buffer .= $this->generateText($node, $open);
@@ -407,10 +406,10 @@ class Compiler extends Base
     protected function generateHelpers() : string
     {
         $helpers = $this->handlebars->getHelpers();
-        
+
         foreach ($helpers as $name => $helper) {
             $function = new \ReflectionFunction($this->handlebars->getHelper($name));
-            
+
             $path = $function->getFileName();
             $lines = file_get_contents($path);
             $file = new \SplFileObject($path);
@@ -418,16 +417,16 @@ class Compiler extends Base
             $start = $file->ftell();
             $file->seek($function->getEndLine() - 1);
             $end = $file->ftell();
-            
+
             $code = preg_replace(
                 '/^.*?function(\s+[^\s\\(]+?)?\s*\\((.+)\\}.*?\s*$/s',
                 'function($2}',
                 substr($lines, $start, $end - $start)
             );
-            
+
             $helpers[$name] = sprintf(self::BLOCK_OPTIONS_HASH_KEY_VALUE, $name, $code);
         }
-        
+
         return $this->prettyPrint(self::BLOCK_OPTIONS_OPEN)
             . $this->prettyPrint('\r\t')
             . implode($this->prettyPrint(',\r\t'), $helpers)

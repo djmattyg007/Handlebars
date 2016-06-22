@@ -20,29 +20,12 @@ namespace Eden\Handlebars;
  */
 class Tokenizer extends Base
 {
-    /**
-     * @const string TYPE_TEXT
-     */
     const TYPE_TEXT = 'text';
-    
-    /**
-     * @const string TYPE_VARIABLE_ESCAPE
-     */
+
     const TYPE_VARIABLE_ESCAPE = 'escape';
-    
-    /**
-     * @const string TYPE_VARIABLE_UNESCAPE
-     */
     const TYPE_VARIABLE_UNESCAPE = 'variable';
-    
-    /**
-     * @const string TYPE_SECTION_OPEN
-     */
+
     const TYPE_SECTION_OPEN = 'section';
-    
-    /**
-     * @const string TYPE_SECTION_CLOSE
-     */
     const TYPE_SECTION_CLOSE = 'close';
 
     /**
@@ -64,7 +47,7 @@ class Tokenizer extends Base
      * @var string $level
      */
     protected $level = 0;
-    
+
     /**
      * Just load the source template
      *
@@ -74,7 +57,7 @@ class Tokenizer extends Base
     {
         $this->source = $source;
     }
-    
+
     /**
      * Main rendering function that will
      * callback tokens instead of storing them in memory
@@ -90,12 +73,12 @@ class Tokenizer extends Base
         }
 
         $length = strlen($this->source);
-        
+
         for ($line = 1, $i = 0; $i < $length; $i++) {
             if ($this->source[$i] == "\n") {
                 $line++;
             }
-            
+
             switch (true) {
                 //section
                 case substr($this->source, $i, 3) == '{{{#':
@@ -110,7 +93,7 @@ class Tokenizer extends Base
                 case substr($this->source, $i, 3) == '{{/':
                     $i = $this->addNode($i, self::TYPE_SECTION_CLOSE, $line, 3, 5, $callback);
                     break;
-                
+
                 //variable
                 case substr($this->source, $i, 3) == '{{{':
                     $i = $this->addNode($i, self::TYPE_VARIABLE_ESCAPE, $line, 3, 6, $callback);
@@ -118,19 +101,18 @@ class Tokenizer extends Base
                 case substr($this->source, $i, 2) == '{{':
                     $i = $this->addNode($i, self::TYPE_VARIABLE_UNESCAPE, $line, 2, 4, $callback);
                     break;
-                
+
                 //text
                 default:
                     $this->buffer .= $this->source[$i];
                     break;
-                    
             }
         }
 
         $this->flushText($i, $callback);
         return $this;
     }
-    
+
     /**
      * Forms the node and passes to the callback
      *
@@ -143,7 +125,7 @@ class Tokenizer extends Base
     protected function addNode(int $start, string $type, $line, $offset1, $offset2, $callback)
     {
         $this->flushText($start, $callback);
-        
+
         switch ($type) {
             case self::TYPE_VARIABLE_ESCAPE:
                 $end = $this->findVariable($start, true);
@@ -160,7 +142,7 @@ class Tokenizer extends Base
                 $this->level --;
                 break;
         }
-        
+
         call_user_func($callback, array(
             'type'  => $type,
             'line'  => $line,
@@ -169,14 +151,14 @@ class Tokenizer extends Base
             'level' => $this->level,
             'value' => substr($this->source, $start + $offset1, $end - $start - $offset2)
         ), $this->source);
-        
+
         if ($type === self::TYPE_SECTION_OPEN) {
             $this->level ++;
         }
-        
+
         return $end - 1;
     }
-    
+
     /**
      * Takes whatever is in the buffer
      * forms a node and passes it to
@@ -220,11 +202,10 @@ class Tokenizer extends Base
         if ($escape) {
             $close = '}}}';
         }
-        
-        for (; substr($this->source, $i, strlen($close)) !== $close;
-        $i++) {
+
+        for (; substr($this->source, $i, strlen($close)) !== $close; $i++) {
         }
-        
+
         return $i + strlen($close);
     }
 }
