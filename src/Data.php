@@ -18,7 +18,7 @@ namespace Eden\Handlebars;
  * @author   Christian Blanquera <cblanquera@openovate.com>
  * @standard PSR-2
  */
-class Data extends Base
+class Data extends \Eden\Core\Base
 {
     /**
      * @var array

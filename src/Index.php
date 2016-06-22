@@ -21,7 +21,7 @@ namespace Eden\Handlebars;
  * @author   Christian Blanquera <cblanquera@openovate.com>
  * @standard PSR-2
  */
-class Index extends Base
+class Index extends \Eden\Core\Base
 {
     const COMPILE_ERROR = "%s on line %s \n```\n%s\n```\n";
 

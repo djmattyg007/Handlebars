@@ -18,7 +18,7 @@ namespace Eden\Handlebars;
  * @author   Christian Blanquera <cblanquera@openovate.com>
  * @standard PSR-2
  */
-class Tokenizer extends Base
+class Tokenizer extends \Eden\Core\Base
 {
     const TYPE_TEXT = 'text';
 

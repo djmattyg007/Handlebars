@@ -18,7 +18,7 @@ namespace Eden\Handlebars;
  * @author   Christian Blanquera <cblanquera@openovate.com>
  * @standard PSR-2
  */
-class Compiler extends Base
+class Compiler extends \Eden\Core\Base
 {
     const BLOCK_TEXT_LINE = '\r\t$buffer .= \'%s\'.\n;';
     const BLOCK_TEXT_LAST = '\r\t$buffer .= \'%s\';';
