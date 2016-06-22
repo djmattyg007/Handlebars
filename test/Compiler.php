@@ -17,7 +17,7 @@ class Eden_Handlebars_Compiler_Test extends PHPUnit_Framework_TestCase
     public function testGetSource()
     {    
         //load the source
-        $source = file_get_contents(__DIR__.'/assets/tokenizer.html');
+        $source = file_get_contents(__DIR__ . '/assets/tokenizer.html');
 
         $index = IndexStub::i();
 
@@ -29,9 +29,9 @@ class Eden_Handlebars_Compiler_Test extends PHPUnit_Framework_TestCase
     public function testCompile()
     {
         //load the source
-        $source = trim(file_get_contents(__DIR__.'/assets/tokenizer.html'));
-        $template1 = file_get_contents(__DIR__.'/assets/template1.php');
-        $template2 = file_get_contents(__DIR__.'/assets/template2.php');
+        $source = trim(file_get_contents(__DIR__ . '/assets/tokenizer.html'));
+        $template1 = file_get_contents(__DIR__ . '/assets/template1.php');
+        $template2 = file_get_contents(__DIR__ . '/assets/template2.php');
 
         $index = IndexStub::i();
 
@@ -46,7 +46,7 @@ class Eden_Handlebars_Compiler_Test extends PHPUnit_Framework_TestCase
 
     public function testSetOffset()
     {
-        $source = file_get_contents(__DIR__.'/assets/tokenizer.html');
+        $source = file_get_contents(__DIR__ . '/assets/tokenizer.html');
 
         $index = IndexStub::i();
 
@@ -57,7 +57,7 @@ class Eden_Handlebars_Compiler_Test extends PHPUnit_Framework_TestCase
 
     public function testParseArguments()
     {
-        $source = file_get_contents(__DIR__.'/assets/tokenizer.html');
+        $source = file_get_contents(__DIR__ . '/assets/tokenizer.html');
 
         $index = IndexStub::i();
 
@@ -94,13 +94,13 @@ class Eden_Handlebars_Compiler_Test extends PHPUnit_Framework_TestCase
     }
 }
 
-if(!class_exists('IndexStub')) {
+if (!class_exists('IndexStub')) {
     class IndexStub extends Eden\Handlebars\Index
     {
     }
 }
 
-if(!class_exists('CompilerStub')) {
+if (!class_exists('CompilerStub')) {
     class CompilerStub extends Eden\Handlebars\Compiler
     {
         public function parseArgumentsStub($string)

@@ -116,13 +116,15 @@ class Tokenizer extends Base
     /**
      * Forms the node and passes to the callback
      *
-     * TODO: Look at all parameters
      * @param int $start
      * @param string $type
+     * @param int $line
+     * @param int $offset1
+     * @param int $offset2
      * @param function $callback
      * @return Tokenizer
      */
-    protected function addNode(int $start, string $type, $line, $offset1, $offset2, $callback)
+    protected function addNode(int $start, string $type, int $line, int $offset1, int $offset2, $callback)
     {
         $this->flushText($start, $callback);
 
@@ -139,7 +141,7 @@ class Tokenizer extends Base
             case self::TYPE_SECTION_CLOSE:
             default:
                 $end = $this->findVariable($start, false);
-                $this->level --;
+                $this->level--;
                 break;
         }
 
@@ -153,7 +155,7 @@ class Tokenizer extends Base
         ), $this->source);
 
         if ($type === self::TYPE_SECTION_OPEN) {
-            $this->level ++;
+            $this->level++;
         }
 
         return $end - 1;
@@ -190,7 +192,7 @@ class Tokenizer extends Base
 
     /**
      * Since we know where the start is,
-     * we need to find the end in the source
+     * we need to find the end in the source.
      *
      * @param int $i
      * @param bool $escape
@@ -198,10 +200,7 @@ class Tokenizer extends Base
      */
     protected function findVariable(int $i, bool $escape) : int
     {
-        $close = '}}';
-        if ($escape) {
-            $close = '}}}';
-        }
+        $close = ($escape === true ? '}}}' : '}}');
 
         for (; substr($this->source, $i, strlen($close)) !== $close; $i++) {
         }
