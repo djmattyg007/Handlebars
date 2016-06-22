@@ -129,7 +129,7 @@ class Tokenizer
      * @param int $line
      * @param int $offset1
      * @param int $offset2
-     * @param function $callback
+     * @param callable $callback
      * @return Tokenizer
      */
     protected function addNode(int $start, string $type, int $line, int $offset1, int $offset2, $callback)
@@ -175,7 +175,7 @@ class Tokenizer
      * the callback
      *
      * @param int $i
-     * @param function $callback
+     * @param callable $callback
      * @return Tokenizer
      */
     protected function flushText(int $i, $callback)
