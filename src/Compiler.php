@@ -547,7 +547,7 @@ class Compiler extends \Eden\Core\Base
     {
         //lookout for pre processors helper
         $value = explode(' ', $node['value']);
-            
+
         //is it a helper ?
         $helper = Runtime::getHelper('tokenize-' . $value[0]);
 
@@ -556,7 +556,7 @@ class Compiler extends \Eden\Core\Base
         }
 
         list($name, $args, $hash) = $this->parseArguments($node['value']);
-        
+
         //options
         $args[] = array(
             'node'       => $node,
@@ -566,11 +566,11 @@ class Compiler extends \Eden\Core\Base
             'offset'     => $this->offset,
             'handlebars' => $this->handlebars
         );
-        
+
         //NOTE: Tokenized do not have data binded to it
         return call_user_func_array($helper, $args);
     }
-    
+
     /**
      * Makes code look nicely spaced
      *
@@ -582,11 +582,11 @@ class Compiler extends \Eden\Core\Base
     protected function prettyPrint(string $code, int $before = 0, int $after = 0) : string
     {
         $this->offset += $before;
-        
+
         if ($this->offset < 0) {
             $this->offset = 0;
         }
-        
+
         $code = str_replace(
             array('\r', '\n', '\t', '\1', '\2'),
             array("\n", '"\n"',
@@ -596,26 +596,26 @@ class Compiler extends \Eden\Core\Base
             ),
             $code
         );
-        
+
         $this->offset += $after;
-        
+
         if ($this->offset < 0) {
             $this->offset = 0;
         }
-        
+
         $code = str_replace('\\{', '{', $code);
         $code = str_replace('\\}', '}', $code);
-        
+
         //''."\n"
         $code = str_replace(' \'\'."\n"', ' "\n"', $code);
-        
+
         if ($code === '$buffer .= \'\';') {
             return '';
         }
-        
+
         return $code;
     }
-    
+
     /**
      * Finds a particular node in the open sections
      *
@@ -627,16 +627,16 @@ class Compiler extends \Eden\Core\Base
     {
         foreach ($open as $i => $item) {
             $item = explode(' ', $item['value']);
-            
+
             if ($item[0] === $name) {
                 return $i;
             }
         }
-        
+
         if ($name == self::LAST_OPEN) {
             return $i;
         }
-        
+
         return false;
     }
 
