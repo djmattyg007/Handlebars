@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * This file is part of the Eden PHP Library.
  * (c) 2014-2016 Openovate Labs
@@ -6,7 +7,9 @@
  * Copyright and license information can be found at LICENSE.txt
  * distributed with this package.
  */
- 
+
+use Eden\Handlebars;
+
 /**
  * The following tests were pulled from the Mustache.php Library
  * and kept as is with changes to the final class name to test 
@@ -14,58 +17,45 @@
  */
 class Eden_Handlebars_Compiler_Test extends PHPUnit_Framework_TestCase
 {
-    public function testGetSource()
-    {    
-        //load the source
-        $source = file_get_contents(__DIR__ . '/assets/tokenizer.html');
-
-        $index = IndexStub::i();
-
-        $template = Eden\Handlebars\Compiler::i($index, $source)->getSource();
-
-        $this->assertEquals($source, $template);
-    }
-
     public function testCompile()
     {
         //load the source
         $source = trim(file_get_contents(__DIR__ . '/assets/tokenizer.html'));
+        $tokenizer = new Handlebars\Tokenizer($source);
         $template1 = file_get_contents(__DIR__ . '/assets/template1.php');
         $template2 = file_get_contents(__DIR__ . '/assets/template2.php');
 
         $index = IndexStub::i();
 
-        $code = Eden\Handlebars\Compiler::i($index, $source)->compile();
-
+        $code = Handlebars\Compiler::i($index, $tokenizer)->compile();
         $this->assertEquals($template1, $code);
 
-        $code = Eden\Handlebars\Compiler::i($index, $source)->compile(false);
-
+        $code = Handlebars\Compiler::i($index, $tokenizer)->compile(false);
         $this->assertEquals($template2, $code);
     }
 
     public function testSetOffset()
     {
         $source = file_get_contents(__DIR__ . '/assets/tokenizer.html');
+        $tokenizer = new Handlebars\Tokenizer($source);
 
         $index = IndexStub::i();
 
-        $instance = Eden\Handlebars\Compiler::i($index, $source)->setOffset(3);
-
+        $instance = Handlebars\Compiler::i($index, $tokenizer)->setOffset(3);
         $this->assertInstanceOf('Eden\\Handlebars\\Compiler', $instance);
     }
 
     public function testParseArguments()
     {
         $source = file_get_contents(__DIR__ . '/assets/tokenizer.html');
+        $tokenizer = new Handlebars\Tokenizer($source);
 
         $index = IndexStub::i();
 
-        $compiler = CompilerStub::i($index, $source);
+        $compiler = CompilerStub::i($index, $tokenizer);
 
         //basic
         list($name, $args, $hash) = $compiler->parseArgumentsStub("foobar 'merchant' query.profile_type");
-
         $this->assertCount(2, $args);
 
         //advanced

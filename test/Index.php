@@ -1,4 +1,5 @@
 <?php //-->
+declare(strict_types=1);
 /**
  * This file is part of the Eden PHP Library.
  * (c) 2014-2016 Openovate Labs
@@ -6,6 +7,8 @@
  * Copyright and license information can be found at LICENSE.txt
  * distributed with this package.
  */
+
+use Eden\Handlebars;
 
 class Eden_Handlebars_Index_Test extends PHPUnit_Framework_TestCase
 {

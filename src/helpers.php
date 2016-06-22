@@ -174,7 +174,8 @@ return array(
             . '\r\t);\r'
         );
 
-        $code = \Eden\Handlebars\Compiler::i($options['handlebars'], $partial)
+        $tokenizer = new \Eden\Handlebars\Tokenizer($partial);
+        $code = \Eden\Handlebars\Compiler::i($options['handlebars'], $tokenizer)
             ->setOffset($options['offset'] + 3)
             ->compile(false);
 

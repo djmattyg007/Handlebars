@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * This file is part of the Eden PHP Library.
  * (c) 2014-2016 Openovate Labs
@@ -6,6 +7,8 @@
  * Copyright and license information can be found at LICENSE.txt
  * distributed with this package.
  */
+
+use Eden\Handlebars;
  
 /**
  * The following tests were pulled from the Mustache.php Library
@@ -22,27 +25,27 @@ class Eden_Handlebars_Runtime_Test extends PHPUnit_Framework_TestCase
 
     public function testGetHelper()
     {
-        Eden\Handlebars\Runtime::registerHelper('foo', function() {});
-        $this->assertInstanceOf('Closure', Eden\Handlebars\Runtime::getHelper('foo'));
-        $this->assertNull(Eden\Handlebars\Runtime::getHelper('bar'));
+        Handlebars\Runtime::registerHelper('foo', function() {});
+        $this->assertInstanceOf('Closure', Handlebars\Runtime::getHelper('foo'));
+        $this->assertNull(Handlebars\Runtime::getHelper('bar'));
     }
 
     public function testGetHelpers()
     {
-        $helpers = Eden\Handlebars\Runtime::getHelpers();
+        $helpers = Handlebars\Runtime::getHelpers();
         $this->assertTrue(is_array($helpers));
     }
 
     public function testGetPartial()
     {
-        Eden\Handlebars\Runtime::registerPartial('foo', 'bar');
-        $this->assertTrue(is_string(Eden\Handlebars\Runtime::getPartial('foo')));
-        $this->assertNull(Eden\Handlebars\Runtime::getPartial('foobar'));
+        Handlebars\Runtime::registerPartial('foo', 'bar');
+        $this->assertTrue(is_string(Handlebars\Runtime::getPartial('foo')));
+        $this->assertNull(Handlebars\Runtime::getPartial('foobar'));
     }
 
     public function testGetPartials()
     {
-        $partials = Eden\Handlebars\Runtime::getPartials();
+        $partials = Handlebars\Runtime::getPartials();
 
         $this->assertTrue(is_array($partials));
     }
@@ -50,7 +53,7 @@ class Eden_Handlebars_Runtime_Test extends PHPUnit_Framework_TestCase
     public function testRegisterHelper() 
     {
         //simple helper
-        Eden\Handlebars\Runtime::registerHelper('root', function() {
+        Handlebars\Runtime::registerHelper('root', function() {
             return '/some/root';
         });
 
@@ -61,7 +64,7 @@ class Eden_Handlebars_Runtime_Test extends PHPUnit_Framework_TestCase
 
         $found = false;
         $self = $this;
-        Eden\Handlebars\Runtime::registerHelper('foo', function(
+        Handlebars\Runtime::registerHelper('foo', function(
             $bar, 
             $four, 
             $true, 
@@ -86,7 +89,7 @@ class Eden_Handlebars_Runtime_Test extends PHPUnit_Framework_TestCase
         $this->assertEquals(5, $results); 
 
         $found = false;
-        Eden\Handlebars\Runtime::registerHelper('foo', function(
+        Handlebars\Runtime::registerHelper('foo', function(
             $number, 
             $something1, 
             $number2, 
@@ -110,7 +113,7 @@ class Eden_Handlebars_Runtime_Test extends PHPUnit_Framework_TestCase
 
         //attributes test
         $found = false;
-        Eden\Handlebars\Runtime::registerHelper('foo', function(
+        Handlebars\Runtime::registerHelper('foo', function(
             $bar, 
             $number,
             $something1, 
@@ -142,8 +145,8 @@ class Eden_Handlebars_Runtime_Test extends PHPUnit_Framework_TestCase
     public function testRegisterPartial()
     {
         //basic
-        Eden\Handlebars\Runtime::registerPartial('foo', 'This is {{ foo }}');
-        Eden\Handlebars\Runtime::registerPartial('bar', 'Foo is not {{ bar }}');
+        Handlebars\Runtime::registerPartial('foo', 'This is {{ foo }}');
+        Handlebars\Runtime::registerPartial('bar', 'Foo is not {{ bar }}');
         $template = eden('handlebars')->compile('{{> foo }} ... {{> bar }}');
 
         $results = $template(array('foo' => 'FOO', 'bar' => 'BAR'));
@@ -151,8 +154,8 @@ class Eden_Handlebars_Runtime_Test extends PHPUnit_Framework_TestCase
         $this->assertEquals('This is FOO ... Foo is not BAR', $results); 
 
         //with scope
-        Eden\Handlebars\Runtime::registerPartial('foo', 'This is {{ foo }}');
-        Eden\Handlebars\Runtime::registerPartial('bar', 'Foo is not {{ bar }}');
+        Handlebars\Runtime::registerPartial('foo', 'This is {{ foo }}');
+        Handlebars\Runtime::registerPartial('bar', 'Foo is not {{ bar }}');
         $template = eden('handlebars')->compile('{{> foo }} ... {{> bar zoo}}');
 
         $results = $template(array('foo' => 'FOO', 'bar' => 'BAR', 'zoo' => array('bar' => 'ZOO')));
@@ -160,8 +163,8 @@ class Eden_Handlebars_Runtime_Test extends PHPUnit_Framework_TestCase
         $this->assertEquals('This is FOO ... Foo is not ZOO', $results); 
 
         //with attributes
-        Eden\Handlebars\Runtime::registerPartial('foo', 'This is {{ foo }}');
-        Eden\Handlebars\Runtime::registerPartial('bar', 'Foo is not {{ something }}');
+        Handlebars\Runtime::registerPartial('foo', 'This is {{ foo }}');
+        Handlebars\Runtime::registerPartial('bar', 'Foo is not {{ something }}');
         $template = eden('handlebars')->compile('{{> foo }} ... {{> bar zoo something="Amazing"}}');
 
         $results = $template(array('foo' => 'FOO', 'bar' => 'BAR', 'zoo' => array('bar' => 'ZOO')));
@@ -171,14 +174,14 @@ class Eden_Handlebars_Runtime_Test extends PHPUnit_Framework_TestCase
 
     public function testUnregisterHelper()
     {
-        Eden\Handlebars\Runtime::unregisterHelper('if');
-        $this->assertNull(Eden\Handlebars\Runtime::getHelper('if'));
+        Handlebars\Runtime::unregisterHelper('if');
+        $this->assertNull(Handlebars\Runtime::getHelper('if'));
     }
 
     public function testUnregisterPartial()
     {
-        Eden\Handlebars\Runtime::registerPartial('foo', 'bar');
-        Eden\Handlebars\Runtime::unregisterPartial('foo');
-        $this->assertNull(Eden\Handlebars\Runtime::getPartial('foo'));
+        Handlebars\Runtime::registerPartial('foo', 'bar');
+        Handlebars\Runtime::unregisterPartial('foo');
+        $this->assertNull(Handlebars\Runtime::getPartial('foo'));
     }
 }

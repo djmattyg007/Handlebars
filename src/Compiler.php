@@ -79,12 +79,12 @@ class Compiler extends \Eden\Core\Base
     /**
      * @var Index
      */
-    protected $handlebars = null;
+    protected $handlebars;
 
     /**
-     * @var string
+     * @var Tokenizer
      */
-    protected $source = '';
+    protected $tokenizer;
 
     /**
      * @var int
@@ -94,27 +94,17 @@ class Compiler extends \Eden\Core\Base
     /**
      * Just load the source template
      *
-     * @param Eden\Handlebars\Index $handlebars
-     * @param string $source
+     * @param Index $handlebars
+     * @param Tokenizer $tokenizer
      */
-    public function __construct(Index $handlebars, string $source)
+    public function __construct(Index $handlebars, Tokenizer $tokenizer)
     {
-        $this->source = $this->trim($source);
         $this->handlebars = $handlebars;
+        $this->tokenizer = $tokenizer;
         
         if (is_null(self::$layout)) {
             self::$layout = file_get_contents(__DIR__ . '/layout.template');
         }
-    }
-
-    /**
-     * Returns the source
-     *
-     * @return string
-     */
-    public function getSource() : string
-    {
-        return $this->source;
     }
 
     /**
@@ -129,7 +119,7 @@ class Compiler extends \Eden\Core\Base
         $buffer = '';
         $open = array();
         
-        Tokenizer::i($this->source)->tokenize(function ($node) use (&$buffer, &$open) {
+        $this->tokenizer->tokenize(function ($node) use (&$buffer, &$open) {
             switch ($node['type']) {
                 case Tokenizer::TYPE_TEXT:
                     $buffer .= $this->generateText($node, $open);
@@ -170,6 +160,7 @@ class Compiler extends \Eden\Core\Base
     /**
      * Returns a code snippet
      *
+     * TODO: Work out what "the tabbing" is
      * @param int $offset This is to preset the tabbing when generating the code
      * @return Compiler
      */
@@ -638,20 +629,5 @@ class Compiler extends \Eden\Core\Base
         }
 
         return false;
-    }
-
-    /**
-     * Quick trim script
-     *
-     * @param string $string
-     * @return string
-     */
-    protected function trim(string $string) : string
-    {
-        $string = preg_replace('#\s*\{\{\{\~\s*#is', '{{{', $string);
-        $string = preg_replace('#\s*\~\}\}\}\s*#is', '}}}', $string);
-        $string = preg_replace('#\s*\{\{\~\s*#is', '{{', $string);
-        $string = preg_replace('#\s*\~\}\}\s*#is', '}}', $string);
-        return $string;
     }
 }

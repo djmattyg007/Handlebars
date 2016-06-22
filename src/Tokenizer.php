@@ -18,7 +18,7 @@ namespace Eden\Handlebars;
  * @author   Christian Blanquera <cblanquera@openovate.com>
  * @standard PSR-2
  */
-class Tokenizer extends \Eden\Core\Base
+class Tokenizer
 {
     const TYPE_TEXT = 'text';
 
@@ -39,12 +39,12 @@ class Tokenizer extends \Eden\Core\Base
     protected $buffer = '';
 
     /**
-     * @var string $type
+     * @var string
      */
     protected $type = self::TYPE_TEXT;
 
     /**
-     * @var string $level
+     * @var string
      */
     protected $level = 0;
 
@@ -55,21 +55,29 @@ class Tokenizer extends \Eden\Core\Base
      */
     public function __construct(string $source)
     {
-        $this->source = $source;
+        $this->source = $this->trim($source);
+        $this->reset();
+    }
+
+    private function reset()
+    {
+        $this->buffer = '';
+        $this->type = self::TYPE_TEXT;
+        $this->level = 0;
     }
 
     /**
-     * Main rendering function that will
-     * callback tokens instead of storing them in memory
+     * Main rendering function that passes tokens to the
+     * supplied callback.
      *
      * @param callable|null $callback
      * @return Tokenizer
      */
     public function tokenize($callback = null)
     {
+        $this->reset();
         if (!is_callable($callback)) {
-            $callback = function () {
-            };
+            $callback = function() {};
         }
 
         $length = strlen($this->source);
@@ -206,5 +214,20 @@ class Tokenizer extends \Eden\Core\Base
         }
 
         return $i + strlen($close);
+    }
+
+    /**
+     * Quick trim script
+     *
+     * @param string $string
+     * @return string
+     */
+    protected function trim(string $string) : string
+    {
+        $string = preg_replace('#\s*\{\{\{\~\s*#is', '{{{', $string);
+        $string = preg_replace('#\s*\~\}\}\}\s*#is', '}}}', $string);
+        $string = preg_replace('#\s*\{\{\~\s*#is', '{{', $string);
+        $string = preg_replace('#\s*\~\}\}\s*#is', '}}', $string);
+        return $string;
     }
 }

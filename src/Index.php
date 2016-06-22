@@ -74,7 +74,8 @@ class Index extends \Eden\Core\Base
 
         $callback = $this->loadCache($this->cacheFilePrefix . $name . '.php');
         if (!$callback) {
-            $code = Compiler::i($this, $template)->compile();
+            $tokenizer = new Tokenizer($template);
+            $code = Compiler::i($this, $tokenizer)->compile();
 
             $this->saveCache($this->cacheFilePrefix . $name . '.php', $code);
 
