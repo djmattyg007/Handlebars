@@ -1,4 +1,5 @@
 <?php //-->
+declare(strict_types=1);
 /**
  * This file is part of the Eden PHP Library.
  * (c) 2014-2016 Openovate Labs
@@ -7,11 +8,13 @@
  * distributed with this package.
  */
 
+use Eden\Handlebars;
+
 class Eden_Handlebars_Data_Test extends PHPUnit_Framework_TestCase
 {
     public function testFind()
     {
-        $data = Eden\Handlebars\Data::i(array(
+        $data = new Handlebars\Data(array(
             'product_id' => 123,
             'product_title' => 'Hello World',
             'product_comments' => array(
@@ -21,7 +24,7 @@ class Eden_Handlebars_Data_Test extends PHPUnit_Framework_TestCase
             )
         ));
 
-        $this->assertInstanceOf('Eden\\Handlebars\\Data', $data);
+        $this->assertInstanceOf(Handlebars\Data::class, $data);
         $this->assertEquals(123, $data->find('product_id'));
         $this->assertEquals('Hello World', $data->find('product_title'));
         $this->assertEquals('this is good', $data->find('product_comments.comment1'));
@@ -31,7 +34,7 @@ class Eden_Handlebars_Data_Test extends PHPUnit_Framework_TestCase
 
     public function testGet()
     {
-        $data = Eden\Handlebars\Data::i(array(
+        $data = (new Handlebars\Data(array(
             'product_id' => 123,
             'product_title' => 'Hello World',
             'product_comments' => array(
@@ -39,7 +42,7 @@ class Eden_Handlebars_Data_Test extends PHPUnit_Framework_TestCase
                 'comment2' => 'this is great',
                 'comment3' => 'this is nice'
             )
-        ))->get();
+        )))->get();
 
         $this->assertTrue(is_array($data));
         $this->assertEquals(123, $data['product_id']);
@@ -51,7 +54,7 @@ class Eden_Handlebars_Data_Test extends PHPUnit_Framework_TestCase
 
     public function testPush()
     {
-        $data = Eden\Handlebars\Data::i(array(
+        $data = (new Handlebars\Data(array(
             'product_id' => 123,
             'product_title' => 'Hello World',
             'product_comments' => array(
@@ -59,7 +62,7 @@ class Eden_Handlebars_Data_Test extends PHPUnit_Framework_TestCase
                 'comment2' => 'this is great',
                 'comment3' => 'this is nice'
             )
-        ))
+        )))
         ->push(array(
             'comment1' => 'this is good',
             'comment2' => 'this is great',
@@ -71,7 +74,7 @@ class Eden_Handlebars_Data_Test extends PHPUnit_Framework_TestCase
             'comment6' => 'this is epic'
         ));
 
-        $this->assertInstanceOf('Eden\\Handlebars\\Data', $data);
+        $this->assertInstanceOf(Handlebars\Data::class, $data);
         $this->assertEquals('Hello World', $data->find('../../product_title'));
         $this->assertEquals('this is good', $data->find('../comment1'));
         $this->assertEquals('this is great', $data->find('../../product_comments.comment2'));
@@ -85,7 +88,7 @@ class Eden_Handlebars_Data_Test extends PHPUnit_Framework_TestCase
 
     public function testPop()
     {
-        $data = Eden\Handlebars\Data::i(array(
+        $data = (new Handlebars\Data(array(
             'product_id' => 123,
             'product_title' => 'Hello World',
             'product_comments' => array(
@@ -93,7 +96,7 @@ class Eden_Handlebars_Data_Test extends PHPUnit_Framework_TestCase
                 'comment2' => 'this is great',
                 'comment3' => 'this is nice'
             )
-        ))
+        )))
         ->push(array(
             'comment1' => 'this is good',
             'comment2' => 'this is great',
@@ -106,7 +109,7 @@ class Eden_Handlebars_Data_Test extends PHPUnit_Framework_TestCase
         ))
         ->pop();
 
-        $this->assertInstanceOf('Eden\\Handlebars\\Data', $data);
+        $this->assertInstanceOf(Handlebars\Data::class, $data);
         $this->assertEquals('Hello World', $data->find('../product_title'));
         $this->assertEquals('this is good', $data->find('comment1'));
         $this->assertEquals('this is great', $data->find('../product_comments.comment2'));
