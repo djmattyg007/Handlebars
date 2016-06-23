@@ -1,4 +1,5 @@
-<?php //-->
+<?php
+declare(strict_types=1);
 return array(
     'if' => function ($value, $options) {
         $args = func_get_args();

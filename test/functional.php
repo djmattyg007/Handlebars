@@ -1,4 +1,5 @@
-<?php //-->
+<?php
+declare(strict_types=1);
 /**
  * This file is part of the Eden PHP Library.
  * (c) 2014-2016 Openovate Labs
