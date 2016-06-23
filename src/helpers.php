@@ -54,7 +54,7 @@ return array(
                 list($valueName, $keyName) = explode(',', trim($valueName));
             }
 
-            $keyName = trim($keyName);
+            $keyName = trim((string) $keyName);
             $valueName = trim($valueName);
         }
 
