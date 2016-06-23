@@ -29,7 +29,7 @@ class Eden_Handlebars_Index_Test extends PHPUnit_Framework_TestCase
 
     public function testGetHelper()
     {
-        $this->assertInstanceOf('Closure', eden('handlebars')->getHelper('if'));
+        $this->assertTrue(is_callable(eden('handlebars')->getHelper('if')));
         $this->assertNull(eden('handlebars')->getHelper('foobar'));
     }
 

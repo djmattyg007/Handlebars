@@ -1,37 +1,9 @@
 <?php
 declare(strict_types=1);
 return array(
-    'if' => function ($value, $options) {
-        $args = func_get_args();
-        $options = array_pop($args);
-
-        if (!!$value) {
-            return $options['fn']();
-        }
-
-        return $options['inverse']();
-    },
-
-    'unless' => function ($value, $options) {
-        $args = func_get_args();
-        $options = array_pop($args);
-
-        if (!!$value) {
-            return $options['inverse']();
-        }
-
-        return $options['fn']();
-    },
-
-    'with' => function ($value, $options) {
-        if (!is_array($value)) {
-            $value = array('this' => $value);
-        } else {
-            $value['this'] = $value;
-        }
-
-        return $options['fn']($value);
-    },
+    'if' => new \Eden\Handlebars\Helper\IfHelper(),
+    'unless' => new \Eden\Handlebars\Helper\UnlessHelper(),
+    'with' => new \Eden\Handlebars\Helper\WithHelper(),
 
     'each' => function ($object, $options) {
         $args = func_get_args();
