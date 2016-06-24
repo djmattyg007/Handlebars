@@ -101,7 +101,7 @@ class Compiler
     {
         $this->handlebars = $handlebars;
         $this->tokenizer = $tokenizer;
-        
+
         if (is_null(self::$layout)) {
             self::$layout = file_get_contents(__DIR__ . '/layout.template');
         }
@@ -118,7 +118,7 @@ class Compiler
     {
         $buffer = '';
         $open = array();
-        
+
         $this->tokenizer->tokenize(function ($node) use (&$buffer, &$open) {
             switch ($node['type']) {
                 case Tokenizer::TYPE_TEXT:
@@ -169,7 +169,7 @@ class Compiler
         $this->offset = $offset;
         return $this;
     }
-    
+
     /**
      * Partially renders the text tokens
      *
@@ -180,13 +180,13 @@ class Compiler
     protected function generateText(array $node) : string
     {
         $buffer = '';
-        
+
         $value = explode("\n", $node['value']);
         $last = count($value) - 1;
-        
+
         foreach ($value as $i => $line) {
             $line = str_replace("'", '\\\'', $line);
-            
+
             if ($i === $last) {
                 $buffer .= $this->prettyPrint(sprintf(self::BLOCK_TEXT_LAST, $line));
                 continue;
@@ -194,10 +194,10 @@ class Compiler
 
             $buffer .= $this->prettyPrint(sprintf(self::BLOCK_TEXT_LINE, $line));
         }
-        
+
         return $buffer;
     }
-    
+
     /**
      * Partially renders the unescaped variable tokens
      *
@@ -208,11 +208,11 @@ class Compiler
     protected function generateVariable(array $node, array &$open) : string
     {
         $node['value'] = trim($node['value']);
-        
+
         //look out for else
         if ($node['value'] === 'else') {
             $open[$this->findSection($open)]['else'] = true;
-            
+
             return $this->prettyPrint(self::BLOCK_OPTIONS_FN_BODY_5, -1)
                 . $this->prettyPrint(self::BLOCK_OPTIONS_FN_BODY_6)
                 . $this->prettyPrint(self::BLOCK_OPTIONS_FN_BODY_7)
@@ -223,22 +223,22 @@ class Compiler
                 . $this->prettyPrint(self::BLOCK_OPTIONS_INVERSE_BODY_3)
                 . $this->prettyPrint(self::BLOCK_OPTIONS_INVERSE_BODY_4, 0, 1);
         }
-        
+
         //lookout for tokenizer
         $tokenized = $this->tokenize($node);
         if ($tokenized) {
             return $tokenized;
         }
-        
+
         list($name, $args, $hash) = $this->parseArguments($node['value']);
-        
+
         //if it's a helper
         if (Runtime::getHelper($name)) {
             //form hash
             foreach ($hash as $key => $value) {
                 $hash[$key] = sprintf(self::BLOCK_OPTIONS_HASH_KEY_VALUE, $key, $value);
             }
-            
+
             $args[] = $this->prettyPrint(self::BLOCK_OPTIONS_OPEN, 0, 2)
                 . $this->prettyPrint(sprintf(self::BLOCK_OPTIONS_NAME, $name))
                 . $this->prettyPrint(sprintf(self::BLOCK_OPTIONS_ARGS, str_replace("'", '\\\'', $node['value'])))
@@ -246,18 +246,18 @@ class Compiler
                 . $this->prettyPrint(self::BLOCK_OPTIONS_FN_EMPTY)
                 . $this->prettyPrint(self::BLOCK_OPTIONS_INVERSE_EMPTY)
                 . $this->prettyPrint(self::BLOCK_OPTIONS_CLOSE, -1);
-            
+
             return $this->prettyPrint(sprintf(self::BLOCK_VARIABLE_HELPER_OPEN, $name), -1)
                 . $this->prettyPrint('\r\t' . implode(', \r\t', $args), 1, -1)
                 . $this->prettyPrint(self::BLOCK_VARIABLE_HELPER_CLOSE);
         }
-        
+
         //it's a value ?
         $value = str_replace(array('[', ']', '(', ')'), '', $node['value']);
         $value = str_replace("'", '\\\'', $value);
         return $this->prettyPrint(sprintf(self::BLOCK_VARIABLE_VALUE, $value));
     }
-    
+
     /**
      * Partially renders the escaped variable tokens
      *
@@ -268,22 +268,22 @@ class Compiler
     protected function generateEscape(array $node, array &$open) : string
     {
         $node['value'] = trim($node['value']);
-        
+
         //lookout for tokenizer
         $tokenized = $this->tokenize($node);
         if ($tokenized) {
             return $tokenized;
         }
-        
+
         list($name, $args, $hash) = $this->parseArguments($node['value']);
-        
+
         //if it's a helper
         if (Runtime::getHelper($name)) {
             //form hash
             foreach ($hash as $key => $value) {
                 $hash[$key] = sprintf(self::BLOCK_OPTIONS_HASH_KEY_VALUE, $key, $value);
             }
-            
+
             $args[] = $this->prettyPrint(self::BLOCK_OPTIONS_OPEN, 0, 2)
                 . $this->prettyPrint(sprintf(self::BLOCK_OPTIONS_NAME, $name))
                 . $this->prettyPrint(sprintf(self::BLOCK_OPTIONS_ARGS, str_replace("'", '\\\'', $node['value'])))
@@ -291,18 +291,18 @@ class Compiler
                 . $this->prettyPrint(self::BLOCK_OPTIONS_FN_EMPTY)
                 . $this->prettyPrint(self::BLOCK_OPTIONS_INVERSE_EMPTY)
                 . $this->prettyPrint(self::BLOCK_OPTIONS_CLOSE, -1);
-            
+
             return $this->prettyPrint(sprintf(self::BLOCK_ESCAPE_HELPER_OPEN, $name), -1)
                 . $this->prettyPrint('\r\t' . implode(', \r\t', $args), 1, -1)
                 . $this->prettyPrint(self::BLOCK_ESCAPE_HELPER_CLOSE);
         }
-        
+
         //it's a value ?
         $value = str_replace(array('[', ']', '(', ')'), '', $node['value']);
         $value = str_replace("'", '\\\'', $value);
         return $this->prettyPrint(sprintf(self::BLOCK_ESCAPE_VALUE, $value));
     }
-    
+
     /**
      * Partially renders the section open tokens
      *
@@ -313,25 +313,25 @@ class Compiler
     protected function generateOpen(array $node, array &$open) : string
     {
         $node['value'] = trim($node['value']);
-        
+
         //push in the node, we are going to need this to close
         $open[] = $node;
-        
+
         list($name, $args, $hash) = $this->parseArguments($node['value']);
-        
+
         //if it's a value
         if (is_null(Runtime::getHelper($name))) {
             //run each
             $node['value'] = 'each '.$node['value'];
             list($name, $args, $hash) = $this->parseArguments($node['value']);
         }
-        
+
         //it's a helper
         //form hash
         foreach ($hash as $key => $value) {
             $hash[$key] = sprintf(self::BLOCK_OPTIONS_HASH_KEY_VALUE, $key, $value);
         }
-        
+
         $args[] = $this->prettyPrint(self::BLOCK_OPTIONS_OPEN, 0, 2)
             . $this->prettyPrint(sprintf(self::BLOCK_OPTIONS_NAME, $name))
             . $this->prettyPrint(sprintf(self::BLOCK_OPTIONS_ARGS, str_replace("'", '\\\'', $node['value'])))
@@ -341,7 +341,7 @@ class Compiler
             . $this->prettyPrint(self::BLOCK_OPTIONS_FN_BODY_2)
             . $this->prettyPrint(self::BLOCK_OPTIONS_FN_BODY_3)
             . $this->prettyPrint(self::BLOCK_OPTIONS_FN_BODY_4);
-        
+
         return $this->prettyPrint(sprintf(self::BLOCK_ESCAPE_HELPER_OPEN, $name), -2)
             . $this->prettyPrint('\r\t' . implode(', \r\t', $args), 1, 2);
     }
@@ -424,7 +424,7 @@ class Compiler
     {
         $args = array();
         $hash = array();
-        
+
         $regex = array(
             '([a-zA-Z0-9]+\="[^"]*")',      // cat="meow"
             '([a-zA-Z0-9]+\=\'[^\']*\')',   // mouse='squeak squeak'
@@ -433,18 +433,18 @@ class Compiler
             '(\'[^\']*\')',                 // 'some"thi " ng'
             '([^\s]+)'                      // <any group with no spaces>
         );
-        
+
         preg_match_all('#'.implode('|', $regex).'#is', $string, $matches);
-        
+
         $stringArgs = $matches[0];
         $name = array_shift($stringArgs);
-        
+
         $hashRegex = array(
             '([a-zA-Z0-9]+\="[^"]*")',      // cat="meow"
             '([a-zA-Z0-9]+\=\'[^\']*\')',   // mouse='squeak squeak'
             '([a-zA-Z0-9]+\=[a-zA-Z0-9]+)', // dog=false
         );
-        
+
         foreach ($stringArgs as $arg) {
             //if it's an attribute
             if (!(substr($arg, 0, 1) === "'" && substr($arg, -1) === "'")
@@ -455,10 +455,10 @@ class Compiler
                 $hash[$hashKey] = $this->parseArgument($hashValue);
                 continue;
             }
-            
+
             $args[] = $this->parseArgument($arg);
         }
-        
+
         return array($name, $args, $hash);
     }
 
@@ -477,7 +477,7 @@ class Compiler
         ) {
             return "'" . str_replace("'", '\\\'', substr($arg, 1, -1)) . "'";
         }
-        
+
         //if it's null
         if (strtolower($arg) === 'null'
             || strtolower($arg) === 'true'
@@ -486,12 +486,12 @@ class Compiler
         ) {
             return $arg;
         }
-        
+
         $arg = str_replace(array('[', ']', '(', ')'), '', $arg);
         $arg = str_replace("'", '\\\'', $arg);
         return sprintf(self::BLOCK_ARGUMENT_VALUE, $arg);
     }
-    
+
     /**
      * Calls an alternative helper to add on to the compiled code
      *
