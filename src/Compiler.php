@@ -389,42 +389,6 @@ class Compiler
     }
 
     /**
-     * Generates helpers to add to the layout
-     * This is a placeholder incase we want to add in the future
-     *
-     * @return string
-     */
-    protected function generateHelpers() : string
-    {
-        $helpers = $this->handlebars->getHelpers();
-
-        foreach ($helpers as $name => $helper) {
-            $function = new \ReflectionFunction($this->handlebars->getHelper($name));
-
-            $path = $function->getFileName();
-            $lines = file_get_contents($path);
-            $file = new \SplFileObject($path);
-            $file->seek($function->getStartLine() - 2);
-            $start = $file->ftell();
-            $file->seek($function->getEndLine() - 1);
-            $end = $file->ftell();
-
-            $code = preg_replace(
-                '/^.*?function(\s+[^\s\\(]+?)?\s*\\((.+)\\}.*?\s*$/s',
-                'function($2}',
-                substr($lines, $start, $end - $start)
-            );
-
-            $helpers[$name] = sprintf(self::BLOCK_OPTIONS_HASH_KEY_VALUE, $name, $code);
-        }
-
-        return $this->prettyPrint(self::BLOCK_OPTIONS_OPEN)
-            . $this->prettyPrint('\r\t')
-            . implode($this->prettyPrint(',\r\t'), $helpers)
-            . $this->prettyPrint(self::BLOCK_OPTIONS_CLOSE);
-    }
-    
-    /**
      * Generates partials to add to the layout
      * This is a placeholder incase we want to add in the future
      *
