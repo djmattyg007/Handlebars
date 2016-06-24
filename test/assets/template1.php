@@ -1,4 +1,4 @@
-<?php //-->
+<?php
 use \Eden\Handlebars\Data as Data;
 use \Eden\Handlebars\Runtime as Runtime;
 
