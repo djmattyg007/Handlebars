@@ -322,7 +322,7 @@ class Compiler
         //if it's a value
         if (is_null(Runtime::getHelper($name))) {
             //run each
-            $node['value'] = 'each '.$node['value'];
+            $node['value'] = 'each ' . $node['value'];
             list($name, $args, $hash) = $this->parseArguments($node['value']);
         }
 
