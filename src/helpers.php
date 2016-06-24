@@ -148,9 +148,8 @@ return array(
         );
 
         $tokenizer = new \Eden\Handlebars\Tokenizer($partial);
-        $code = \Eden\Handlebars\Compiler::i($options['handlebars'], $tokenizer)
-            ->setOffset($options['offset'] + 3)
-            ->compile(false);
+        $compiler = new \Eden\Handlebars\Compiler($options["handlebars"], $tokenizer);
+        $code = $compiler->setOffset($options['offset'] + 3)->compile(false);
 
         return sprintf($layout, $code);
     },

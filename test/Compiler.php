@@ -25,12 +25,12 @@ class Eden_Handlebars_Compiler_Test extends PHPUnit_Framework_TestCase
         $template1 = file_get_contents(__DIR__ . '/assets/template1.php');
         $template2 = file_get_contents(__DIR__ . '/assets/template2.php');
 
-        $index = IndexStub::i();
+        $index = new Handlebars\Index();
 
-        $code = Handlebars\Compiler::i($index, $tokenizer)->compile();
+        $code = (new Handlebars\Compiler($index, $tokenizer))->compile();
         $this->assertEquals($template1, $code);
 
-        $code = Handlebars\Compiler::i($index, $tokenizer)->compile(false);
+        $code = (new Handlebars\Compiler($index, $tokenizer))->compile(false);
         $this->assertEquals($template2, $code);
     }
 
@@ -38,28 +38,29 @@ class Eden_Handlebars_Compiler_Test extends PHPUnit_Framework_TestCase
     {
         $source = file_get_contents(__DIR__ . '/assets/tokenizer.html');
         $tokenizer = new Handlebars\Tokenizer($source);
+        $index = new Handlebars\Index();
 
-        $index = IndexStub::i();
-
-        $instance = Handlebars\Compiler::i($index, $tokenizer)->setOffset(3);
-        $this->assertInstanceOf('Eden\\Handlebars\\Compiler', $instance);
+        $instance = (new Handlebars\Compiler($index, $tokenizer))->setOffset(3);
+        $this->assertInstanceOf(Handlebars\Compiler::class, $instance);
     }
 
     public function testParseArguments()
     {
+        $parseArgsMethod = new \ReflectionMethod(Handlebars\Compiler::class, "parseArguments");
+        $parseArgsMethod->setAccessible(true);
+
         $source = file_get_contents(__DIR__ . '/assets/tokenizer.html');
         $tokenizer = new Handlebars\Tokenizer($source);
+        $index = new Handlebars\Index();
 
-        $index = IndexStub::i();
-
-        $compiler = CompilerStub::i($index, $tokenizer);
+        $compiler = new Handlebars\Compiler($index, $tokenizer);
 
         //basic
-        list($name, $args, $hash) = $compiler->parseArgumentsStub("foobar 'merchant' query.profile_type");
+        list($name, $args, $hash) = $parseArgsMethod->invoke($compiler, "foobar 'merchant' query.profile_type");
         $this->assertCount(2, $args);
 
         //advanced
-        list($name, $args, $hash) = $compiler->parseArgumentsStub(
+        list($name, $args, $hash) = $parseArgsMethod->invoke($compiler,
             'foobar 4bar4 4.5 \'some"thi " ng\' 4 "some\'thi \' ng" '
             .'dog=false cat="meow" mouse=\'squeak squeak\'');
 
@@ -74,28 +75,12 @@ class Eden_Handlebars_Compiler_Test extends PHPUnit_Framework_TestCase
         $this->assertEquals('\'squeak squeak\'', $hash['mouse']);
 
         //BUG: '_ \'TODAY\'S BEST DEALS\''
-        list($name, $args, $hash) = $compiler->parseArgumentsStub('_ \'TODAY\'S BEST DEALS\'');
+        list($name, $args, $hash) = $parseArgsMethod->invoke($compiler, '_ \'TODAY\'S BEST DEALS\'');
 
         $this->assertCount(4, $args);
         $this->assertEquals('\'TODAY\'', $args[0]);
         $this->assertEquals('$data->find(\'S\')', $args[1]);
         $this->assertEquals('$data->find(\'BEST\')', $args[2]);
         $this->assertEquals('$data->find(\'DEALS\\\'\')', $args[3]);
-    }
-}
-
-if (!class_exists('IndexStub')) {
-    class IndexStub extends Eden\Handlebars\Index
-    {
-    }
-}
-
-if (!class_exists('CompilerStub')) {
-    class CompilerStub extends Eden\Handlebars\Compiler
-    {
-        public function parseArgumentsStub($string)
-        {
-            return $this->parseArguments($string);
-        }
     }
 }
