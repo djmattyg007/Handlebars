@@ -6,6 +6,7 @@ return array(
     'unless' => new \Eden\Handlebars\Helper\UnlessHelper(),
     'with' => new \Eden\Handlebars\Helper\WithHelper(),
     'each' => new \Eden\Handlebars\Helper\EachHelper(),
+    'noop' => new \Eden\Handlebars\Helper\NoopHelper(),
 
     'tokenize->' => function ($name) {
         //get args
@@ -93,18 +94,4 @@ return array(
 
         return sprintf($layout, $code);
     },
-
-    'noop' => function () {
-        $args = func_get_args();
-        $options = array_pop($args);
-        $context = null;
-
-        if (count($args)) {
-            $context = array_merge($args[0], $options['hash']);
-        } else if (!empty($options['hash'])) {
-            $context = $options['hash'];
-        }
-
-        return $options['fn']($context);
-    }
 );
