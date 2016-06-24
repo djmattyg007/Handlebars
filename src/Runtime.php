@@ -21,7 +21,7 @@ namespace Eden\Handlebars;
  * @author   Christian Blanquera <cblanquera@openovate.com>
  * @standard PSR-2
  */
-class Runtime extends \Eden\Core\Base
+class Runtime
 {
     /**
      * A raw list of partials
