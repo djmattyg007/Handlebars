@@ -389,30 +389,6 @@ class Compiler
     }
 
     /**
-     * Generates partials to add to the layout
-     * This is a placeholder incase we want to add in the future
-     *
-     * @return string
-     */
-    protected function generatePartials() : string
-    {
-        $partials = $this->handlebars->getPartials();
-        
-        foreach ($partials as $name => $partial) {
-            $partials[$name] = sprintf(
-                self::BLOCK_OPTIONS_HASH_KEY_VALUE,
-                $name,
-                "'" . str_replace("'", '\\\'', $partial) . "'"
-            );
-        }
-        
-        return $this->prettyPrint(self::BLOCK_OPTIONS_OPEN)
-            . $this->prettyPrint('\r\t')
-            . implode($this->prettyPrint(',\r\t'), $partials)
-            . $this->prettyPrint(self::BLOCK_OPTIONS_CLOSE);
-    }
-    
-    /**
      * Handlebars will give arguments in a string
      * This will transform them into a legit argument
      * array
