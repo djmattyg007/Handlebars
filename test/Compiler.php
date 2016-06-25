@@ -1,46 +1,47 @@
 <?php
 declare(strict_types=1);
 /**
- * This file is part of the Eden PHP Library.
+ * This file was formerly part of the Eden PHP Library.
  * (c) 2014-2016 Openovate Labs
+ * (c) 2016 Matthew Gamble
  *
  * Copyright and license information can be found at LICENSE.txt
  * distributed with this package.
  */
 
-use Eden\Handlebars;
+namespace MattyG\Handlebars\Test;
 
-/**
- * The following tests were pulled from the Mustache.php Library
- * and kept as is with changes to the final class name to test 
- * backwards compatibility
- */
-class Eden_Handlebars_Compiler_Test extends PHPUnit_Framework_TestCase
+use MattyG\Handlebars;
+
+class Compiler extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var Handlebars\Compiler
+     */
+    protected $compiler;
+
+    protected function setUp()
+    {
+        $this->compiler = new Handlebars\Compiler(new Handlebars\Runtime(), new Handlebars\TokenizerFactory());
+    }
+
+    protected function tearDown()
+    {
+        $this->compiler = null;
+    }
+
     public function testCompile()
     {
-        //load the source
         $source = trim(file_get_contents(__DIR__ . '/assets/tokenizer.html'));
-        $tokenizer = new Handlebars\Tokenizer($source);
-        $template1 = file_get_contents(__DIR__ . '/assets/template1.php');
-        $template2 = file_get_contents(__DIR__ . '/assets/template2.php');
+        $template = file_get_contents(__DIR__ . '/assets/template.php');
 
-        $index = new Handlebars\Index();
-
-        $code = (new Handlebars\Compiler($index, $tokenizer))->compile();
-        $this->assertEquals($template1, $code);
-
-        $code = (new Handlebars\Compiler($index, $tokenizer))->compile(false);
-        $this->assertEquals($template2, $code);
+        $code = $this->compiler->compile($source);
+        $this->assertEquals($template, $code);
     }
 
     public function testSetOffset()
     {
-        $source = file_get_contents(__DIR__ . '/assets/tokenizer.html');
-        $tokenizer = new Handlebars\Tokenizer($source);
-        $index = new Handlebars\Index();
-
-        $instance = (new Handlebars\Compiler($index, $tokenizer))->setOffset(3);
+        $instance = $this->compiler->setOffset(3);
         $this->assertInstanceOf(Handlebars\Compiler::class, $instance);
     }
 
@@ -49,18 +50,12 @@ class Eden_Handlebars_Compiler_Test extends PHPUnit_Framework_TestCase
         $parseArgsMethod = new \ReflectionMethod(Handlebars\Compiler::class, "parseArguments");
         $parseArgsMethod->setAccessible(true);
 
-        $source = file_get_contents(__DIR__ . '/assets/tokenizer.html');
-        $tokenizer = new Handlebars\Tokenizer($source);
-        $index = new Handlebars\Index();
-
-        $compiler = new Handlebars\Compiler($index, $tokenizer);
-
         //basic
-        list($name, $args, $hash) = $parseArgsMethod->invoke($compiler, "foobar 'merchant' query.profile_type");
+        list($name, $args, $hash) = $parseArgsMethod->invoke($this->compiler, "foobar 'merchant' query.profile_type");
         $this->assertCount(2, $args);
 
         //advanced
-        list($name, $args, $hash) = $parseArgsMethod->invoke($compiler,
+        list($name, $args, $hash) = $parseArgsMethod->invoke($this->compiler,
             'foobar 4bar4 4.5 \'some"thi " ng\' 4 "some\'thi \' ng" '
             .'dog=false cat="meow" mouse=\'squeak squeak\'');
 
@@ -75,7 +70,7 @@ class Eden_Handlebars_Compiler_Test extends PHPUnit_Framework_TestCase
         $this->assertEquals('\'squeak squeak\'', $hash['mouse']);
 
         //BUG: '_ \'TODAY\'S BEST DEALS\''
-        list($name, $args, $hash) = $parseArgsMethod->invoke($compiler, '_ \'TODAY\'S BEST DEALS\'');
+        list($name, $args, $hash) = $parseArgsMethod->invoke($this->compiler, '_ \'TODAY\'S BEST DEALS\'');
 
         $this->assertCount(4, $args);
         $this->assertEquals('\'TODAY\'', $args[0]);

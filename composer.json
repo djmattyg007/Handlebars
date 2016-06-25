@@ -1,21 +1,24 @@
 {
-    "name": "eden/handlebars",
+    "name": "djmattyg007/handlebars",
     "type": "library",
     "description": "PHP Handlebars with JS interface to match with compile time helper support and super nice compile time error reporting.",
-    "keywords": ["hamdlebars", "eden", "library", "template", "templating"],
+    "keywords": ["hamdlebars", "template", "templating"],
     "homepage": "http://eden-php.com",
     "license": "MIT",
     "authors": [
         {
             "name": "Christian Blanquera",
             "email": "cblanquera@openovate.com"
+        },
+        {
+            "name": "Matthew Gamble",
+            "email": "git@matthewgamble.net"
         }
     ],
     "require": {
-        "php": ">=5.4.1",
-		"eden/core": "4.*"
+        "php": ">=7.0.0"
     },
     "autoload": {
-         "psr-4": { "Eden\\Handlebars\\": "src/" }
+         "psr-4": { "MattyG\\Handlebars\\": "src/" }
     }
 }

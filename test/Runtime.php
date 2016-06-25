@@ -1,187 +1,199 @@
 <?php
 declare(strict_types=1);
 /**
- * This file is part of the Eden PHP Library.
+ * This file was formerly part of the Eden PHP Library.
  * (c) 2014-2016 Openovate Labs
+ * (c) 2016 Matthew Gamble
  *
  * Copyright and license information can be found at LICENSE.txt
  * distributed with this package.
  */
 
-use Eden\Handlebars;
+namespace MattyG\Handlebars\Test;
+
+use MattyG\Handlebars;
  
-/**
- * The following tests were pulled from the Mustache.php Library
- * and kept as is with changes to the final class name to test 
- * backwards compatibility
- */
-class Eden_Handlebars_Runtime_Test extends PHPUnit_Framework_TestCase
+class Runtime extends \PHPUnit_Framework_TestCase
 {
-    public function setUp()
+    /**
+     * @var callable
+     */
+    protected $compilerFactory;
+
+    /**
+     * @var Handlebars\DataFactory
+     */
+    protected $dataFactory;
+
+    protected function setUp()
     {
-        //reset the helpers and partials after every test
-        eden('handlebars')->reset();
+        // TODO: Move this to constructor
+        $this->compilerFactory = function(Handlebars\Runtime $runtime) {
+            return new Handlebars\Compiler($runtime, new Handlebars\TokenizerFactory());
+        };
+        $this->dataFactory = new Handlebars\DataFactory();
     }
 
     public function testGetHelper()
     {
-        Handlebars\Runtime::registerHelper('foo', function() {});
-        $this->assertTrue(is_callable(Handlebars\Runtime::getHelper('foo')));
-        $this->assertNull(Handlebars\Runtime::getHelper('bar'));
+        $runtime1 = new Handlebars\Runtime();
+        $runtime2 = new Handlebars\Runtime(false);
+
+        $this->assertTrue(is_callable($runtime1->getHelper("if")));
+        $this->assertInstanceOf(Handlebars\Helper\EachHelper::class, $runtime1->getHelper("each"));
+        $this->assertNull($runtime1->getHelper("bar"));
+
+        $this->assertNull($runtime2->getHelper("if"));
     }
 
-    public function testGetHelpers()
+    public function testAddHelper1()
     {
-        $helpers = Handlebars\Runtime::getHelpers();
-        $this->assertTrue(is_array($helpers));
-    }
-
-    public function testGetPartial()
-    {
-        Handlebars\Runtime::registerPartial('foo', 'bar');
-        $this->assertTrue(is_string(Handlebars\Runtime::getPartial('foo')));
-        $this->assertNull(Handlebars\Runtime::getPartial('foobar'));
-    }
-
-    public function testGetPartials()
-    {
-        $partials = Handlebars\Runtime::getPartials();
-
-        $this->assertTrue(is_array($partials));
-    }
-
-    public function testRegisterHelper() 
-    {
-        //simple helper
-        Handlebars\Runtime::registerHelper('root', function() {
-            return '/some/root';
+        $runtime = new Handlebars\Runtime(false);
+        $runtime->addHelper("root", function() {
+            return "/some/root";
         });
+        $handlebars = new Handlebars\Handlebars($runtime, call_user_func($this->compilerFactory, $runtime), $this->dataFactory);
 
-        $template = eden('handlebars')->compile('{{root}}/bower_components/eve-font-awesome/awesome.css');
+        $template = $handlebars->compile('{{root}}/bower_components/eve-font-awesome/awesome.css');
 
-        $results = $template();
-        $this->assertEquals('/some/root/bower_components/eve-font-awesome/awesome.css', $results); 
+        $result = $template();
+        $this->assertEquals('/some/root/bower_components/eve-font-awesome/awesome.css', $result);
+    }
 
+    public function testAddHelper2()
+    {
         $found = false;
-        $self = $this;
-        Handlebars\Runtime::registerHelper('foo', function(
+        $runtime = new Handlebars\Runtime(false);
+        $runtime->addHelper("foo", function(
             $bar, 
             $four, 
             $true, 
             $null, 
             $false,
             $zoo
-        ) use ($self, &$found) {
-            $self->assertEquals('', $bar);
-            $self->assertEquals(4, $four);
-            $self->assertTrue($true);
-            $self->assertNull($null);
-            $self->assertFalse($false);
-            $self->assertEquals('foobar', $zoo);
+        ) use (&$found) {
+            $this->assertEquals('', $bar);
+            $this->assertEquals(4, $four);
+            $this->assertTrue($true);
+            $this->assertNull($null);
+            $this->assertFalse($false);
+            $this->assertEquals('foobar', $zoo);
             $found = true;
             return $four + 1;
         });
+        $handlebars = new Handlebars\Handlebars($runtime, call_user_func($this->compilerFactory, $runtime), $this->dataFactory);
 
-        $template = eden('handlebars')->compile('{{foo bar 4 true null false zoo}}');
+        $template = $handlebars->compile('{{foo bar 4 true null false zoo}}');
 
-        $results = $template(array('zoo' => 'foobar'));
+        $result = $template(array('zoo' => 'foobar'));
         $this->assertTrue($found);
-        $this->assertEquals(5, $results); 
+        $this->assertEquals(5, $result);
+    }
 
+    public function testAddHelper3()
+    {
         $found = false;
-        Handlebars\Runtime::registerHelper('foo', function(
+        $runtime = new Handlebars\Runtime(false);
+        $runtime->addHelper("foo", function(
             $number, 
             $something1, 
             $number2, 
             $something2
-        ) use ($self, &$found) {
-            $self->assertEquals(4.5, $number);
-            $self->assertEquals(4, $number2);
-            $self->assertEquals('some"thi " ng', $something1);
-            $self->assertEquals("some'thi ' ng", $something2);
+        ) use (&$found) {
+            $this->assertEquals(4.5, $number);
+            $this->assertEquals(4, $number2);
+            $this->assertEquals('some"thi " ng', $something1);
+            $this->assertEquals("some'thi ' ng", $something2);
             $found = true;
-
-            return $something1.$something2;
+            return $something1 . $something2;
         });
+        $handlebars = new Handlebars\Handlebars($runtime, call_user_func($this->compilerFactory, $runtime), $this->dataFactory);
 
-        $template = eden('handlebars')->compile('{{{foo 4.5 \'some"thi " ng\' 4 "some\'thi \' ng"}}}');
+        $template = $handlebars->compile('{{{foo 4.5 \'some"thi " ng\' 4 "some\'thi \' ng"}}}');
 
-        $results = $template();
-
+        $result = $template();
         $this->assertTrue($found);
-        $this->assertEquals('some"thi " ng'."some'thi ' ng", $results); 
+        $this->assertEquals('some"thi " ng'."some'thi ' ng", $result);
+    }
 
-        //attributes test
+    public function testAddHelper4()
+    {
         $found = false;
-        Handlebars\Runtime::registerHelper('foo', function(
+        $runtime = new Handlebars\Runtime(false);
+        $runtime->addHelper("foo", function(
             $bar, 
             $number,
             $something1, 
             $number2, 
             $something2,
             $options
-        ) use ($self, &$found) {
-            $self->assertEquals(4.5, $number);
-            $self->assertEquals(4, $number2);
-            $self->assertEquals('some"thi " ng', $something1);
-            $self->assertEquals("some'thi ' ng", $something2);
-            $self->assertFalse($options['hash']['dog']);
-            $self->assertEquals('meow', $options['hash']['cat']);
-            $self->assertEquals('squeak squeak', $options['hash']['mouse']);
-            
+        ) use (&$found) {
+            $this->assertEquals(4.5, $number);
+            $this->assertEquals(4, $number2);
+            $this->assertEquals('some"thi " ng', $something1);
+            $this->assertEquals("some'thi ' ng", $something2);
+            $this->assertFalse($options['hash']['dog']);
+            $this->assertEquals('meow', $options['hash']['cat']);
+            $this->assertEquals('squeak squeak', $options['hash']['mouse']);
             $found = true;
             return $number2 + 1;
         });
+        $handlebars = new Handlebars\Handlebars($runtime, call_user_func($this->compilerFactory, $runtime), $this->dataFactory);
 
-        $template = eden('handlebars')->compile(
+        $template = $handlebars->compile(
             '{{foo 4bar4 4.5 \'some"thi " ng\' 4 "some\'thi \' ng" '
             .'dog=false cat="meow" mouse=\'squeak squeak\'}}');
 
-        $results = $template(array('zoo' => 'foobar'));
+        $result = $template(array('zoo' => 'foobar'));
         $this->assertTrue($found);
-        $this->assertEquals(5, $results);
+        $this->assertEquals(5, $result);
     }
 
-    public function testRegisterPartial()
+    public function testGetPartial()
     {
-        //basic
-        Handlebars\Runtime::registerPartial('foo', 'This is {{ foo }}');
-        Handlebars\Runtime::registerPartial('bar', 'Foo is not {{ bar }}');
-        $template = eden('handlebars')->compile('{{> foo }} ... {{> bar }}');
+        $runtime = new Handlebars\Runtime();
+        $runtime->addPartial("foo", "bar");
 
-        $results = $template(array('foo' => 'FOO', 'bar' => 'BAR'));
-
-        $this->assertEquals('This is FOO ... Foo is not BAR', $results); 
-
-        //with scope
-        Handlebars\Runtime::registerPartial('foo', 'This is {{ foo }}');
-        Handlebars\Runtime::registerPartial('bar', 'Foo is not {{ bar }}');
-        $template = eden('handlebars')->compile('{{> foo }} ... {{> bar zoo}}');
-
-        $results = $template(array('foo' => 'FOO', 'bar' => 'BAR', 'zoo' => array('bar' => 'ZOO')));
-
-        $this->assertEquals('This is FOO ... Foo is not ZOO', $results); 
-
-        //with attributes
-        Handlebars\Runtime::registerPartial('foo', 'This is {{ foo }}');
-        Handlebars\Runtime::registerPartial('bar', 'Foo is not {{ something }}');
-        $template = eden('handlebars')->compile('{{> foo }} ... {{> bar zoo something="Amazing"}}');
-
-        $results = $template(array('foo' => 'FOO', 'bar' => 'BAR', 'zoo' => array('bar' => 'ZOO')));
-
-        $this->assertEquals('This is FOO ... Foo is not Amazing', $results);
+        $this->assertTrue(is_string($runtime->getPartial("foo")));
+        $this->assertNull($runtime->getPartial("foobar"));
     }
 
-    public function testUnregisterHelper()
+    public function testAddPartial1()
     {
-        Handlebars\Runtime::unregisterHelper('if');
-        $this->assertNull(Handlebars\Runtime::getHelper('if'));
+        $runtime = new Handlebars\Runtime();
+        $runtime->addPartial("foo", "This is {{ foo }}");
+        $runtime->addPartial("bar", "Foo is not {{ bar }}");
+        $handlebars = new Handlebars\Handlebars($runtime, call_user_func($this->compilerFactory, $runtime), $this->dataFactory);
+
+        $template = $handlebars->compile("{{> foo }} ... {{> bar }}");
+
+        $result = $template->render(array("foo" => "FOO", "bar" => "BAR"));
+        $this->assertEquals("This is FOO ... Foo is not BAR", $result);
     }
 
-    public function testUnregisterPartial()
+    public function testAddPartial2()
     {
-        Handlebars\Runtime::registerPartial('foo', 'bar');
-        Handlebars\Runtime::unregisterPartial('foo');
-        $this->assertNull(Handlebars\Runtime::getPartial('foo'));
+        $runtime = new Handlebars\Runtime();
+        $runtime->addPartial("foo", "This is {{ foo }}");
+        $runtime->addPartial("bar", "Foo is not {{ bar }}");
+        $handlebars = new Handlebars\Handlebars($runtime, call_user_func($this->compilerFactory, $runtime), $this->dataFactory);
+
+        $template = $handlebars->compile("{{> foo }} ... {{> bar zoo}}");
+
+        $result = $template->render(array("foo" => "FOO", "bar" => "BAR", "zoo" => array("bar" => "ZOO")));
+        $this->assertEquals("This is FOO ... Foo is not ZOO", $result);
+    }
+
+    public function testAddPartial3()
+    {
+        $runtime = new Handlebars\Runtime();
+        $runtime->addPartial("foo", "This is {{ foo }}");
+        $runtime->addPartial("bar", "Foo is not {{ something }}");
+        $handlebars = new Handlebars\Handlebars($runtime, call_user_func($this->compilerFactory, $runtime), $this->dataFactory);
+
+        $template = $handlebars->compile("{{> foo }} ... {{> bar zoo something='Amazing'}}");
+
+        $result = $template->render(array("foo" => "FOO", "bar" => "BAR", "zoo" => array("bar" => "ZOO")));
+        $this->assertEquals("This is FOO ... Foo is not Amazing", $result);
     }
 }

@@ -1,16 +1,19 @@
 <?php
 declare(strict_types=1);
 /**
- * This file is part of the Eden PHP Library.
+ * This file was formerly part of the Eden PHP Library.
  * (c) 2014-2016 Openovate Labs
+ * (c) 2016 Matthew Gamble
  *
  * Copyright and license information can be found at LICENSE.txt
  * distributed with this package.
  */
 
-use Eden\Handlebars;
+namespace MattyG\Handlebars\Test;
 
-class Eden_Handlebars_Tokenizer_Test extends PHPUnit_Framework_TestCase
+use MattyG\Handlebars;
+
+class Tokenizer extends \PHPUnit_Framework_TestCase
 {
     public function testTokenize()
     {
@@ -59,13 +62,11 @@ class Eden_Handlebars_Tokenizer_Test extends PHPUnit_Framework_TestCase
             'if errors.product_detail',
         );
 
-        $unit = $this;
-
-        $tokenizer->tokenize(function($node) use ($unit, $tests, &$i) {
+        $tokenizer->tokenize(function($node) use ($tests, &$i) {
             // Currently we don't test all of the tokens in tokenizer.html, but there's no easy way to stop
             // the tokenizer half-way. This achieves that effect in a somewhat haphazard manner.
             if (isset($tests[$i])) {
-                $unit->assertEquals($tests[$i], $node['value']);
+                $this->assertEquals($tests[$i], $node['value']);
             }
 
             $i++;

@@ -1,23 +1,16 @@
 <?php
 declare(strict_types=1);
 /**
- * This file is part of the Eden PHP Library.
+ * This file was formerly part of the Eden PHP Library.
  * (c) 2014-2016 Openovate Labs
+ * (c) 2016 Matthew Gamble
  *
  * Copyright and license information can be found at LICENSE.txt
  * distributed with this package.
  */
 
-namespace Eden\Handlebars;
+namespace MattyG\Handlebars;
 
-/**
- * Transforms Handlebars Templates to PHP equivilent
- *
- * @vendor   Eden
- * @package  handlebars
- * @author   Christian Blanquera <cblanquera@openovate.com>
- * @standard PSR-2
- */
 class Compiler
 {
     const BLOCK_TEXT_LINE = '\r\t$buffer .= \'%s\'.\n;';
@@ -26,10 +19,10 @@ class Compiler
     const BLOCK_ESCAPE_VALUE = '\r\t$buffer .= $data->find(\'%s\');\r';
     const BLOCK_VARIABLE_VALUE = '\r\t$buffer .= htmlspecialchars($data->find(\'%s\'), ENT_COMPAT, \'UTF-8\');\r';
 
-    const BLOCK_ESCAPE_HELPER_OPEN = '\r\t$buffer .= $helper[\'%s\'](';
+    const BLOCK_ESCAPE_HELPER_OPEN = '\r\t$buffer .= $this->runtime->getHelper(\'%s\')(';
     const BLOCK_ESCAPE_HELPER_CLOSE = '\r\t);\r';
 
-    const BLOCK_VARIABLE_HELPER_OPEN = '\r\t$buffer .= htmlspecialchars($helper[\'%s\'](';
+    const BLOCK_VARIABLE_HELPER_OPEN = '\r\t$buffer .= htmlspecialchars($this->runtime->getHelper(\'%s\')(';
     const BLOCK_VARIABLE_HELPER_CLOSE = '\r\t), ENT_COMPAT, \'UTF-8\');\r';
 
     const BLOCK_ARGUMENT_VALUE = '$data->find(\'%s\')';
@@ -37,7 +30,7 @@ class Compiler
     const BLOCK_OPTIONS_OPEN = 'array(';
     const BLOCK_OPTIONS_CLOSE = '\r\t)';
 
-    const BLOCK_OPTIONS_FN_OPEN = '\r\t\'fn\' => function($context = null) use ($noop, $data, &$helper) {';
+    const BLOCK_OPTIONS_FN_OPEN = '\r\t\'fn\' => function($context = null) use ($data) {';
     const BLOCK_OPTIONS_FN_BODY_1 = '\r\t\1if (is_array($context)) {';
     const BLOCK_OPTIONS_FN_BODY_2 = '\r\t\1\1$data->push($context);';
     const BLOCK_OPTIONS_FN_BODY_3 = '\r\t\1}';
@@ -47,7 +40,7 @@ class Compiler
     const BLOCK_OPTIONS_FN_BODY_7 = '\r\t\1}';
     const BLOCK_OPTIONS_FN_CLOSE = '\r\r\t\1return $buffer;\r\t},\r';
 
-    const BLOCK_OPTIONS_INVERSE_OPEN = '\r\t\'inverse\' => function($context = null) use ($noop, $data, &$helper) {';
+    const BLOCK_OPTIONS_INVERSE_OPEN = '\r\t\'inverse\' => function($context = null) use ($data) {';
     const BLOCK_OPTIONS_INVERSE_BODY_1 = '\r\t\1if (is_array($context)) {';
     const BLOCK_OPTIONS_INVERSE_BODY_2 = '\r\t\1\1$data->push($context);';
     const BLOCK_OPTIONS_INVERSE_BODY_3 = '\r\t\1}';
@@ -57,8 +50,8 @@ class Compiler
     const BLOCK_OPTIONS_INVERSE_BODY_7 = '\r\t\1}';
     const BLOCK_OPTIONS_INVERSE_CLOSE = '\r\r\t\1return $buffer;\r\t}\r';
 
-    const BLOCK_OPTIONS_FN_EMPTY = '\r\t\'fn\' => $noop,';
-    const BLOCK_OPTIONS_INVERSE_EMPTY = '\r\t\'inverse\' => $noop';
+    const BLOCK_OPTIONS_FN_EMPTY = '\r\t\'fn\' => function() {},';
+    const BLOCK_OPTIONS_INVERSE_EMPTY = '\r\t\'inverse\' => function() {},';
     const BLOCK_OPTIONS_NAME = '\r\t\'name\' => \'%s\',';
     const BLOCK_OPTIONS_ARGS = '\r\t\'args\' => \'%s\',';
     const BLOCK_OPTIONS_HASH = '\r\t\'hash\' => array(%s),';
@@ -72,19 +65,14 @@ class Compiler
     const ERROR_UNKNOWN_END = 'Unknown close tag: "%s" on line %s';
 
     /**
-     * @var string
+     * @var Runtime
      */
-    protected static $layout = null;
+    protected $runtime;
 
     /**
-     * @var Index
+     * @var TokenizerFactory
      */
-    protected $handlebars;
-
-    /**
-     * @var Tokenizer
-     */
-    protected $tokenizer;
+    protected $tokenizerFactory;
 
     /**
      * @var int
@@ -94,32 +82,29 @@ class Compiler
     /**
      * Just load the source template
      *
-     * @param Index $handlebars
-     * @param Tokenizer $tokenizer
+     * @param Runtime $runtime
+     * @param TokenizerFactory $tokenizerFactory
      */
-    public function __construct(Index $handlebars, Tokenizer $tokenizer)
+    public function __construct(Runtime $runtime, TokenizerFactory $tokenizerFactory)
     {
-        $this->handlebars = $handlebars;
-        $this->tokenizer = $tokenizer;
-
-        if (is_null(self::$layout)) {
-            self::$layout = file_get_contents(__DIR__ . '/layout.template');
-        }
+        $this->runtime = $runtime;
+        $this->tokenizerFactory = $tokenizerFactory;
     }
 
     /**
-     * Transform the template to code
-     * that can be used independently
+     * Transform the template to code that can be used independently
+     * TODO: Must never return layout
      *
-     * @param bool $layout Whether to use the layout or raw code
+     * @param string $source
      * @return string
      */
-    public function compile(bool $layout = true)
+    public function compile(string $source) : string
     {
+        $tokenizer = $this->tokenizerFactory->create($source);
         $buffer = '';
         $open = array();
 
-        $this->tokenizer->tokenize(function ($node) use (&$buffer, &$open) {
+        $tokenizer->tokenize(function ($node) use (&$buffer, &$open) {
             switch ($node['type']) {
                 case Tokenizer::TYPE_TEXT:
                     $buffer .= $this->generateText($node, $open);
@@ -150,18 +135,14 @@ class Compiler
         }
         //END: This is more to help troubleshooting
 
-        if (!$layout) {
-            return $buffer;
-        }
-
-        return sprintf(self::$layout, $buffer);
+        // Indent all of the code by one level because it's destined for a class method.
+        $indentedCode = str_replace("\n", "\n    ", $buffer);
+        // Strip trailing whitespace from otherwise blank lines.
+        return preg_replace('/^    $/m', '', $indentedCode);
     }
 
     /**
-     * Returns a code snippet
-     *
-     * TODO: Work out what "the tabbing" is
-     * @param int $offset This is to preset the tabbing when generating the code
+     * @param int $offset This is to pre-set the tab indentation level when generating the code
      * @return Compiler
      */
     public function setOffset(int $offset) : Compiler
@@ -224,16 +205,17 @@ class Compiler
                 . $this->prettyPrint(self::BLOCK_OPTIONS_INVERSE_BODY_4, 0, 1);
         }
 
-        //lookout for tokenizer
-        $tokenized = $this->tokenize($node);
-        if ($tokenized) {
-            return $tokenized;
+        //lookout for partials
+        //var_dump($node["value"]);
+        if (substr($node["value"], 0, 2) === "> ") {
+            //var_dump($node["value"]);
+            return $this->generatePartial($node);
         }
 
         list($name, $args, $hash) = $this->parseArguments($node['value']);
 
         //if it's a helper
-        if (Runtime::getHelper($name)) {
+        if ($this->runtime->getHelper($name)) {
             //form hash
             foreach ($hash as $key => $value) {
                 $hash[$key] = sprintf(self::BLOCK_OPTIONS_HASH_KEY_VALUE, $key, $value);
@@ -269,16 +251,15 @@ class Compiler
     {
         $node['value'] = trim($node['value']);
 
-        //lookout for tokenizer
-        $tokenized = $this->tokenize($node);
-        if ($tokenized) {
-            return $tokenized;
+        //lookout for partials
+        if (substr($node["value"], 2) === "> ") {
+            return $this->generatePartial($node);
         }
 
         list($name, $args, $hash) = $this->parseArguments($node['value']);
 
         //if it's a helper
-        if (Runtime::getHelper($name)) {
+        if ($this->runtime->getHelper($name)) {
             //form hash
             foreach ($hash as $key => $value) {
                 $hash[$key] = sprintf(self::BLOCK_OPTIONS_HASH_KEY_VALUE, $key, $value);
@@ -320,7 +301,7 @@ class Compiler
         list($name, $args, $hash) = $this->parseArguments($node['value']);
 
         //if it's a value
-        if (is_null(Runtime::getHelper($name))) {
+        if (is_null($this->runtime->getHelper($name))) {
             //run each
             $node['value'] = 'each ' . $node['value'];
             list($name, $args, $hash) = $this->parseArguments($node['value']);
@@ -386,6 +367,91 @@ class Compiler
         $buffer .= $this->prettyPrint(self::BLOCK_ESCAPE_HELPER_CLOSE, -1);
 
         return $buffer;
+    }
+
+    /**
+     * @param array $node
+     * @return string
+     */
+    protected function generatePartial(array $node) : string
+    {
+        list($name, $args, $optionsHash) = $this->parseArguments($node['value']);
+
+        //get the name
+        //it will be like 'something'
+        //or $data->find('something')
+        $name = array_shift($args);
+
+        //if it's a data lookup
+        if (strpos($name, '$data->find(') === 0) {
+            //this is not what we really want
+            $name = substr($name, 12, -1);
+        }
+
+        //if it has quotes
+        if (substr($name, 0, 1) === "'" && substr($name, -1) === "'") {
+            //remove it
+            $name = substr($name, 1, -1);
+        }
+
+        //get the partial
+        $partial = $this->runtime->getPartial($name);
+
+        //but if the partial is null
+        if (is_null($partial) === true) {
+            //name is really the partial
+            $partial = $name;
+        }
+
+        //if there are still arguments
+        $scope = '';
+        if (count($args)) {
+            $scope = '\r\t\1' . $args[0] . ', ';
+        }
+
+        //form hash
+        $hash = array();
+        foreach ($optionsHash as $key => $value) {
+            $hash[$key] = sprintf('\'%s\' => %s', $key, $value);
+        }
+
+        if (empty($hash)) {
+            $hash = '';
+        } else {
+            $hash = '\r\t\1\1\1' . implode(', \r\t\1\1\1', $hash) . '\r\t\1\1';
+        }
+
+        $layout = str_replace(
+            array('\r', '\t', '\1'),
+            array("\n",
+                str_repeat('    ', $this->offset),
+                str_repeat('    ', 1)
+            ),
+            '\r\t$buffer .= $this->runtime->getHelper(\'noop\')('
+            . $scope
+            . '\r\t\1array('
+            . '\r\t\1\1\'name\' => \'noop\','
+            . '\r\t\1\1\'hash\' => array(' . $hash . '),'
+            . '\r\t\1\1\'fn\' => function($context = null) use ($data) {'
+            . '\r\t\1\1\1if (is_array($context)) {'
+            . '\r\t\1\1\1\1$data->push($context);'
+            . '\r\t\1\1\1}'
+            . '\r\r\t\1\1\1$buffer = \'\';'
+            . '%s'
+            . '\r\t\1\1\1if (is_array($context)) {'
+            . '\r\t\1\1\1\1$data->pop();'
+            . '\r\t\1\1\1}'
+            . '\r\r\t\1\1\1return $buffer;'
+            . '\r\t\1\1},'
+            . '\r\t\1\1\'inverse\' => function() {},'
+            . '\r\t\1)'
+            . '\r\t);\r'
+        );
+
+        $compiler = new static($this->runtime, $this->tokenizerFactory);
+        $code = $compiler->setOffset($this->offset + 3)->compile($partial);
+
+        return sprintf($layout, $code);
     }
 
     /**
@@ -466,40 +532,6 @@ class Compiler
         $arg = str_replace(array('[', ']', '(', ')'), '', $arg);
         $arg = str_replace("'", '\\\'', $arg);
         return sprintf(self::BLOCK_ARGUMENT_VALUE, $arg);
-    }
-
-    /**
-     * Calls an alternative helper to add on to the compiled code
-     *
-     * @param array $node
-     * @return string|false
-     */
-    protected function tokenize(array $node)
-    {
-        //lookout for pre processors helper
-        $value = explode(' ', $node['value']);
-
-        //is it a helper ?
-        $helper = Runtime::getHelper('tokenize-' . $value[0]);
-
-        if (!$helper) {
-            return false;
-        }
-
-        list($name, $args, $hash) = $this->parseArguments($node['value']);
-
-        //options
-        $args[] = array(
-            'node'       => $node,
-            'name'       => $name,
-            'args'       => $node['value'],
-            'hash'       => $hash,
-            'offset'     => $this->offset,
-            'handlebars' => $this->handlebars
-        );
-
-        //NOTE: Tokenized do not have data binded to it
-        return call_user_func_array($helper, $args);
     }
 
     /**

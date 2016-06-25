@@ -1,13 +1,21 @@
 <?php
-use \Eden\Handlebars\Data as Data;
-use \Eden\Handlebars\Runtime as Runtime;
+//declare(strict_types=1);
 
-return function($data = array()) {
-    $noop = function() {};
-    $context = $data = new Data($data);
-    $helper = Runtime::getHelpers();
+use MattyG\Handlebars\Data;
+use MattyG\Handlebars\Template;
 
-    $buffer = ''; 
-%s
-    return $buffer;
-};
+class %1$s extends Template
+{
+    /**
+     * @param Data $data
+     * @return string The rendered template
+     */
+    protected function _render(Data $data) : string
+    {
+        $buffer = "";
+
+%2$s
+
+        return $buffer;
+    }
+}

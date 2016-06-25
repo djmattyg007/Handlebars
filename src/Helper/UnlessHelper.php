@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Eden\Handlebars\Helper;
+namespace MattyG\Handlebars\Helper;
 
 class UnlessHelper
 {

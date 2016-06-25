@@ -1,23 +1,40 @@
 <?php
 declare(strict_types=1);
 /**
- * This file is part of the Eden PHP Library.
+ * This file was formerly part of the Eden PHP Library.
  * (c) 2014-2016 Openovate Labs
+ * (c) 2016 Matthew Gamble
  *
  * Copyright and license information can be found at LICENSE.txt
  * distributed with this package.
  */
 
-class EdenHandlebarshelpersTest extends PHPUnit_Framework_TestCase
+namespace MattyG\Handlebars\Test;
+
+use MattyG\Handlebars;
+
+class Helpers extends \PHPUnit_Framework_TestCase
 {
-    public function setUp()
+    /**
+     * @var Handlebars\Handlebars
+     */
+    protected $handlebars;
+
+    protected function setUp()
     {
-        //reset the helpers and partials after every test
-        eden('handlebars')->reset();
+        $runtime = new Handlebars\Runtime(true);
+        $compiler = new Handlebars\Compiler($runtime, new Handlebars\TokenizerFactory());
+        $this->handlebars = new Handlebars\Handlebars($runtime, $compiler, new Handlebars\DataFactory());
+    }
+
+    protected function tearDown()
+    {
+        $this->handlebars = null;
     }
 
     public function testEach()
     {
+        // TODO: Store these in one big array so we can iterate over it and reduce testing code
         //simple loop
         $case1 = array(
             '{{#each comments}}{{{this}}}{{/each}}',
@@ -27,14 +44,14 @@ class EdenHandlebarshelpersTest extends PHPUnit_Framework_TestCase
 
         //nested loop 1
         $case2 = array(
-            '{{#each posts}}{{@index}}'.$case1[0].'{{/each}}',
+            '{{#each posts}}{{@index}}' . $case1[0] . '{{/each}}',
             array('posts' => array($case1[1], $case1[1], $case1[1])),
             '012341123421234'
         );
 
         //nested loop 2
         $case3 = array(
-            '{{#each users}}{{@index}}'.$case2[0].'{{/each}}',
+            '{{#each users}}{{@index}}' . $case2[0] . '{{/each}}',
             array('users' => array($case2[1], $case2[1], $case2[1])),
             '001234112342123410123411234212342012341123421234'
         );
@@ -62,14 +79,14 @@ class EdenHandlebarshelpersTest extends PHPUnit_Framework_TestCase
 
         //nested loop 1 ../
         $case7 = array(
-            '{{#each posts}}{{@index}}'.$case6[0].'{{/each}}',
+            '{{#each posts}}{{@index}}' . $case6[0] . '{{/each}}',
             array('posts' => array($case6[1], $case6[1], $case6[1])),
             '0barbar1bar2bar3bar41barbar1bar2bar3bar42barbar1bar2bar3bar4'
         );
 
         //nested loop 2 ../
         $case8 = array(
-            '{{#each users}}{{@index}}'.$case7[0].'{{/each}}',
+            '{{#each users}}{{@index}}' . $case7[0] . '{{/each}}',
             array('users' => array($case7[1], $case7[1], $case7[1])),
             '00barbar1bar2bar3bar41barbar1bar2bar3bar42barbar1bar2bar3bar410barbar'.
             '1bar2bar3bar41barbar1bar2bar3bar42barbar1bar2bar3bar420barbar1bar2bar'.
@@ -122,95 +139,95 @@ class EdenHandlebarshelpersTest extends PHPUnit_Framework_TestCase
             '1,2,3,4,'
         );
 
-        $template = eden('handlebars')->compile($case1[0]);
+        $template = $this->handlebars->compile($case1[0]);
         $results = $template($case1[1]);
         $this->assertEquals($case1[2], $results);
 
-        $template = eden('handlebars')->compile($case2[0]);
-        $results = $template($case2[1]);
+        $template = $this->handlebars->compile($case2[0]);
+        $results = $template->render($case2[1]);
         $this->assertEquals($case2[2], $results);
 
-        $template = eden('handlebars')->compile($case3[0]);
+        $template = $this->handlebars->compile($case3[0]);
         $results = $template($case3[1]);
         $this->assertEquals($case3[2], $results);
 
-        $template = eden('handlebars')->compile($case4[0]);
-        $results = $template($case4[1]);
+        $template = $this->handlebars->compile($case4[0]);
+        $results = $template->render($case4[1]);
         $this->assertEquals($case4[2], $results);
 
-        $template = eden('handlebars')->compile($case5[0]);
+        $template = $this->handlebars->compile($case5[0]);
         $results = $template($case5[1]);
         $this->assertEquals($case5[2], $results);
 
-        $template = eden('handlebars')->compile($case6[0]);
-        $results = $template($case6[1]);
+        $template = $this->handlebars->compile($case6[0]);
+        $results = $template->render($case6[1]);
         $this->assertEquals($case6[2], $results);
 
-        $template = eden('handlebars')->compile($case7[0]);
+        $template = $this->handlebars->compile($case7[0]);
         $results = $template($case7[1]);
         $this->assertEquals($case7[2], $results);
 
-        $template = eden('handlebars')->compile($case8[0]);
-        $results = $template($case8[1]);
+        $template = $this->handlebars->compile($case8[0]);
+        $results = $template->render($case8[1]);
         $this->assertEquals($case8[2], $results);
 
-        $template = eden('handlebars')->compile($case9[0]);
+        $template = $this->handlebars->compile($case9[0]);
         $results = $template($case9[1]);
         $this->assertEquals($case9[2], $results);
 
-        $template = eden('handlebars')->compile($case10[0]);
-        $results = $template($case10[1]);
+        $template = $this->handlebars->compile($case10[0]);
+        $results = $template->render($case10[1]);
         $this->assertEquals($case10[2], $results);
 
-        $template = eden('handlebars')->compile($case11[0]);
+        $template = $this->handlebars->compile($case11[0]);
         $results = $template($case11[1]);
         $this->assertEquals($case11[2], $results);
 
-        $template = eden('handlebars')->compile($case12[0]);
-        $results = $template($case12[1]);
+        $template = $this->handlebars->compile($case12[0]);
+        $results = $template->render($case12[1]);
         $this->assertEquals($case12[2], $results);
 
-        $template = eden('handlebars')->compile($case13[0]);
+        $template = $this->handlebars->compile($case13[0]);
         $results = $template($case13[1]);
         $this->assertEquals($case13[2], $results);
 
-        $template = eden('handlebars')->compile($case14[0]);
-        $results = $template($case14[1]);
+        $template = $this->handlebars->compile($case14[0]);
+        $results = $template->render($case14[1]);
         $this->assertEquals($case14[2], $results);
     }
 
     public function testIf()
     {
-        //simple if
+        // simple if
         $case1 = array(
             '{{#if comments}}YES{{else}}NO{{/if}}',
             array('comments' => array(1, 2, 3, 4)),
             'YES'
         );
 
-        //simple else
+        // simple else
         $case2 = array(
             '{{#if comments}}YES{{else}}NO{{/if}}',
             array(),
             'NO'
         );
 
-        //nested if
+        // nested if
         $case3 = array(
             '{{#if foo}}{{#if bar}}{{foo}} {{bar}}{{/if}}{{foo}}{{/if}}',
             array('foo' => 'bar', 'bar' => 'foo'),
             'bar foobar'
         );
 
-        $template = eden('handlebars')->compile($case1[0]);
+        $template = $this->handlebars->compile($case1[0]);
         $results = $template($case1[1]);
         $this->assertEquals($case1[2], $results);
 
-        $template = eden('handlebars')->compile($case2[0]);
+        $template = $this->handlebars->compile($case2[0]);
         $results = $template($case2[1]);
         $this->assertEquals($case2[2], $results);
 
-        $template = eden('handlebars')->compile($case3[0]);
+        $template = $this->handlebars->compile($case3[0]);
         $results = $template($case3[1]);
         $this->assertEquals($case3[2], $results);
     }
@@ -231,11 +248,11 @@ class EdenHandlebarshelpersTest extends PHPUnit_Framework_TestCase
             'YES'
         );
 
-        $template = eden('handlebars')->compile($case1[0]);
+        $template = $this->handlebars->compile($case1[0]);
         $results = $template($case1[1]);
         $this->assertEquals($case1[2], $results);
 
-        $template = eden('handlebars')->compile($case2[0]);
+        $template = $this->handlebars->compile($case2[0]);
         $results = $template($case2[1]);
         $this->assertEquals($case2[2], $results);
     }
@@ -249,7 +266,7 @@ class EdenHandlebarshelpersTest extends PHPUnit_Framework_TestCase
             '2'
         );
 
-        $template = eden('handlebars')->compile($case1[0]);
+        $template = $this->handlebars->compile($case1[0]);
         $results = $template($case1[1]);
         $this->assertEquals($case1[2], $results);
     }
@@ -276,7 +293,7 @@ class EdenHandlebarshelpersTest extends PHPUnit_Framework_TestCase
         NO1
         {{~/if}}';
 
-        $template = eden('handlebars')->compile($contents);
+        $template = $this->handlebars->compile($contents);
         $results = $template(array(
             'merchants' => array(
                 array('profile_name' => 'John'),

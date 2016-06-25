@@ -11,17 +11,12 @@
  - [Production Ready](#production)
  - [API](#api)
     - [compile](#compile)
-    - [getCachePath](#getCachePath)
-    - [getHelper](#getHelper)
-    - [getHelpers](#getHelpers)
-    - [getPartial](#getPartial)
-    - [getPartials](#getPartials)
     - [registerHelper](#registerHelper)
+    - [getHelper](#getHelper)
     - [registerPartial](#registerPartial)
-    - [setCacheFilePrefix](#setCacheFilePrefix)
+    - [getPartial](#getPartial)
     - [setCachePath](#setCachePath)
-    - [unregisterHelper](#unregisterHelper)
-    - [unregisterPartial](#unregisterPartial)
+    - [setNamePrefix](#setCacheFilePrefix)
  - [Contributing](#contributing)
 
 ====
@@ -139,17 +134,6 @@ echo $template(array('foo' => 'BAR'));
      - PHP has functions that support most of the listed Utils in handlebars.js 
 	 - We didn't want to create something that already exists in other contexts
 	 - This de-feature will be considered upon requests ( create an issue :) )
- - Dynamic Partials
-     - At the bottom of our pipe 
-	 - because of it's difficulty to recreate
-	 - and practicality
-	 - This de-feature will be considered upon requests ( create an issue :( )
- - Inline Partials
-     - TODO
- - Decorators
- 	 - TODO
- - Frames
- 	 - TODO
 
 ====
 
@@ -193,22 +177,6 @@ Returns `function` - the template binding handler
 eden('handlebars')->compile();
 ```
 
-====
-
-<a name="getCachePath"></a>
-
-### getCachePath
-
-Returns the active cache path
-
-#### Usage
-
-```
-eden('handlebars')->getCachePath();
-```
-
-Returns `Closure`
-
 ==== 
 
 <a name="getHelper"></a>
@@ -227,25 +195,7 @@ eden('handlebars')->getHelper('if');
 
 - `string $name` - the name of the helper
 
-Returns `Closure`
-
-==== 
-
-<a name="getHelpers"></a>
-
-### getHelpers
-
-Returns all the registered helpers 
-
-#### Usage
-
-```
-eden('handlebars')->getHelpers();
-```
-
-#### Parameters
-
-Returns `array`
+Returns `callable`
 
 ====
 
@@ -266,24 +216,6 @@ eden('handlebars')->getPartial('foobar');
 - `string $name` - the name of the partial
 
 Returns `string`
-
-==== 
-
-<a name="getPartials"></a>
-
-### getPartials
-
-Returns all the registered partials 
-
-#### Usage
-
-```
-eden('handlebars')->getPartials();
-```
-
-#### Parameters
-
-Returns `array`
 
 ==== 
 
@@ -367,16 +299,16 @@ eden('handlebars')->setCachePath('/path/to/cache/folder');
 
 ====  
 
-<a name="setCacheFilePrefix"></a>
+<a name="setNamePrefix"></a>
 
-### setCacheFilePrefix
+### setNamePrefix
 
-Sets the cache file name prefix for caching
+Sets the name prefix for compiled templates
 
 #### Usage
 
 ```
-eden('handlebars')->setCacheFilePrefix(string $cacheFilePrefix);
+eden('handlebars')->setNamePrefix(string $namePrefix);
 ```
 
 #### Parameters
@@ -393,59 +325,8 @@ eden('handlebars')->setCacheFilePrefix('special-template-');
 
 ==== 
 
-<a name="unregisterHelper"></a>
-
-### unregisterHelper
-
-The opposite of registerHelper 
-
-#### Usage
-
-```
-eden('handlebars')->unregisterHelper(string $name);
-```
-
-#### Parameters
-
- - `string $name` - the helper name
-
-Returns `Eden\Handlebars\Index`
-
-#### Example
-
-```
-eden('handlebars')->unregisterHelper();
-```
-
-==== 
-
-<a name="unregisterPartial"></a>
-
-### unregisterPartial
-
-The opposite of registerPartial 
-
-#### Usage
-
-```
-eden('handlebars')->unregisterPartial(string $name);
-```
-
-#### Parameters
-
- - `string $name` - the partial name
-
-Returns `Eden\Handlebars\Index`
-
-#### Example
-
-```
-eden('handlebars')->unregisterPartial();
-```
-
-==== 
-
 <a name="contributing"></a>
+
 #Contributing to Eden
 
 Contributions to *Eden* are following the Github work flow. Please read up before contributing.

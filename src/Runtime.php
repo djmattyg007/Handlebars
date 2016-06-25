@@ -1,49 +1,52 @@
 <?php
 declare(strict_types=1);
 /**
- * This file is part of the Eden PHP Library.
+ * This file was formerly part of the Eden PHP Library.
  * (c) 2014-2016 Openovate Labs
+ * (c) 2016 Matthew Gamble
  *
  * Copyright and license information can be found at LICENSE.txt
  * distributed with this package.
  */
 
-namespace Eden\Handlebars;
+namespace MattyG\Handlebars;
 
-/**
- * Welcome to Eden\Handlebars!
- *
- * This definition wraps the Engine to match
- * the handlebars API as close as possible
- *
- * @vendor   Eden
- * @package  handlebars
- * @author   Christian Blanquera <cblanquera@openovate.com>
- * @standard PSR-2
- */
 class Runtime
 {
     /**
-     * A raw list of partials
-     *
-     * @var array
-     */
-    protected static $partials = array();
-    
-    /**
      * A raw list of helpers
      *
-     * @var array
+     * @var callable[]
      */
-    protected static $helpers = array();
+    protected $helpers = array();
 
     /**
-     * Resets the helpers and partials
+     * A raw list of partials
+     *
+     * @var string[]
      */
-    public static function flush()
+    protected $partials = array();
+
+    public function __construct($addDefaultHelpers = true)
     {
-         self::$partials = array();
-         self::$helpers = array();
+        if ($addDefaultHelpers === true) {
+            $helpers = require(__DIR__ . '/helpers.php');
+            foreach ($helpers as $name => $helper) {
+                $this->addHelper($name, $helper);
+            }
+        }
+    }
+
+    /**
+     * @param string $name The name of the helper
+     * @param callable $helper The helper
+     */
+    public function addHelper(string $name, $helper)
+    {
+        if (is_callable($helper) === false) {
+            throw new Exception("All Handlebars helpers must be callable");
+        }
+        $this->helpers[$name] = $helper;
     }
 
     /**
@@ -52,62 +55,13 @@ class Runtime
      * @param string $name The name of the helper
      * @return callable|null
      */
-    public static function getHelper(string $name)
+    public function getHelper(string $name)
     {
-        if (isset(self::$helpers[$name])) {
-            return self::$helpers[$name];
-        }
-        
-        return null;
-    }
-
-    /**
-     * Returns all the registered helpers
-     *
-     * @return array
-     */
-    public static function getHelpers() : array
-    {
-        return self::$helpers;
-    }
-
-    /**
-     * Returns a specific partial
-     *
-     * @param string $name The name of the helper
-     * @return string|null
-     */
-    public static function getPartial(string $name)
-    {
-        if (isset(self::$partials[$name])) {
-            return self::$partials[$name];
+        if (isset($this->helpers[$name])) {
+            return $this->helpers[$name];
         }
 
         return null;
-    }
-
-    /**
-     * Returns all the registered partials
-     *
-     * @return array
-     */
-    public static function getPartials() : array
-    {
-        return self::$partials;
-    }
-
-    /**
-     * The famous register helper matching the Handlebars API
-     *
-     * @param string $name The name of the helper
-     * @param callable $helper The helper handler
-     */
-    public static function registerHelper(string $name, $helper)
-    {
-        if (is_callable($helper) === false) {
-            throw new Exception("All Handlebars helpers must be callable");
-        }
-        self::$helpers[$name] = $helper;
     }
 
     /**
@@ -117,32 +71,23 @@ class Runtime
      * @param string $name The name of the helper
      * @param string $partial The helper handler
      */
-    public static function registerPartial(string $name, string $partial)
+    public function addPartial(string $name, string $partial)
     {
-        self::$partials[$name] = $partial;
+        $this->partials[$name] = $partial;
     }
 
     /**
-     * The opposite of registerHelper
+     * Returns a specific partial
      *
-     * @param string $name the helper name
+     * @param string $name The name of the helper
+     * @return string|null
      */
-    public static function unregisterHelper(string $name)
+    public function getPartial(string $name)
     {
-        if (isset(self::$helpers[$name])) {
-            unset(self::$helpers[$name]);
+        if (isset($this->partials[$name])) {
+            return $this->partials[$name];
         }
-    }
 
-    /**
-     * The opposite of registerPartial
-     *
-     * @param string $name the partial name
-     */
-    public static function unregisterPartial(string $name)
-    {
-        if (isset(self::$partials[$name])) {
-            unset(self::$partials[$name]);
-        }
+        return null;
     }
 }

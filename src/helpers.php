@@ -1,97 +1,12 @@
 <?php
 declare(strict_types=1);
 
+use MattyG\Handlebars\Helper;
+
 return array(
-    'if' => new \Eden\Handlebars\Helper\IfHelper(),
-    'unless' => new \Eden\Handlebars\Helper\UnlessHelper(),
-    'with' => new \Eden\Handlebars\Helper\WithHelper(),
-    'each' => new \Eden\Handlebars\Helper\EachHelper(),
-    'noop' => new \Eden\Handlebars\Helper\NoopHelper(),
-
-    'tokenize->' => function ($name) {
-        //get args
-        $args = func_get_args();
-
-        //get the name
-        //it will be like 'something'
-        //or $data->find('something')
-        $original = $name = array_shift($args);
-
-        //we need the options
-        $options = array_pop($args);
-
-        //if it's a data lookup
-        if (strpos($name, '$data->find(') === 0) {
-            //this is not what we really want
-            $name = substr($name, 12, -1);
-        }
-
-        //if it has quotes
-        if (substr($name, 0, 1) === "'" && substr($name, -1) === "'") {
-            //remove it
-            $name = substr($name, 1, -1);
-        }
-
-        //get the partial
-        $partial = \Eden\Handlebars\Runtime::getPartial($name);
-
-        //but if the partial is null
-        if (is_null($partial)) {
-            //name is really the partial
-            $partial = $name;
-        }
-
-        //if there are still arguments
-        $scope = '';
-        if (count($args)) {
-            $scope = '\r\t\1' . $args[0] . ', ';
-        }
-
-        //form hash
-        $hash = array();
-        foreach ($options['hash'] as $key => $value) {
-            $hash[$key] = sprintf('\'%s\' => %s', $key, $value);
-        }
-
-        if (empty($hash)) {
-            $hash = '';
-        } else {
-            $hash = '\r\t\1\1\1' . implode(', \r\t\1\1\1', $hash) . '\r\t\1\1';
-        }
-
-        $level = $options['offset'];
-
-        $layout = str_replace(
-            array('\r', '\t', '\1'),
-            array("\n",
-                str_repeat('    ', $options['offset']),
-                str_repeat('    ', 1)
-            ),
-            '\r\t$buffer .= $helper[\'noop\']('
-            . $scope
-            . '\r\t\1array('
-            . '\r\t\1\1\'name\' => \'noop\','
-            . '\r\t\1\1\'hash\' => array('.$hash.'),'
-            . '\r\t\1\1\'fn\' => function($context = null) use ($noop, $data, &$helper) {'
-            . '\r\t\1\1\1if (is_array($context)) {'
-            . '\r\t\1\1\1\1$data->push($context);'
-            . '\r\t\1\1\1}'
-            . '\r\r\t\1\1\1$buffer = \'\';'
-            . '%s'
-            . '\r\t\1\1\1if (is_array($context)) {'
-            . '\r\t\1\1\1\1$data->pop();'
-            . '\r\t\1\1\1}'
-            . '\r\r\t\1\1\1return $buffer;'
-            . '\r\t\1\1},'
-            . '\r\t\1\1\'inverse\' => $noop'
-            . '\r\t\1)'
-            . '\r\t);\r'
-        );
-
-        $tokenizer = new \Eden\Handlebars\Tokenizer($partial);
-        $compiler = new \Eden\Handlebars\Compiler($options["handlebars"], $tokenizer);
-        $code = $compiler->setOffset($options['offset'] + 3)->compile(false);
-
-        return sprintf($layout, $code);
-    },
+    "if" => new Helper\IfHelper(),
+    "unless" => new Helper\UnlessHelper(),
+    "with" => new Helper\WithHelper(),
+    "each" => new Helper\EachHelper(),
+    "noop" => new Helper\NoopHelper(),
 );

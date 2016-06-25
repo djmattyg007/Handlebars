@@ -12,14 +12,14 @@
          bootstrap="test/bootstrap.php"
 >
   <testsuites>
-    <testsuite name="Eden Handlebars Test Suite">
-      <file>test/Data.php</file>
-      <file>test/Tokenizer.php</file>
+    <testsuite name="Handlebars Test Suite">
       <file>test/Compiler.php</file>
-	  <file>test/Runtime.php</file>
-      <file>test/Index.php</file>
-	  <file>test/helpers.php</file>
+      <file>test/Data.php</file>
+      <file>test/Handlebars.php</file>
+      <file>test/Runtime.php</file>
+      <file>test/Tokenizer.php</file>
       <file>test/functional.php</file>
+      <file>test/helpers.php</file>
     </testsuite>
   </testsuites>
 
