@@ -1,4 +1,4 @@
-Handlebars
+Handlebars for PHP
 ====
 
  - [Install](#install)
@@ -116,7 +116,6 @@ echo $template->render(array('foo' => 'BAR'));
      - Comments like `{{!-- Something --}}` and `{{! Something }}` supported
      - Trims like `{{~#each}}` and `{{~foo~}}` supported
      - Mustache backwards compatibility `{{#foo}}{{this}}{{/foo}}`
-     - Event handlers for unknown helpers and unknown partials
  - Default Helpers matching handlebars.js
      - if
      - each - and `{{#each foo as |value, key|}}`
