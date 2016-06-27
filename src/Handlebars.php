@@ -137,7 +137,7 @@ returner:
             return;
         }
         $fullFilename = $this->cachePath . DIRECTORY_SEPARATOR . $filename;
-        file_put_contents($filename, $code);
+        file_put_contents($fullFilename, $code);
     }
 
     /**
