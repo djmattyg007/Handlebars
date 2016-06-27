@@ -153,18 +153,6 @@ returner:
     }
 
     /**
-     * Returns a specific helper
-     * TODO: Remove this
-     *
-     * @param string $name The name of the helper
-     * @return callable|null
-     */
-    public function getHelper(string $name)
-    {
-        return $this->runtime->getHelper($name);
-    }
-
-    /**
      * Delays registering partials to the engine
      * because there is no add partial method...
      *
@@ -176,18 +164,6 @@ returner:
     {
         $this->runtime->addPartial($name, $partial);
         return $this;
-    }
-
-    /**
-     * Returns a specific partial
-     * TODO: Remove this
-     *
-     * @param string $name The name of the helper
-     * @return string|null
-     */
-    public function getPartial(string $name)
-    {
-        return $this->runtime->getPartial($name);
     }
 
     /**
