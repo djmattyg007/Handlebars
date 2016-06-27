@@ -1,29 +1,12 @@
 Handlebars for PHP
 ====
 
- - [Install](#install)
- - [Introduction](#intro)
- - [Usage](#usage)
- - [Features](#features)
- - [Production Ready](#production)
- - [API](#api)
-    - [compile](#compile)
-    - [registerHelper](#registerHelper)
-    - [registerPartial](#registerPartial)
-    - [setCachePath](#setCachePath)
-    - [setNamePrefix](#setCacheFilePrefix)
- - [Contributing](#contributing)
-
-====
-
-<a name="install"></a>
 ## Install
 
 `composer require djmattyg007/handlebars`
 
 ====
 
-<a name="intro"></a>
 ## Introduction
 
 This is a PHP implementation of Handlebars templates that aims to match the interface of the JS
@@ -36,7 +19,6 @@ singletons. It also takes advantage of scalar type declarations available in PHP
 
 ====
 
-<a name="usage"></a>
 ## Basic Usage
 
 #### Instantiating the Handlebars class
@@ -106,7 +88,6 @@ echo $template->render(array('foo' => 'BAR'));
 
 ====
 
-<a name="features"></a>
 ## Features
 
  - PHP API - designed to match the handlebars.js documentation
@@ -122,14 +103,12 @@ echo $template->render(array('foo' => 'BAR'));
      - unless
      - with
 
-<a name="features-todo"></a>
 ### Features on the todo list
 
  - Safe String/Escaping
 
 ====
 
-<a name="production"></a>
 ## Production Ready
 
 When your templates are ready for a production (live) environment, it is recommended that caching be used. To enable cache:
@@ -140,16 +119,13 @@ When your templates are ready for a production (live) environment, it is recomme
 
 ====
 
-<a name="api"></a>
 ## API
 
 ==== 
 
-<a name="compile"></a>
-
 ### compile
 
-Returns a callback that binds the data with the template 
+Returns a template object containing the compiled code for the supplied template string.
 
 #### Usage
 
@@ -173,8 +149,6 @@ echo $template->render(array('foo' => 'FOO', 'bar' => 'BAR'));
 ```
 
 ==== 
-
-<a name="registerHelper"></a>
 
 ### registerHelper
 
@@ -206,8 +180,6 @@ echo $template(array('foo' => 'FOO'));
 
 ==== 
 
-<a name="registerPartial"></a>
-
 ### registerPartial
 
 Registers a reusable partial template for use within other templates
@@ -234,8 +206,6 @@ echo $template->render(array('result' => 3));
 
 ==== 
 
-<a name="setCachePath"></a>
-
 ### setCachePath
 
 Enables caching of compiled templates.
@@ -257,8 +227,6 @@ $handlebars->setCachePath('/path/to/cache/folder');
 ```
 
 ====  
-
-<a name="setNamePrefix"></a>
 
 ### setNamePrefix
 
@@ -282,8 +250,6 @@ $handlebars->setNamePrefix('special-template-');
 ```
 
 ==== 
-
-<a name="contributing"></a>
 
 #Contributing
 
