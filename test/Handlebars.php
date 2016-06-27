@@ -50,19 +50,6 @@ class HandlebarsTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(Handlebars\Handlebars::class, $this->handlebars->setCachePath("/foo/bar"));
     }
 
-    public function testGetHelper()
-    {
-        $this->assertTrue(is_callable($this->handlebars->getHelper("if")));
-        $this->assertInstanceOf(Handlebars\Helper\IfHelper::class, $this->handlebars->getHelper("if"));
-        $this->assertNull($this->handlebars->getHelper("foobar"));
-    }
-
-    public function testGetPartial()
-    {
-        $this->assertTrue(is_string($this->handlebars->registerPartial("foo", "bar")->getPartial("foo")));
-        $this->assertNull($this->handlebars->getPartial("foobar"));
-    }
-
     public function testRegisterHelper1() 
     {
         //simple helper
