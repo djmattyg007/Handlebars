@@ -75,12 +75,11 @@ class Handlebars
 
     /**
      * Returns a callback that binds the data with the template
-     * TODO: Update return type
      *
      * @param string $source The template string
      * @return callable The template binding handler
      */
-    public function compile(string $source)
+    public function compile(string $source) : callable
     {
         $name = $this->namePrefix . md5(self::VERSION . $source);
 
