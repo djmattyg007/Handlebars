@@ -1,20 +1,15 @@
-![logo](http://eden.openovate.com/assets/images/cloud-social.png) Eden Handlebars
-====
-[![Build Status](https://api.travis-ci.org/Eden-PHP/Handlebars.png)](https://travis-ci.org/Eden-PHP/Handlebars)
+Handlebars
 ====
 
  - [Install](#install)
  - [Introduction](#intro)
  - [Usage](#usage)
  - [Features](#features)
- - [De-Features](#defeatures)
  - [Production Ready](#production)
  - [API](#api)
     - [compile](#compile)
     - [registerHelper](#registerHelper)
-    - [getHelper](#getHelper)
     - [registerPartial](#registerPartial)
-    - [getPartial](#getPartial)
     - [setCachePath](#setCachePath)
     - [setNamePrefix](#setCacheFilePrefix)
  - [Contributing](#contributing)
@@ -24,73 +19,89 @@
 <a name="install"></a>
 ## Install
 
-`composer install eden/handlebars`
-
-====
-
-## Enable Eden
-
-The following documentation uses `eden()` in its example reference. Enabling this function requires an extra step as descirbed in this section which is not required if you access this package using the following.
-
-```
-Eden\Handlebars\Index::i();
-```
-
-When using composer, there is not an easy way to access functions from packages. As a workaround, adding this constant in your code will allow `eden()` to be available after. 
-
-```
-Eden::DECORATOR;
-```
-
-For example:
-
-```
-Eden::DECORATOR;
-
-eden()->inspect('Hello World');
-```
+`composer require djmattyg007/handlebars`
 
 ====
 
 <a name="intro"></a>
 ## Introduction
 
-PHP Handlebars with JS interface to match with compile time helper support and super nice compile 
-time error reporting. This version of Handlebars is based on caching the compiled templates and 
-inheritently made the overall compile times faster. Loading at ~50ms uncached and ~30ms cached. 
+This is a PHP implementation of Handlebars templates that aims to match the interface of the JS
+implementation. It does not provide some of the niceties found in other similar PHP libraries,
+such as loading templates from files.
+
+This is a fork of the Handlebars package from the Eden framework. It has been refactored to not
+rely on the magic provided by the Core package from Eden, and to not treat most of the classes as
+singletons. It also takes advantage of scalar type declarations available in PHP 7.
 
 ====
 
 <a name="usage"></a>
 ## Basic Usage
 
+#### Instantiating the Handlebars class
+
+There are several parts to the Handlebars object. The first is the Runtime object. The Runtime is
+what ends up containing all helpers and partials. It is passed to Templates when they are compiled,
+and also the Compiler for use during compilation.
+
+```php
+use MattyG\Handlebars\Runtime;
+$runtime = new Runtime();
+// Pass false to the constructor to have it not load the default Helpers
+$helperlessRuntime = new Runtime(false);
+```
+
+The Compiler has two dependencies: the Runtime, and a factory to produce Tokenizers. Each time a
+new Template is compiled, a new Tokenizer is created using the Tokernizer factory.
+
+```php
+use MattyG\Handlebars\Compiler;
+use MattyG\Handlebars\TokenizerFactory;
+$compiler = new Compiler($runtime, new TokenizerFactory());
+```
+
+Finally, we instanstiate the actual Handlebars object. This is the object you'll be interacting
+with to register helpers and partials, and to compile templates. It has three dependencies: the
+Runtime, the Compiler, and a factory to produce Data objects. Data objects are used to help easily
+navigate the context provided when rendering a Template.
+
+```php
+use MattyG\Handlebars\DataFactory;
+use MattyG\Handlebars\Handlebars;
+$handlebars = new Handlebars($runtime, $compiler, new DataFactory());
+```
+
+It is recommended that you use a dependency injection system to handle construction of the main
+Handlebars object, so that the only part you need to worry about is registering your helpers and
+partials, and actually compiling your templates.
+
 #### Rendering 
 
-```
-$template = eden('handlebars')->compile('{{foo}} {{bar}}');
+```php
+$template = $handlebars->compile('{{foo}} {{bar}}');
 
-echo $template(array('foo' => 'BAR', 'bar' => 'ZOO'));
+$content = $template->render(array('foo' => BAR, 'bar' =. 'ZOO'));
+// Or used as a callable
+$content = $template(array('foo' => 'BAZ', 'bar' => 'ABC'));
 ```
-#### Registering Helpers 
 
-```
-$template = eden('handlebars')
-	->registerHelper('bar', function($options) {
-		return 'ZOO';
-	})
-	->compile('{{foo}} {{bar}}');
+#### Registering Helpers
 
+```php
+$handlebars->registerHelper('bar', function($options) {
+    return 'BAZ';
+});
+$template = $handlebars->compile('{{foo}} {{bar}}');
 echo $template(array('foo' => 'BAR'));
 ```
 
 #### Registering Partials
 
-```
-$template = eden('handlebars')
-	->registerPartial('bar', 'zoo')
-	->compile('{{foo}} {{> bar}}');
-
-echo $template(array('foo' => 'BAR'));
+```php
+$handlebars->registerPartial('bar' => 'ABC');
+$template = $handlebars->compile('{{foo}} {{> bar}}');
+echo $template->render(array('foo' => 'BAR'));
 ```
 
 ====
@@ -99,41 +110,23 @@ echo $template(array('foo' => 'BAR'));
 ## Features
 
  - PHP API - designed to match the handlebars.js documentation
-     - registerHelper() - Matches exactly what you expect from handlebars.js (except it's PHP syntax)
+     - registerHelper() - matches exactly what you expect from handlebars.js (except it's PHP syntax)
      - registerPartial() - accepts strings and functions as callbacks
      - Literals like `{{./foo}}` and `{{../bar}}` are evaluated properly
      - Comments like `{{!-- Something --}}` and `{{! Something }}` supported
-	 - Trims like `{{~#each}}` and `{{~foo~}}` supported
-	 - Mustache backwards compatibility `{{#foo}}{{this}}{{/foo}}`
-	 - Tokenizer helpers to optimize custom code generation to cache
-	 - Event handlers for unknown helpers and unknown partials
+     - Trims like `{{~#each}}` and `{{~foo~}}` supported
+     - Mustache backwards compatibility `{{#foo}}{{this}}{{/foo}}`
+     - Event handlers for unknown helpers and unknown partials
  - Default Helpers matching handlebars.js
+     - if
      - each - and `{{#each foo as |value, key|}}`
-	     - Please note that there is an issue with `each` being slow depending on the size of the object
-		 - We need help optimizing this
-	 - with
-	 - unless
-	 - if 
+     - unless
+     - with
 
-<a name="defeatures"></a>
-## De-Features (or whatever the opposite of features is)
+<a name="features-todo"></a>
+### Features on the todo list
 
- - Does not support file templates. 
-     - You need to load them up and pass it into Handlebars. 
-     - If this is a problem you should consider other Handlebars PHP libraries
-	 - You can always create a helper for this
-	 - This de-feature will be considered upon requests ( create an issue :) )
- - Partial Failover
-     - Something we haven't had a chance to come around doing yet as we did not have a need
-	 - This de-feature will be considered upon requests ( create an issue :) )
  - Safe String/Escaping
-     - PHP has functions that can turn a string "safe". 
-	 - We didn't want to create something that already exists in other contexts
-	 - This de-feature will be considered upon requests ( create an issue :) )
- - Utils
-     - PHP has functions that support most of the listed Utils in handlebars.js 
-	 - We didn't want to create something that already exists in other contexts
-	 - This de-feature will be considered upon requests ( create an issue :) )
 
 ====
 
@@ -143,8 +136,8 @@ echo $template(array('foo' => 'BAR'));
 When your templates are ready for a production (live) environment, it is recommended that caching be used. To enable cache:
 
  - Create a cache folder and make sure permissions are properly set for handlebars to write files to it.
- - Enable cache by using `eden('handlebars')->setCachePath(__DIR__.'/your/cache/folder/location');`
- - If the folder location does not exist, caching will be disabled.
+ - Enable cache by using `$handlebars->setCachePath(__DIR__ . '/your/cache/folder/location');`
+ - The code will not attempt to create the specified folder if it doesn't exist.
 
 ====
 
@@ -161,61 +154,24 @@ Returns a callback that binds the data with the template
 
 #### Usage
 
-```
-eden('handlebars')->compile(string $string);
+```php
+$template = $handlebars->compile(string $string);
 ```
 
 #### Parameters
 
  - `string $string` - the template string
 
-Returns `function` - the template binding handler
+Returns an instance of `MattyG\Handlebars\Template` - call render() on the template object (or use
+it as a callable) to render it.
 
 #### Example
 
+```php
+$template = $handlebars->compile('{{foo}} {{bar}}');
+echo $template->render(array('foo' => 'FOO', 'bar' => 'BAR'));
+// result: 'FOO BAR'
 ```
-eden('handlebars')->compile();
-```
-
-==== 
-
-<a name="getHelper"></a>
-
-### getHelper
-
-Returns a helper given the name
-
-#### Usage
-
-```
-eden('handlebars')->getHelper('if');
-```
-
-#### Parameters
-
-- `string $name` - the name of the helper
-
-Returns `callable`
-
-====
-
-<a name="getPartial"></a>
-
-### getPartial
-
-Returns a partial given the name
-
-#### Usage
-
-```
-eden('handlebars')->getPartial('foobar');
-```
-
-#### Parameters
-
-- `string $name` - the name of the partial
-
-Returns `string`
 
 ==== 
 
@@ -223,25 +179,30 @@ Returns `string`
 
 ### registerHelper
 
-The famous register helper matching the Handlebars API 
+Register a helper to be used within templates.
+
+Note that unlike the JS implementation of Handlebars, the concept of "this" is not bound to the
+current context inside of a helper. This is actually a freedom: it allows you to use any type of
+callable you wish.
 
 #### Usage
 
-```
-eden('handlebars')->registerHelper(string $name, function $helper);
+```php
+$handlebars->registerHelper(string $name, callable $helper);
 ```
 
 #### Parameters
 
  - `string $name` - the name of the helper
- - `function $helper` - the helper handler
-
-Returns `Eden\Handlebrs\Index`
+ - `callable $helper` - the helper handler
 
 #### Example
 
-```
-eden('handlebars')->registerHelper();
+```php
+$handlebars->registerHelper('baz', function() { return 'BAZ' });
+$template = $handlebars->compile('{{foo}} {{baz}}');
+echo $template(array('foo' => 'FOO'));
+// result: 'FOO BAZ'
 ```
 
 ==== 
@@ -250,25 +211,26 @@ eden('handlebars')->registerHelper();
 
 ### registerPartial
 
-Delays registering partials to the engine because there is no add partial method... 
+Registers a reusable partial template for use within other templates
 
 #### Usage
 
-```
-eden('handlebars')->registerPartial(string $name, string $partial);
+```php
+$handlebars->registerPartial(string $name, string $partial);
 ```
 
 #### Parameters
 
- - `string $name` - the name of the helper
- - `string $partial` - the helper handler
-
-Returns `Eden\Handlebrs\Index`
+ - `string $name` - the name of the partial
+ - `string $partial` - the template string of the partial
 
 #### Example
 
-```
-eden('handlebars')->registerPartial();
+```php
+$handlebars->registerPartial('zoo', '1 + 2');
+$template = $handlebars->compile('{{> zoo}} = {{result}}');
+echo $template->render(array('result' => 3));
+// result: '1 + 2 = 3'
 ```
 
 ==== 
@@ -277,24 +239,22 @@ eden('handlebars')->registerPartial();
 
 ### setCachePath
 
-Enables the cache option
+Enables caching of compiled templates.
 
 #### Usage
 
-```
-eden('handlebars')->setCachePath(string $cachePath);
+```php
+$handlebars->setCachePath(string $cachePath);
 ```
 
 #### Parameters
 
  - `string $cachePath` - The path to store cached copies of compiled templates
 
-Returns `Eden\Handlebrs\Index`
-
 #### Example
 
-```
-eden('handlebars')->setCachePath('/path/to/cache/folder');
+```php
+$handlebars->setCachePath('/path/to/cache/folder');
 ```
 
 ====  
@@ -303,48 +263,29 @@ eden('handlebars')->setCachePath('/path/to/cache/folder');
 
 ### setNamePrefix
 
-Sets the name prefix for compiled templates
+Sets the name prefix for compiled templates. This is used to avoid conflicts when generating
+templates.
 
 #### Usage
 
-```
-eden('handlebars')->setNamePrefix(string $namePrefix);
+```php
+$handlebars->setNamePrefix(string $namePrefix);
 ```
 
 #### Parameters
 
- - `string $cacheFilePrefix` - Custom prefix name
-
-Returns `Eden\Handlebrs\Index`
+ - `string $namePrefix` - Custom prefix name
 
 #### Example
 
 ```
-eden('handlebars')->setCacheFilePrefix('special-template-');
+$handlebars->setNamePrefix('special-template-');
 ```
 
 ==== 
 
 <a name="contributing"></a>
 
-#Contributing to Eden
+#Contributing
 
-Contributions to *Eden* are following the Github work flow. Please read up before contributing.
-
-##Setting up your machine with the Eden repository and your fork
-
-1. Fork the repository
-2. Fire up your local terminal create a new branch from the `v4` branch of your 
-fork with a branch name describing what your changes are. 
- Possible branch name types:
-    - bugfix
-    - feature
-    - improvement
-3. Make your changes. Always make sure to sign-off (-s) on all commits made (git commit -s -m "Commit message")
-
-##Making pull requests
-
-1. Please ensure to run `phpunit` before making a pull request.
-2. Push your code to your remote forked version.
-3. Go back to your forked version on GitHub and submit a pull request.
-4. An Eden developer will review your code and merge it in when it has been classified as suitable.
+All contributions are welcome. Ideally, all code contributions will come with new or updated tests :)
