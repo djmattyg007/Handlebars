@@ -5,8 +5,6 @@ Handlebars for PHP
 
 `composer require djmattyg007/handlebars`
 
-====
-
 ## Introduction
 
 This is a PHP implementation of Handlebars templates that aims to match the interface of the JS
@@ -16,8 +14,6 @@ such as loading templates from files.
 This is a fork of the Handlebars package from the Eden framework. It has been refactored to not
 rely on the magic provided by the Core package from Eden, and to not treat most of the classes as
 singletons. It also takes advantage of scalar type declarations available in PHP 7.
-
-====
 
 ## Basic Usage
 
@@ -85,8 +81,6 @@ $handlebars->registerPartial('bar' => 'ABC');
 $template = $handlebars->compile('{{foo}} {{> bar}}');
 echo $template->render(array('foo' => 'BAR'));
 ```
-
-====
 
 ## Features
 

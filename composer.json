@@ -2,7 +2,7 @@
     "name": "djmattyg007/handlebars",
     "type": "library",
     "description": "PHP implementation of Handlebars templates aiming to match the JS interface.",
-    "keywords": ["hamdlebars", "template", "templating"],
+    "keywords": ["handlebars", "template", "templating"],
     "homepage": "https://github.com/djmattyg007/handlebars",
     "license": "MIT",
     "authors": [
