@@ -91,6 +91,7 @@ echo $template->render(array('foo' => 'BAR'));
      - Comments like `{{!-- Something --}}` and `{{! Something }}` supported
      - Trims like `{{~#each}}` and `{{~foo~}}` supported
      - Mustache backwards compatibility `{{#foo}}{{this}}{{/foo}}`
+     - SafeString class, to allow helpers to return HTML
  - Default Helpers matching handlebars.js
      - if
      - each - and `{{#each foo as |value, key|}}`
@@ -142,6 +143,9 @@ echo $template->render(array('foo' => 'FOO', 'bar' => 'BAR'));
 
 Register a helper to be used within templates.
 
+Helpers can return an instance of the SafeString class to ensure that the returned content is
+not escaped by the compiler.
+
 Note that unlike the JS implementation of Handlebars, the concept of "this" is not bound to the
 current context inside of a helper. This is actually a freedom: it allows you to use any type of
 callable you wish.
@@ -160,10 +164,18 @@ $handlebars->registerHelper(string $name, callable $helper);
 #### Example
 
 ```php
-$handlebars->registerHelper('baz', function() { return 'BAZ' });
+$handlebars->registerHelper('baz', function() { return 'BAZ&BAZ'; });
 $template = $handlebars->compile('{{foo}} {{baz}}');
 echo $template(array('foo' => 'FOO'));
-// result: 'FOO BAZ'
+// result: 'FOO BAZ&amp;BAZ'
+```
+
+```php
+use MattyG\Handlebars\SafeString;
+$handlebars->registerHelper('safehelper', function($value) { return new SafeString($value . '&BAZ'); });
+$template = $handlebars->compile('{foo}} {{safehelper 'BAR'}}');
+echo $template->render(array('foo' => 'FOO'));
+// result: 'FOO BAR&BAZ'
 ```
 
 ==== 
