@@ -13,7 +13,7 @@ namespace MattyG\Handlebars;
 
 class Handlebars
 {
-    const VERSION = "6.0.0-dev1";
+    const VERSION = "6.1.0";
 
     const COMPILE_ERROR = "%s on line %s \n```\n%s\n```\n";
 
