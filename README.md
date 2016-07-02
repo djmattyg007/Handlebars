@@ -97,10 +97,6 @@ echo $template->render(array('foo' => 'BAR'));
      - unless
      - with
 
-### Features on the todo list
-
- - Safe String/Escaping
-
 ====
 
 ## Production Ready
@@ -114,8 +110,6 @@ When your templates are ready for a production (live) environment, it is recomme
 ====
 
 ## API
-
-==== 
 
 ### compile
 
@@ -242,8 +236,6 @@ $handlebars->setNamePrefix(string $namePrefix);
 ```
 $handlebars->setNamePrefix('special-template-');
 ```
-
-==== 
 
 #Contributing
 
