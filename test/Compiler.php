@@ -22,7 +22,15 @@ class Compiler extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->compiler = new Handlebars\Compiler(new Handlebars\Runtime(), new Handlebars\TokenizerFactory());
+        $runtime = new Handlebars\Runtime();
+        $runtime->addHelper("startswithfoo", function($value) {
+            return "foo{$value}";
+        });
+        $runtime->addHelper("testinglink", function($url, $text) {
+            $string = sprintf('<a href="%1$s">%2$s</a>', $url, $text);
+            return new Handlebars\SafeString($string);
+        });
+        $this->compiler = new Handlebars\Compiler($runtime, new Handlebars\TokenizerFactory());
     }
 
     protected function tearDown()

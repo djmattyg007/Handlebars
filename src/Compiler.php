@@ -22,8 +22,9 @@ class Compiler
     const BLOCK_ESCAPE_HELPER_OPEN = '\r\t$buffer .= $this->runtime->getHelper(\'%s\')(';
     const BLOCK_ESCAPE_HELPER_CLOSE = '\r\t);\r';
 
-    const BLOCK_VARIABLE_HELPER_OPEN = '\r\t$buffer .= htmlspecialchars($this->runtime->getHelper(\'%s\')(';
-    const BLOCK_VARIABLE_HELPER_CLOSE = '\r\t), ENT_COMPAT, \'UTF-8\');\r';
+    const BLOCK_VARIABLE_HELPER_OPEN = '\r\t$helperResult = $this->runtime->getHelper(\'%s\')(';
+    const BLOCK_VARIABLE_HELPER_CLOSE = '\r\t);';
+    const BLOCK_VARIABLE_HELPER_RESULTCHECK = '\r\t$buffer .= $helperResult instanceof SafeString ? $helperResult : htmlspecialchars($helperResult, ENT_COMPAT, \'UTF-8\');\r';
 
     const BLOCK_ARGUMENT_VALUE = '$data->find(\'%s\')';
 

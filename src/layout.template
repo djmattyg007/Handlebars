@@ -1,6 +1,7 @@
 <?php
 
 use MattyG\Handlebars\Data;
+use Mattyg\Handlebars\SafeString;
 use MattyG\Handlebars\Template;
 
 class %1$s extends Template

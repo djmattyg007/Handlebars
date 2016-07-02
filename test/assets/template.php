@@ -319,4 +319,38 @@
         $buffer .= "\n";
         $buffer .= '        </div>'."\n";
         $buffer .= '    </div>'."\n";
+        $buffer .= "\n";
+        $buffer .= '    <div class="form-group clearfix extra-testing">'."\n";
+        $buffer .= '        <label class="control-label">';
+        $helperResult = $this->runtime->getHelper('startswithfoo')(
+            'testing',
+            array(
+                'name' => 'startswithfoo',
+                'args' => 'startswithfoo \'testing\'',
+                'hash' => array(),
+                'fn' => function() {},
+                'inverse' => function() {},
+            )
+        );
+        $buffer .= $helperResult instanceof SafeString ? $helperResult : htmlspecialchars($helperResult, ENT_COMPAT, 'UTF-8');
+
+        $buffer .= '</label>'."\n";
+        $buffer .= '        <div>'."\n";
+        $buffer .= '            ';
+        $helperResult = $this->runtime->getHelper('testinglink')(
+            'https://github.com/djmattyg007/Handlebars',
+            'Testing link',
+            array(
+                'name' => 'testinglink',
+                'args' => 'testinglink \'https://github.com/djmattyg007/Handlebars\' \'Testing link\'',
+                'hash' => array(),
+                'fn' => function() {},
+                'inverse' => function() {},
+            )
+        );
+        $buffer .= $helperResult instanceof SafeString ? $helperResult : htmlspecialchars($helperResult, ENT_COMPAT, 'UTF-8');
+
+        $buffer .= "\n";
+        $buffer .= '        </div>'."\n";
+        $buffer .= '    </div>'."\n";
         $buffer .= '</div>';
