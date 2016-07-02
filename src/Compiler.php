@@ -230,8 +230,9 @@ class Compiler
                 . $this->prettyPrint(self::BLOCK_OPTIONS_CLOSE, -1);
 
             return $this->prettyPrint(sprintf(self::BLOCK_VARIABLE_HELPER_OPEN, $name), -1)
-                . $this->prettyPrint('\r\t' . implode(', \r\t', $args), 1, -1)
-                . $this->prettyPrint(self::BLOCK_VARIABLE_HELPER_CLOSE);
+                . $this->prettyPrint('\r\t' . implode(',\r\t', $args), 1, -1)
+                . $this->prettyPrint(self::BLOCK_VARIABLE_HELPER_CLOSE)
+                . $this->prettyPrint(self::BLOCK_VARIABLE_HELPER_RESULTCHECK);
         }
 
         //it's a value ?
@@ -274,7 +275,7 @@ class Compiler
                 . $this->prettyPrint(self::BLOCK_OPTIONS_CLOSE, -1);
 
             return $this->prettyPrint(sprintf(self::BLOCK_ESCAPE_HELPER_OPEN, $name), -1)
-                . $this->prettyPrint('\r\t' . implode(', \r\t', $args), 1, -1)
+                . $this->prettyPrint('\r\t' . implode(',\r\t', $args), 1, -1)
                 . $this->prettyPrint(self::BLOCK_ESCAPE_HELPER_CLOSE);
         }
 
@@ -324,7 +325,7 @@ class Compiler
             . $this->prettyPrint(self::BLOCK_OPTIONS_FN_BODY_4);
 
         return $this->prettyPrint(sprintf(self::BLOCK_ESCAPE_HELPER_OPEN, $name), -2)
-            . $this->prettyPrint('\r\t' . implode(', \r\t', $args), 1, 2);
+            . $this->prettyPrint('\r\t' . implode(',\r\t', $args), 1, 2);
     }
 
     /**

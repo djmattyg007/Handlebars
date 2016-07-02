@@ -2,7 +2,7 @@
         $buffer .= '<div class="product-fields">'."\n";
         $buffer .= '    <div class="form-group';
         $buffer .= $this->runtime->getHelper('if')(
-            $data->find('errors.product_title'), 
+            $data->find('errors.product_title'),
             array(
                 'name' => 'if',
                 'args' => 'if errors.product_title',
@@ -47,7 +47,7 @@
         $buffer .= "\n";
         $buffer .= '            ';
         $buffer .= $this->runtime->getHelper('if')(
-            $data->find('errors.product_title'), 
+            $data->find('errors.product_title'),
             array(
                 'name' => 'if',
                 'args' => 'if errors.product_title',
@@ -82,7 +82,7 @@
         $buffer .= "\n";
         $buffer .= '    <div class="form-group';
         $buffer .= $this->runtime->getHelper('if')(
-            $data->find('errors.product_detail'), 
+            $data->find('errors.product_detail'),
             array(
                 'name' => 'if',
                 'args' => 'if errors.product_detail',
@@ -125,7 +125,7 @@
         $buffer .= "\n";
         $buffer .= '            ';
         $buffer .= $this->runtime->getHelper('if')(
-            $data->find('errors.product_detail'), 
+            $data->find('errors.product_detail'),
             array(
                 'name' => 'if',
                 'args' => 'if errors.product_detail',
@@ -160,7 +160,7 @@
         $buffer .= "\n";
         $buffer .= '    <div class="form-group';
         $buffer .= $this->runtime->getHelper('if')(
-            $data->find('errors.product_brand'), 
+            $data->find('errors.product_brand'),
             array(
                 'name' => 'if',
                 'args' => 'if errors.product_brand',
@@ -205,7 +205,7 @@
         $buffer .= "\n";
         $buffer .= '            ';
         $buffer .= $this->runtime->getHelper('if')(
-            $data->find('errors.product_brand'), 
+            $data->find('errors.product_brand'),
             array(
                 'name' => 'if',
                 'args' => 'if errors.product_brand',
@@ -240,7 +240,7 @@
         $buffer .= "\n";
         $buffer .= '    <div class="form-group';
         $buffer .= $this->runtime->getHelper('if')(
-            $data->find('errors.product_price'), 
+            $data->find('errors.product_price'),
             array(
                 'name' => 'if',
                 'args' => 'if errors.product_price',
@@ -287,7 +287,7 @@
         $buffer .= "\n";
         $buffer .= '            ';
         $buffer .= $this->runtime->getHelper('if')(
-            $data->find('errors.product_price'), 
+            $data->find('errors.product_price'),
             array(
                 'name' => 'if',
                 'args' => 'if errors.product_price',
