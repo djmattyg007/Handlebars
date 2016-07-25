@@ -207,9 +207,7 @@ class Compiler
         }
 
         //lookout for partials
-        //var_dump($node["value"]);
         if (substr($node["value"], 0, 2) === "> ") {
-            //var_dump($node["value"]);
             return $this->generatePartial($node);
         }
 
