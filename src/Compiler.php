@@ -16,15 +16,16 @@ class Compiler
     const BLOCK_TEXT_LINE = '\r\t$buffer .= \'%s\'.\n;';
     const BLOCK_TEXT_LAST = '\r\t$buffer .= \'%s\';';
 
-    const BLOCK_ESCAPE_VALUE = '\r\t$buffer .= $data->find(\'%s\');\r';
     const BLOCK_VARIABLE_VALUE = '\r\t$buffer .= htmlspecialchars($data->find(\'%s\'), ENT_COMPAT, \'UTF-8\');\r';
+    const BLOCK_ESCAPE_VALUE = '\r\t$buffer .= $data->find(\'%s\');\r';
+
+    const BLOCK_HELPER_OPEN = '\r\t$helperResult = $this->runtime->getHelper(\'%s\')(';
+    const BLOCK_HELPER_CLOSE = '\r\t);';
+    const BLOCK_HELPER_VARIABLE_RESULTCHECK = '\r\t$buffer .= $helperResult instanceof SafeString ? $helperResult : htmlspecialchars($helperResult, ENT_COMPAT, \'UTF-8\');\r';
+    const BLOCK_HELPER_ESCAPE_RESULTCHECK = '\r\t$buffer .= $helperResult;\r';
 
     const BLOCK_ESCAPE_HELPER_OPEN = '\r\t$buffer .= $this->runtime->getHelper(\'%s\')(';
     const BLOCK_ESCAPE_HELPER_CLOSE = '\r\t);\r';
-
-    const BLOCK_VARIABLE_HELPER_OPEN = '\r\t$helperResult = $this->runtime->getHelper(\'%s\')(';
-    const BLOCK_VARIABLE_HELPER_CLOSE = '\r\t);';
-    const BLOCK_VARIABLE_HELPER_RESULTCHECK = '\r\t$buffer .= $helperResult instanceof SafeString ? $helperResult : htmlspecialchars($helperResult, ENT_COMPAT, \'UTF-8\');\r';
 
     const BLOCK_ARGUMENT_VALUE = '$data->find(\'%s\')';
 
@@ -215,23 +216,7 @@ class Compiler
 
         //if it's a helper
         if ($this->runtime->getHelper($name)) {
-            //form hash
-            foreach ($hash as $key => $value) {
-                $hash[$key] = sprintf(self::BLOCK_OPTIONS_HASH_KEY_VALUE, $key, $value);
-            }
-
-            $args[] = $this->prettyPrint(self::BLOCK_OPTIONS_OPEN, 0, 2)
-                . $this->prettyPrint(sprintf(self::BLOCK_OPTIONS_NAME, $name))
-                . $this->prettyPrint(sprintf(self::BLOCK_OPTIONS_ARGS, str_replace("'", '\\\'', $node['value'])))
-                . $this->prettyPrint(sprintf(self::BLOCK_OPTIONS_HASH, implode(', \r\t', $hash)))
-                . $this->prettyPrint(self::BLOCK_OPTIONS_FN_EMPTY)
-                . $this->prettyPrint(self::BLOCK_OPTIONS_INVERSE_EMPTY)
-                . $this->prettyPrint(self::BLOCK_OPTIONS_CLOSE, -1);
-
-            return $this->prettyPrint(sprintf(self::BLOCK_VARIABLE_HELPER_OPEN, $name), -1)
-                . $this->prettyPrint('\r\t' . implode(',\r\t', $args), 1, -1)
-                . $this->prettyPrint(self::BLOCK_VARIABLE_HELPER_CLOSE)
-                . $this->prettyPrint(self::BLOCK_VARIABLE_HELPER_RESULTCHECK);
+            return $this->generateHelper($name, $node['value'], $args, $hash, self::BLOCK_HELPER_VARIABLE_RESULTCHECK);
         }
 
         //it's a value ?
@@ -260,22 +245,7 @@ class Compiler
 
         //if it's a helper
         if ($this->runtime->getHelper($name)) {
-            //form hash
-            foreach ($hash as $key => $value) {
-                $hash[$key] = sprintf(self::BLOCK_OPTIONS_HASH_KEY_VALUE, $key, $value);
-            }
-
-            $args[] = $this->prettyPrint(self::BLOCK_OPTIONS_OPEN, 0, 2)
-                . $this->prettyPrint(sprintf(self::BLOCK_OPTIONS_NAME, $name))
-                . $this->prettyPrint(sprintf(self::BLOCK_OPTIONS_ARGS, str_replace("'", '\\\'', $node['value'])))
-                . $this->prettyPrint(sprintf(self::BLOCK_OPTIONS_HASH, implode(', \r\t', $hash)))
-                . $this->prettyPrint(self::BLOCK_OPTIONS_FN_EMPTY)
-                . $this->prettyPrint(self::BLOCK_OPTIONS_INVERSE_EMPTY)
-                . $this->prettyPrint(self::BLOCK_OPTIONS_CLOSE, -1);
-
-            return $this->prettyPrint(sprintf(self::BLOCK_ESCAPE_HELPER_OPEN, $name), -1)
-                . $this->prettyPrint('\r\t' . implode(',\r\t', $args), 1, -1)
-                . $this->prettyPrint(self::BLOCK_ESCAPE_HELPER_CLOSE);
+            return $this->generateHelper($name, $node['value'], $args, $hash, self::BLOCK_HELPER_ESCAPE_RESULTCHECK);
         }
 
         //it's a value ?
@@ -452,6 +422,34 @@ class Compiler
         $code = $compiler->setOffset($this->offset + 3)->compile($partial);
 
         return sprintf($layout, $code);
+    }
+
+    /**
+     * @param string $name
+     * @param string $nodeValue
+     * @param array $args
+     * @param array $hash
+     * @param string $closingTag
+     */
+    protected function generateHelper(string $name, string $nodeValue, array $args, array $hash, string $closingTag)
+    {
+        //form hash
+        foreach ($hash as $key => $value) {
+            $hash[$key] = sprintf(self::BLOCK_OPTIONS_HASH_KEY_VALUE, $key, $value);
+        }
+
+        $args[] = $this->prettyPrint(self::BLOCK_OPTIONS_OPEN, 0, 2)
+            . $this->prettyPrint(sprintf(self::BLOCK_OPTIONS_NAME, $name))
+            . $this->prettyPrint(sprintf(self::BLOCK_OPTIONS_ARGS, str_replace("'", '\\\'', $nodeValue)))
+            . $this->prettyPrint(sprintf(self::BLOCK_OPTIONS_HASH, implode(', \r\t', $hash)))
+            . $this->prettyPrint(self::BLOCK_OPTIONS_FN_EMPTY)
+            . $this->prettyPrint(self::BLOCK_OPTIONS_INVERSE_EMPTY)
+            . $this->prettyPrint(self::BLOCK_OPTIONS_CLOSE, -1);
+
+        return $this->prettyPrint(sprintf(self::BLOCK_HELPER_OPEN, $name), -1)
+            . $this->prettyPrint('\r\t' . implode(',\r\t', $args), 1, -1)
+            . $this->prettyPrint(self::BLOCK_HELPER_CLOSE)
+            . $this->prettyPrint($closingTag);
     }
 
     /**
