@@ -73,6 +73,7 @@ class Compiler extends \PHPUnit_Framework_TestCase
         $this->assertEquals('\'some"thi " ng\'', $args[2]);
         $this->assertEquals(4, $args[3]);
         $this->assertEquals('\'some\\\'thi \\\' ng\'', $args[4]);
+        $this->assertCount(3, $hash);
         $this->assertEquals('false', $hash['dog']);
         $this->assertEquals('\'meow\'', $hash['cat']);
         $this->assertEquals('\'squeak squeak\'', $hash['mouse']);
