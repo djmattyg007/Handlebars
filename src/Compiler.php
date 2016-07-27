@@ -476,23 +476,23 @@ class Compiler
             '([^\s]+)'                      // <any group with no spaces>
         ));
 
-        preg_match_all('#'.implode('|', $allRegex).'#is', $string, $matches);
+        preg_match_all('#' . implode('|', $allRegex) . '#is', $string, $matches);
 
         $stringArgs = $matches[0];
         $name = array_shift($stringArgs);
 
-        foreach ($stringArgs as $arg) {
+        foreach ($stringArgs as $stringArg) {
             //if it's an attribute
-            if (!(substr($arg, 0, 1) === "'" && substr($arg, -1) === "'")
-                && !(substr($arg, 0, 1) === '"' && substr($arg, -1) === '"')
-                && preg_match('#'.implode('|', $hashRegex).'#is', $arg)
+            if (!(substr($stringArg, 0, 1) === "'" && substr($stringArg, -1) === "'") // Check to see if it's surrounded by single quotes
+                && !(substr($stringArg, 0, 1) === '"' && substr($stringArg, -1) === '"') // Check to see if it's surrounded by double quotes
+                && preg_match('#' . implode('|', $hashRegex) . '#is', $stringArg) // Check to see if it's a hash argument
             ) {
-                list($hashKey, $hashValue) = explode('=', $arg, 2);
+                list($hashKey, $hashValue) = explode('=', $stringArg, 2);
                 $hash[$hashKey] = $this->parseArgument($hashValue);
                 continue;
             }
 
-            $args[] = $this->parseArgument($arg);
+            $args[] = $this->parseArgument($stringArg);
         }
 
         return array($name, $args, $hash);
