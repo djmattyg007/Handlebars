@@ -465,25 +465,21 @@ class Compiler
         $args = array();
         $hash = array();
 
-        $regex = array(
-            '([a-zA-Z0-9]+\="[^"]*")',      // cat="meow"
-            '([a-zA-Z0-9]+\=\'[^\']*\')',   // mouse='squeak squeak'
-            '([a-zA-Z0-9]+\=[a-zA-Z0-9]+)', // dog=false
-            '("[^"]*")',                    // "some\'thi ' ng"
-            '(\'[^\']*\')',                 // 'some"thi " ng'
-            '([^\s]+)'                      // <any group with no spaces>
-        );
-
-        preg_match_all('#'.implode('|', $regex).'#is', $string, $matches);
-
-        $stringArgs = $matches[0];
-        $name = array_shift($stringArgs);
-
         $hashRegex = array(
             '([a-zA-Z0-9]+\="[^"]*")',      // cat="meow"
             '([a-zA-Z0-9]+\=\'[^\']*\')',   // mouse='squeak squeak'
             '([a-zA-Z0-9]+\=[a-zA-Z0-9]+)', // dog=false
         );
+        $allRegex = array_merge($hashRegex, array(
+            '("[^"]*")',                    // "some\'thi ' ng"
+            '(\'[^\']*\')',                 // 'some"thi " ng'
+            '([^\s]+)'                      // <any group with no spaces>
+        ));
+
+        preg_match_all('#'.implode('|', $allRegex).'#is', $string, $matches);
+
+        $stringArgs = $matches[0];
+        $name = array_shift($stringArgs);
 
         foreach ($stringArgs as $arg) {
             //if it's an attribute
