@@ -77,6 +77,11 @@ class Compiler
     protected $tokenizerFactory;
 
     /**
+     * @var ArgumentParserFactory
+     */
+    protected $argumentParserFactory;
+
+    /**
      * @var int
      */
     protected $offset = 1;
@@ -86,11 +91,13 @@ class Compiler
      *
      * @param Runtime $runtime
      * @param TokenizerFactory $tokenizerFactory
+     * @param ArgumentParserFactory $argumentParserFactory
      */
-    public function __construct(Runtime $runtime, TokenizerFactory $tokenizerFactory)
+    public function __construct(Runtime $runtime, TokenizerFactory $tokenizerFactory, ArgumentParserFactory $argumentParserFactory)
     {
         $this->runtime = $runtime;
         $this->tokenizerFactory = $tokenizerFactory;
+        $this->argumentParserFactory = $argumentParserFactory;
     }
 
     /**
@@ -418,7 +425,7 @@ class Compiler
             . '\r\t);\r'
         );
 
-        $compiler = new static($this->runtime, $this->tokenizerFactory);
+        $compiler = new static($this->runtime, $this->tokenizerFactory, $this->argumentParserFactory);
         $code = $compiler->setOffset($this->offset + 3)->compile($partial);
 
         return sprintf($layout, $code);
@@ -453,79 +460,16 @@ class Compiler
     }
 
     /**
-     * Handlebars will give arguments in a string
-     * This will transform them into a legit argument
-     * array
+     * Handlebars will give arguments in a string. This will transform them
+     * into a legitimate argument array.
      *
-     * @param string $string The argument string
+     * @param string $string The argument string.
      * @return array
      */
     protected function parseArguments(string $string) : array
     {
-        $args = array();
-        $hash = array();
-
-        $hashRegex = array(
-            '([a-zA-Z0-9]+\="[^"]*")',      // cat="meow"
-            '([a-zA-Z0-9]+\=\'[^\']*\')',   // mouse='squeak squeak'
-            '([a-zA-Z0-9]+\=[a-zA-Z0-9]+)', // dog=false
-        );
-        $allRegex = array_merge($hashRegex, array(
-            '("[^"]*")',                    // "some\'thi ' ng"
-            '(\'[^\']*\')',                 // 'some"thi " ng'
-            '([^\s]+)'                      // <any group with no spaces>
-        ));
-
-        preg_match_all('#' . implode('|', $allRegex) . '#is', $string, $matches);
-
-        $stringArgs = $matches[0];
-        $name = array_shift($stringArgs);
-
-        foreach ($stringArgs as $stringArg) {
-            //if it's an attribute
-            if (!(substr($stringArg, 0, 1) === "'" && substr($stringArg, -1) === "'") // Check to see if it's surrounded by single quotes
-                && !(substr($stringArg, 0, 1) === '"' && substr($stringArg, -1) === '"') // Check to see if it's surrounded by double quotes
-                && preg_match('#' . implode('|', $hashRegex) . '#is', $stringArg) // Check to see if it's a hash argument
-            ) {
-                list($hashKey, $hashValue) = explode('=', $stringArg, 2);
-                $hash[$hashKey] = $this->parseArgument($hashValue);
-                continue;
-            }
-
-            $args[] = $this->parseArgument($stringArg);
-        }
-
-        return array($name, $args, $hash);
-    }
-
-    /**
-     * If there's a quote, null, bool,
-     * int, float... it's the literal value
-     *
-     * @param string $value One string argument value
-     * @return mixed
-     */
-    protected function parseArgument(string $arg)
-    {
-        //if it's a literal string value
-        if (strpos($arg, '"') === 0
-            || strpos($arg, "'") === 0
-        ) {
-            return "'" . str_replace("'", '\\\'', substr($arg, 1, -1)) . "'";
-        }
-
-        //if it's null
-        if (strtolower($arg) === 'null'
-            || strtolower($arg) === 'true'
-            || strtolower($arg) === 'false'
-            || is_numeric($arg)
-        ) {
-            return $arg;
-        }
-
-        $arg = str_replace(array('[', ']', '(', ')'), '', $arg);
-        $arg = str_replace("'", '\\\'', $arg);
-        return sprintf(self::BLOCK_ARGUMENT_VALUE, $arg);
+        $argParser = $this->argumentParserFactory->create($string);
+        return $argParser->tokenise();
     }
 
     /**

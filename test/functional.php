@@ -23,7 +23,7 @@ class Functional extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $runtime = new Handlebars\Runtime(true);
-        $compiler = new Handlebars\Compiler($runtime, new Handlebars\TokenizerFactory());
+        $compiler = new Handlebars\Compiler($runtime, new Handlebars\TokenizerFactory(), new Handlebars\ArgumentParserFactory());
         $this->handlebars = new Handlebars\Handlebars($runtime, $compiler, new Handlebars\DataFactory());
     }
 
