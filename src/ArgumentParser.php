@@ -68,14 +68,15 @@ class ArgumentParser
      */
     protected function gatherArgument()
     {
-        $quoteStart = $this->curChar() === "'" || $this->curChar() === '"';
+        $firstChar = $this->curChar();
+        $quoteStart = $firstChar === "'" || $firstChar === '"';
         $value = "";
 
         if ($quoteStart === true) {
-            $breakSymbol = $this->curChar();
+            $breakSymbol = $firstChar;
         } else {
             $breakSymbol = null;
-            $value .= $this->curChar();
+            $value .= $firstChar;
         }
 
         while ($this->nextChar() === true) {
