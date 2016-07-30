@@ -55,6 +55,7 @@ class Compiler extends \PHPUnit_Framework_TestCase
 
     public function testParseArguments()
     {
+        // TODO: Move these tests into a separate class, as argument parsing is now in a dedicated class
         $parseArgsMethod = new \ReflectionMethod(Handlebars\Compiler::class, "parseArguments");
         $parseArgsMethod->setAccessible(true);
 
@@ -67,6 +68,7 @@ class Compiler extends \PHPUnit_Framework_TestCase
             'foobar 4bar4 4.5 \'some"thi " ng\' 4 "some\'thi \' ng" '
             .'dog=false cat="meow" mouse=\'squeak squeak\'');
 
+        $this->assertEquals('foobar', $name);
         $this->assertCount(5, $args);
         $this->assertEquals('$data->find(\'4bar4\')', $args[0]);
         $this->assertEquals(4.5, $args[1]);
@@ -81,10 +83,12 @@ class Compiler extends \PHPUnit_Framework_TestCase
         //BUG: '_ \'TODAY\'S BEST DEALS\''
         list($name, $args, $hash) = $parseArgsMethod->invoke($this->compiler, '_ \'TODAY\'S BEST DEALS\'');
 
+        $this->assertEquals('_', $name);
         $this->assertCount(4, $args);
         $this->assertEquals('\'TODAY\'', $args[0]);
         $this->assertEquals('$data->find(\'S\')', $args[1]);
         $this->assertEquals('$data->find(\'BEST\')', $args[2]);
         $this->assertEquals('$data->find(\'DEALS\\\'\')', $args[3]);
+        $this->assertCount(0, $hash);
     }
 }
