@@ -12,12 +12,6 @@ declare(strict_types=1);
 namespace MattyG\Handlebars\Test;
 
 use MattyG\Handlebars;
-/*use MattyG\Handlebars\Compiler;
-use MattyG\Handlebars\DataFactory;
-use MattyG\Handlebars\Handlebars as HandlebarsMain;
-use MattyG\Handlebars\Helper as HandlebarsHelpers;
-use MattyG\Handlebars\Runtime;
-use MattyG\Handlebars\TokenizerFactory;*/
 
 class HandlebarsTest extends \PHPUnit_Framework_TestCase
 {
