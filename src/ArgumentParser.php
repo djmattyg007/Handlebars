@@ -25,7 +25,7 @@ class ArgumentParser
      */
     public function __construct(string $string)
     {
-        $this->string = $string;
+        $this->string = trim($string);
         $this->strlen = mb_strlen($string);
     }
 
@@ -35,21 +35,24 @@ class ArgumentParser
     public function tokenise() : array
     {
         $name = "";
+        $args = array();
+        $hash = array();
+
         $name .= $this->curChar();
-        while ($this->canNext() === true) {
-            $this->nextChar();
+        while ($this->nextChar() === true) {
             if ($this->isWhitespace() === true) {
                 break;
             }
             $name .= $this->curChar();
         }
 
-        $args = array();
-        $hash = array();
-        while ($this->canNext() === true) {
+        if ($this->canNext() === false) {
+            goto finishTokenise;
+        }
+
+        while ($this->nextChar() === true) {
             if ($this->isWhitespace() === true) {
                 $this->nextChar();
-                continue;
             } else {
                 $param = $this->gatherArgument();
                 if (is_array($param) === true) {
@@ -60,6 +63,7 @@ class ArgumentParser
             }
         }
 
+finishTokenise:
         return array($name, $args, $hash);
     }
 
@@ -84,6 +88,7 @@ class ArgumentParser
                 break;
             } elseif ($breakSymbol !== null && $this->curChar() === $breakSymbol) {
                 $this->nextChar();
+                // TODO: Throw exception if next character is not whitespace
                 break;
             } elseif ($breakSymbol !== null && $this->curChar() === "\\") {
                 $this->nextChar();

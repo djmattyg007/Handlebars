@@ -80,15 +80,33 @@ class Compiler extends \PHPUnit_Framework_TestCase
         $this->assertEquals("'meow'", $hash['cat']);
         $this->assertEquals("'squeak squeak'", $hash['mouse']);
 
-        //BUG: '_ \'TODAY\'S BEST DEALS\''
-        list($name, $args, $hash) = $parseArgsMethod->invoke($this->compiler, '_ \'TODAY\'S BEST DEALS\'');
+        list($name, $args, $hash) = $parseArgsMethod->invoke($this->compiler, '_ \'TODAY\\\'S\' BEST DEALS\'');
 
         $this->assertEquals('_', $name);
-        $this->assertCount(4, $args);
-        $this->assertEquals("'TODAY'", $args[0]);
-        $this->assertEquals('$data->find(\'S\')', $args[1]);
-        $this->assertEquals('$data->find(\'BEST\')', $args[2]);
-        $this->assertEquals('$data->find(\'DEALS\\\'\')', $args[3]);
+        $this->assertCount(3, $args);
+        $this->assertEquals("'TODAY\\'S'", $args[0]);
+        $this->assertEquals('$data->find(\'BEST\')', $args[1]);
+        $this->assertEquals('$data->find(\'DEALS\\\'\')', $args[2]);
         $this->assertCount(0, $hash);
+
+        list($name, $args, $hash) = $parseArgsMethod->invoke($this->compiler, 'abc x ');
+
+        $this->assertEquals('abc', $name);
+        $this->assertCount(1, $args);
+        $this->assertEquals('$data->find(\'x\')', $args[0]);
+
+        list($name, $args, $hash) = $parseArgsMethod->invoke($this->compiler, '___ a "b" c');
+
+        $this->assertEquals('___', $name);
+        $this->assertCount(3, $args);
+        $this->assertEquals('$data->find(\'a\')', $args[0]);
+        $this->assertEquals("'b'", $args[1]);
+        $this->assertEquals('$data->find(\'c\')', $args[2]);
+
+        list($name, $args, $hash) = $parseArgsMethod->invoke($this->compiler, '__ herp=derp rofl="copter" m');
+        $this->assertEquals('__', $name);
+        $this->assertCount(1, $args);
+        $this->assertEquals('$data->find(\'m\')', $args[0]);
+        $this->assertCount(2, $hash);
     }
 }
