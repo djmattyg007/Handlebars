@@ -102,4 +102,17 @@ class ArgumentParser extends \PHPUnit_Framework_TestCase
         $this->assertEquals('$data->find(\'derp\')', $hash['herp']);
         $this->assertEquals("'copter'", $hash['rofl']);
     }
+
+    public function testTokenise7()
+    {
+        $argParser = $this->argumentParserFactory->create('hbs he"rp=de\'rp be\'ep=true null');
+        list($name, $args, $hash) = $argParser->tokenise();
+
+        $this->assertEquals('hbs', $name);
+        $this->assertCount(1, $args);
+        $this->assertEquals('null', $args[0]);
+        $this->assertCount(2, $hash);
+        $this->assertEquals('$data->find(\'de\\\'rp\')', $hash['he"rp']);
+        $this->assertEquals('true', $hash['be\'ep']);
+    }
 }
