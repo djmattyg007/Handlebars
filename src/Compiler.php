@@ -105,10 +105,12 @@ class Compiler
      * TODO: Must never return layout
      *
      * @param string $source
+     * @param int $startingOffset
      * @return string
      */
-    public function compile(string $source) : string
+    public function compile(string $source, int $startingOffset = 1) : string
     {
+        $this->offset = $startingOffset;
         $tokenizer = $this->tokenizerFactory->create($source);
         $buffer = '';
         $open = array();
@@ -148,16 +150,6 @@ class Compiler
         $indentedCode = str_replace("\n", "\n    ", $buffer);
         // Strip trailing whitespace from otherwise blank lines.
         return preg_replace('/^    $/m', '', $indentedCode);
-    }
-
-    /**
-     * @param int $offset This is to pre-set the tab indentation level when generating the code
-     * @return Compiler
-     */
-    public function setOffset(int $offset) : Compiler
-    {
-        $this->offset = $offset;
-        return $this;
     }
 
     /**
@@ -426,7 +418,7 @@ class Compiler
         );
 
         $compiler = new static($this->runtime, $this->tokenizerFactory, $this->argumentParserFactory);
-        $code = $compiler->setOffset($this->offset + 3)->compile($partial);
+        $code = $compiler->compile($partial, $this->offset + 3);
 
         return sprintf($layout, $code);
     }

@@ -47,12 +47,6 @@ class Compiler extends \PHPUnit_Framework_TestCase
         $this->assertEquals($template, $code);
     }
 
-    public function testSetOffset()
-    {
-        $instance = $this->compiler->setOffset(3);
-        $this->assertInstanceOf(Handlebars\Compiler::class, $instance);
-    }
-
     /**
      * @expectedException MattyG\Handlebars\Exception
      * @expectedExceptionMessage Missing closing tags for:
