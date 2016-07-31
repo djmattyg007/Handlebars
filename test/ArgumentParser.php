@@ -78,7 +78,7 @@ class ArgumentParser extends \PHPUnit_Framework_TestCase
 
     public function testTokenise5()
     {
-        $argParser = $this->argumentParserFactory->create('___ a "b" cd hash=hashed');
+        $argParser = $this->argumentParserFactory->create('___   a  "b"    cd   hash=hashed');
         list($name, $args, $hash) = $argParser->tokenise();
 
         $this->assertEquals('___', $name);

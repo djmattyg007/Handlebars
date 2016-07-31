@@ -52,14 +52,14 @@ class ArgumentParser
 
         while ($this->nextChar() === true) {
             if ($this->isWhitespace() === true) {
-                $this->nextChar();
+                continue;
+            }
+
+            $param = $this->gatherArgument();
+            if (is_array($param) === true) {
+                $hash[$param[0]] = $param[1];
             } else {
-                $param = $this->gatherArgument();
-                if (is_array($param) === true) {
-                    $hash[$param[0]] = $param[1];
-                } else {
-                    $args[] = $param;
-                }
+                $args[] = $param;
             }
         }
 
