@@ -8,7 +8,7 @@ use MattyG\Handlebars;
 class ArgumentParser extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var Handlebars\Compiler
+     * @var Handlebars\ArgumentParserFactory
      */
     protected $argumentParserFactory;
 
