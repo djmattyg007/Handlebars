@@ -94,19 +94,24 @@ class Compiler extends \PHPUnit_Framework_TestCase
         $this->assertEquals('abc', $name);
         $this->assertCount(1, $args);
         $this->assertEquals('$data->find(\'x\')', $args[0]);
+        $this->assertCount(0, $hash);
 
-        list($name, $args, $hash) = $parseArgsMethod->invoke($this->compiler, '___ a "b" c');
+        list($name, $args, $hash) = $parseArgsMethod->invoke($this->compiler, '___ a "b" cd hash=hashed');
 
         $this->assertEquals('___', $name);
         $this->assertCount(3, $args);
         $this->assertEquals('$data->find(\'a\')', $args[0]);
         $this->assertEquals("'b'", $args[1]);
-        $this->assertEquals('$data->find(\'c\')', $args[2]);
+        $this->assertEquals('$data->find(\'cd\')', $args[2]);
+        $this->assertCount(1, $hash);
+        $this->assertEquals('$data->find(\'hashed\')', $hash['hash']);
 
         list($name, $args, $hash) = $parseArgsMethod->invoke($this->compiler, '__ herp=derp rofl="copter" m');
         $this->assertEquals('__', $name);
         $this->assertCount(1, $args);
         $this->assertEquals('$data->find(\'m\')', $args[0]);
         $this->assertCount(2, $hash);
+        $this->assertEquals('$data->find(\'derp\')', $hash['herp']);
+        $this->assertEquals("'copter'", $hash['rofl']);
     }
 }
