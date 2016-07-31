@@ -52,4 +52,22 @@ class Compiler extends \PHPUnit_Framework_TestCase
         $instance = $this->compiler->setOffset(3);
         $this->assertInstanceOf(Handlebars\Compiler::class, $instance);
     }
+
+    /**
+     * @expectedException MattyG\Handlebars\Exception
+     * @expectedExceptionMessage Missing closing tags for:
+     */
+    public function testMissingClosingTag()
+    {
+        $this->compiler->compile('{{#testing}}');
+    }
+
+    /**
+     * @expectedException MattyG\Handlebars\Exception
+     * @expectedExceptionMessage Unknown close tag:
+     */
+    public function testUnknownClosingTag()
+    {
+        $this->compiler->compile('{{#testing}}test{{/testing2}}');
+    }
 }

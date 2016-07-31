@@ -148,6 +148,16 @@ class Runtime extends \PHPUnit_Framework_TestCase
         $this->assertEquals(5, $result);
     }
 
+    /**
+     * @expectedException MattyG\Handlebars\Exception
+     * @expectedExceptionMessage All Handlebars helpers must be callable
+     */
+    public function testAddNonCallableHelper()
+    {
+        $runtime = new Handlebars\Runtime(false);
+        $runtime->addHelper("foo", 1);
+    }
+
     public function testGetPartial()
     {
         $runtime = new Handlebars\Runtime();
