@@ -27,7 +27,10 @@ class Runtime
      */
     protected $partials = array();
 
-    public function __construct($addDefaultHelpers = true)
+    /**
+     * @param bool $addDefaultHelpers
+     */
+    public function __construct(bool $addDefaultHelpers = true)
     {
         if ($addDefaultHelpers === true) {
             $helpers = require(__DIR__ . '/helpers.php');
