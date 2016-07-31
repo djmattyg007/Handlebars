@@ -5,6 +5,9 @@ namespace MattyG\Handlebars;
 
 class ArgumentParser
 {
+    // Private
+    const ERROR_NON_WHITESPACE_AFTER_STRING = 'Non-whitespace character detected after string argument: %s';
+
     /**
      * @var string
      */
@@ -31,6 +34,7 @@ class ArgumentParser
 
     /**
      * @return array
+     * @throws Exception
      */
     public function tokenise() : array
     {
@@ -69,6 +73,7 @@ finishTokenise:
 
     /**
      * @return array|string
+     * @throws Exception
      */
     protected function gatherArgument()
     {
@@ -87,8 +92,12 @@ finishTokenise:
             if ($breakSymbol === null && $this->isWhitespace() === true) {
                 break;
             } elseif ($breakSymbol !== null && $this->curChar() === $breakSymbol) {
-                $this->nextChar();
-                // TODO: Throw exception if next character is not whitespace
+                if ($this->canNext() === true) {
+                    $this->nextChar();
+                    if ($this->isWhitespace() === false) {
+                        throw new Exception(sprintf(self::ERROR_NON_WHITESPACE_AFTER_STRING, $value));
+                    }
+                }
                 break;
             } elseif ($breakSymbol !== null && $this->curChar() === "\\") {
                 $this->nextChar();

@@ -465,6 +465,7 @@ class Compiler
      *
      * @param string $string The argument string.
      * @return array
+     * @throws Exception
      */
     protected function parseArguments(string $string) : array
     {

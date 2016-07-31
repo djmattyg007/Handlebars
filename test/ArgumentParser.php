@@ -115,4 +115,14 @@ class ArgumentParser extends \PHPUnit_Framework_TestCase
         $this->assertEquals('$data->find(\'de\\\'rp\')', $hash['he"rp']);
         $this->assertEquals('true', $hash['be\'ep']);
     }
+
+    /**
+     * @expectedException MattyG\Handlebars\Exception
+     * @expectedExceptionMessage Non-whitespace character detected after string argument:
+     */
+    public function testTokenise8()
+    {
+        $argParser = $this->argumentParserFactory->create('abcdef "rofl"copter a1');
+        $argParser->tokenise();
+    }
 }
