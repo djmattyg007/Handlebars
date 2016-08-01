@@ -102,7 +102,6 @@ class Compiler
 
     /**
      * Transform the template to code that can be used independently
-     * TODO: Must never return layout
      *
      * @param string $source
      * @param int $startingOffset
