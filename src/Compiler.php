@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace MattyG\Handlebars;
 
+use MattyG\Handlebars\Argument\ArgumentParserFactory;
+
 class Compiler
 {
     const BLOCK_TEXT_LINE = '\r\t$buffer .= \'%s\'.\n;';

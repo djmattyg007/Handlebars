@@ -13,7 +13,7 @@
 >
   <testsuites>
     <testsuite name="Handlebars Test Suite">
-      <file>test/ArgumentParser.php</file>
+      <file>test/Argument/ArgumentParser.php</file>
       <file>test/Compiler.php</file>
       <file>test/Data.php</file>
       <file>test/Handlebars.php</file>

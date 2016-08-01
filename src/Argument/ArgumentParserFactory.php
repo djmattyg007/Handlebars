@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MattyG\Handlebars;
+namespace MattyG\Handlebars\Argument;
 
 class ArgumentParserFactory
 {

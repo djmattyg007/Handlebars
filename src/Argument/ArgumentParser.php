@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MattyG\Handlebars;
+namespace MattyG\Handlebars\Argument;
 
 class ArgumentParser
 {
@@ -132,7 +132,7 @@ finishTokenise:
         } else {
             $returnValue = str_replace(array("[", "]", "(", ")"), "", $value);
             $returnValue = str_replace("'", '\\\'', $value);
-            return sprintf(Compiler::BLOCK_ARGUMENT_VALUE, $returnValue);
+            return sprintf(\MattyG\Handlebars\Compiler::BLOCK_ARGUMENT_VALUE, $returnValue);
         }
     }
 

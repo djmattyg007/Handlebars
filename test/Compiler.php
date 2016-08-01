@@ -30,7 +30,7 @@ class Compiler extends \PHPUnit_Framework_TestCase
             $string = sprintf('<a href="%1$s">%2$s</a>', $url, $text);
             return new Handlebars\SafeString($string);
         });
-        $this->compiler = new Handlebars\Compiler($runtime, new Handlebars\TokenizerFactory(), new Handlebars\ArgumentParserFactory());
+        $this->compiler = new Handlebars\Compiler($runtime, new Handlebars\TokenizerFactory(), new Handlebars\Argument\ArgumentParserFactory());
     }
 
     protected function tearDown()

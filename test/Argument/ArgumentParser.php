@@ -1,20 +1,20 @@
 <?php
 declare(strict_types=1);
 
-namespace MattyG\Handlebars\Test;
+namespace MattyG\Handlebars\Test\Argument;
 
 use MattyG\Handlebars;
 
 class ArgumentParser extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var Handlebars\ArgumentParserFactory
+     * @var Handlebars\Argument\ArgumentParserFactory
      */
     protected $argumentParserFactory;
 
     protected function setUp()
     {
-        $this->argumentParserFactory = new Handlebars\ArgumentParserFactory();
+        $this->argumentParserFactory = new Handlebars\Argument\ArgumentParserFactory();
     }
 
     protected function tearDown()
@@ -117,7 +117,7 @@ class ArgumentParser extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException MattyG\Handlebars\Exception
+     * @expectedException MattyG\Handlebars\Argument\Exception
      * @expectedExceptionMessage Non-whitespace character detected after string argument:
      */
     public function testTokenise8()

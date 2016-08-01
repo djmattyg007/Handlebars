@@ -28,7 +28,7 @@ class Runtime extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->compilerFactory = function(Handlebars\Runtime $runtime) {
-            return new Handlebars\Compiler($runtime, new Handlebars\TokenizerFactory(), new Handlebars\ArgumentParserFactory());
+            return new Handlebars\Compiler($runtime, new Handlebars\TokenizerFactory(), new Handlebars\Argument\ArgumentParserFactory());
         };
         $this->dataFactory = new Handlebars\DataFactory();
     }
