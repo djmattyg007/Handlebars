@@ -19,6 +19,11 @@ class ArgumentParser
     protected $strlen;
 
     /**
+     * @var ArgumentListFactory
+     */
+    protected $argumentListFactory;
+
+    /**
      * @var int
      */
     protected $index = 0;
@@ -26,22 +31,22 @@ class ArgumentParser
     /**
      * @param string $string The string to be tokenised.
      */
-    public function __construct(string $string)
+    public function __construct(string $string, ArgumentListFactory $argumentListFactory)
     {
         $this->string = trim($string);
         $this->strlen = mb_strlen($string);
+        $this->argumentListFactory = $argumentListFactory;
     }
 
     /**
-     * @return array
+     * @return ArgumentList
      * @throws Exception
      */
-    public function tokenise() : array
+    public function tokenise() : ArgumentList
     {
-        $name = "";
-        $args = array();
-        $hash = array();
+        $this->index = 0;
 
+        $name = "";
         $name .= $this->curChar();
         while ($this->nextChar() === true) {
             if ($this->isWhitespace() === true) {
@@ -49,6 +54,7 @@ class ArgumentParser
             }
             $name .= $this->curChar();
         }
+        $argumentList = $this->argumentListFactory->create($name);
 
         if ($this->canNext() === false) {
             goto finishTokenise;
@@ -61,14 +67,14 @@ class ArgumentParser
 
             $param = $this->gatherArgument();
             if (is_array($param) === true) {
-                $hash[$param[0]] = $param[1];
+                $argumentList->addNamedArgument($param[0], $param[1]);
             } else {
-                $args[] = $param;
+                $argumentList->addArgument($param);
             }
         }
 
 finishTokenise:
-        return array($name, $args, $hash);
+        return $argumentList;
     }
 
     /**
@@ -121,18 +127,16 @@ finishTokenise:
         }
 
         if ($breakSymbol !== null) {
-            return "'" . str_replace("'", '\\\'', $value) . "'";
+            return new StringArgument($value);
         } elseif (
             mb_strtolower($value) === "null" ||
             mb_strtolower($value) === "true" ||
             mb_strtolower($value) === "false" ||
             is_numeric($value)
         ) {
-            return $value;
+            return new Argument($value);
         } else {
-            $returnValue = str_replace(array("[", "]", "(", ")"), "", $value);
-            $returnValue = str_replace("'", '\\\'', $value);
-            return sprintf(\MattyG\Handlebars\Compiler::BLOCK_ARGUMENT_VALUE, $returnValue);
+            return new VariableArgument($value);
         }
     }
 

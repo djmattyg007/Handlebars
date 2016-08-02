@@ -23,7 +23,8 @@ class Helpers extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $runtime = new Handlebars\Runtime(true);
-        $compiler = new Handlebars\Compiler($runtime, new Handlebars\TokenizerFactory(), new Handlebars\Argument\ArgumentParserFactory());
+        $argumentParserFactory = new Handlebars\Argument\ArgumentParserFactory(new Handlebars\Argument\ArgumentListFactory());
+        $compiler = new Handlebars\Compiler($runtime, new Handlebars\TokenizerFactory(), $argumentParserFactory);
         $this->handlebars = new Handlebars\Handlebars($runtime, $compiler, new Handlebars\DataFactory());
     }
 

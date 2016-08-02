@@ -11,7 +11,10 @@ declare(strict_types=1);
 
 namespace MattyG\Handlebars;
 
+use MattyG\Handlebars\Argument\Argument;
+use MattyG\Handlebars\Argument\ArgumentList;
 use MattyG\Handlebars\Argument\ArgumentParserFactory;
+use MattyG\Handlebars\Argument\StringArgument;
 
 class Compiler
 {
@@ -212,11 +215,11 @@ class Compiler
             return $this->generatePartial($node);
         }
 
-        list($name, $args, $hash) = $this->parseArguments($node['value']);
+        $argumentList = $this->parseArguments($node['value']);
 
         //if it's a helper
-        if ($this->runtime->getHelper($name)) {
-            return $this->generateHelper($name, $node['value'], $args, $hash, self::BLOCK_HELPER_VARIABLE_RESULTCHECK);
+        if ($this->runtime->getHelper($argumentList->getName())) {
+            return $this->generateHelper($argumentList, $node['value'], self::BLOCK_HELPER_VARIABLE_RESULTCHECK);
         }
 
         //it's a value ?
@@ -241,11 +244,11 @@ class Compiler
             return $this->generatePartial($node);
         }
 
-        list($name, $args, $hash) = $this->parseArguments($node['value']);
+        $argumentList = $this->parseArguments($node['value']);
 
         //if it's a helper
-        if ($this->runtime->getHelper($name)) {
-            return $this->generateHelper($name, $node['value'], $args, $hash, self::BLOCK_HELPER_ESCAPE_RESULTCHECK);
+        if ($this->runtime->getHelper($argumentList->getName())) {
+            return $this->generateHelper($argumentList, $node['value'], self::BLOCK_HELPER_ESCAPE_RESULTCHECK);
         }
 
         //it's a value ?
@@ -268,23 +271,24 @@ class Compiler
         //push in the node, we are going to need this to close
         $open[] = $node;
 
-        list($name, $args, $hash) = $this->parseArguments($node['value']);
+        $argumentList = $this->parseArguments($node['value']);
 
         //if it's a value
-        if (is_null($this->runtime->getHelper($name))) {
+        if (is_null($this->runtime->getHelper($argumentList->getName()))) {
             //run each
             $node['value'] = 'each ' . $node['value'];
-            list($name, $args, $hash) = $this->parseArguments($node['value']);
+            $argumentList = $this->parseArguments($node['value']);
         }
 
-        //it's a helper
-        //form hash
-        foreach ($hash as $key => $value) {
-            $hash[$key] = sprintf(self::BLOCK_OPTIONS_HASH_KEY_VALUE, $key, $value);
+        $args = array_map(function(Argument $arg) { return $arg->getValue(); }, $argumentList->getArguments());
+
+        $hash = array();
+        foreach ($argumentList->getNamedArguments() as $key => $value) {
+            $hash[$key] = sprintf(self::BLOCK_OPTIONS_HASH_KEY_VALUE, $key, $value->getValue());
         }
 
         $args[] = $this->prettyPrint(self::BLOCK_OPTIONS_OPEN, 0, 2)
-            . $this->prettyPrint(sprintf(self::BLOCK_OPTIONS_NAME, $name))
+            . $this->prettyPrint(sprintf(self::BLOCK_OPTIONS_NAME, $argumentList->getName()))
             . $this->prettyPrint(sprintf(self::BLOCK_OPTIONS_ARGS, str_replace("'", '\\\'', $node['value'])))
             . $this->prettyPrint(sprintf(self::BLOCK_OPTIONS_HASH, implode(', \r\t', $hash)))
             . $this->prettyPrint(self::BLOCK_OPTIONS_FN_OPEN)
@@ -293,7 +297,7 @@ class Compiler
             . $this->prettyPrint(self::BLOCK_OPTIONS_FN_BODY_3)
             . $this->prettyPrint(self::BLOCK_OPTIONS_FN_BODY_4);
 
-        return $this->prettyPrint(sprintf(self::BLOCK_ESCAPE_HELPER_OPEN, $name), -2)
+        return $this->prettyPrint(sprintf(self::BLOCK_ESCAPE_HELPER_OPEN, $argumentList->getName()), -2)
             . $this->prettyPrint('\r\t' . implode(',\r\t', $args), 1, 2);
     }
 
@@ -345,44 +349,34 @@ class Compiler
      */
     protected function generatePartial(array $node) : string
     {
-        list($name, $args, $optionsHash) = $this->parseArguments($node['value']);
+        $argumentList = $this->parseArguments($node['value']);
+        $args = $argumentList->getArguments();
 
-        //get the name
-        //it will be like 'something'
-        //or $data->find('something')
-        $name = array_shift($args);
-
-        //if it's a data lookup
-        if (strpos($name, '$data->find(') === 0) {
-            //this is not what we really want
-            $name = substr($name, 12, -1);
-        }
-
-        //if it has quotes
-        if (substr($name, 0, 1) === "'" && substr($name, -1) === "'") {
-            //remove it
-            $name = substr($name, 1, -1);
-        }
-
-        //get the partial
-        $partial = $this->runtime->getPartial($name);
-
-        //but if the partial is null
+        $partialNameArg = array_shift($args);
+        $partial = $this->runtime->getPartial($partialNameArg->getRawValue());
         if (is_null($partial) === true) {
-            //name is really the partial
-            $partial = $name;
+            if ($partialNameArg instanceof StringArgument) {
+                $partial = $partialNameArg->getRawValue();
+            } else {
+                // TODO: Add message
+                throw new Exception();
+            }
         }
 
-        //if there are still arguments
-        $scope = '';
+        $compiler = new static($this->runtime, $this->tokenizerFactory, $this->argumentParserFactory);
+        $code = $compiler->compile($partial, $this->offset + 3);
+
+        // If there is at least one other argument, use it
+        // as the scope for the partial.
         if (count($args)) {
-            $scope = '\r\t\1' . $args[0] . ', ';
+            $scope = '\r\t\1' . $args[0]->getValue() . ', ';
+        } else {
+            $scope = '';
         }
 
-        //form hash
         $hash = array();
-        foreach ($optionsHash as $key => $value) {
-            $hash[$key] = sprintf('\'%s\' => %s', $key, $value);
+        foreach ($argumentList->getNamedArguments() as $key => $value) {
+            $hash[$key] = sprintf('\'%s\' => %s', $key, $value->getValue());
         }
 
         if (empty($hash)) {
@@ -393,10 +387,7 @@ class Compiler
 
         $layout = str_replace(
             array('\r', '\t', '\1'),
-            array("\n",
-                str_repeat('    ', $this->offset),
-                str_repeat('    ', 1)
-            ),
+            array("\n", str_repeat('    ', $this->offset), str_repeat('    ', 1)),
             '\r\t$buffer .= $this->runtime->getHelper(\'noop\')('
             . $scope
             . '\r\t\1array('
@@ -417,36 +408,33 @@ class Compiler
             . '\r\t\1)'
             . '\r\t);\r'
         );
-
-        $compiler = new static($this->runtime, $this->tokenizerFactory, $this->argumentParserFactory);
-        $code = $compiler->compile($partial, $this->offset + 3);
-
         return sprintf($layout, $code);
     }
 
     /**
-     * @param string $name
+     * @param ArgumentList $argumentList
      * @param string $nodeValue
-     * @param array $args
-     * @param array $hash
      * @param string $closingTag
+     * @return string
      */
-    protected function generateHelper(string $name, string $nodeValue, array $args, array $hash, string $closingTag)
+    protected function generateHelper(ArgumentList $argumentList, string $nodeValue, string $closingTag) : string
     {
-        //form hash
-        foreach ($hash as $key => $value) {
-            $hash[$key] = sprintf(self::BLOCK_OPTIONS_HASH_KEY_VALUE, $key, $value);
+        $args = array_map(function(Argument $arg) { return $arg->getValue(); }, $argumentList->getArguments());
+
+        $hash = array();
+        foreach ($argumentList->getNamedArguments() as $key => $value) {
+            $hash[$key] = sprintf(self::BLOCK_OPTIONS_HASH_KEY_VALUE, $key, $value->getValue());
         }
 
         $args[] = $this->prettyPrint(self::BLOCK_OPTIONS_OPEN, 0, 2)
-            . $this->prettyPrint(sprintf(self::BLOCK_OPTIONS_NAME, $name))
+            . $this->prettyPrint(sprintf(self::BLOCK_OPTIONS_NAME, $argumentList->getName()))
             . $this->prettyPrint(sprintf(self::BLOCK_OPTIONS_ARGS, str_replace("'", '\\\'', $nodeValue)))
             . $this->prettyPrint(sprintf(self::BLOCK_OPTIONS_HASH, implode(', \r\t', $hash)))
             . $this->prettyPrint(self::BLOCK_OPTIONS_FN_EMPTY)
             . $this->prettyPrint(self::BLOCK_OPTIONS_INVERSE_EMPTY)
             . $this->prettyPrint(self::BLOCK_OPTIONS_CLOSE, -1);
 
-        return $this->prettyPrint(sprintf(self::BLOCK_HELPER_OPEN, $name), -1)
+        return $this->prettyPrint(sprintf(self::BLOCK_HELPER_OPEN, $argumentList->getName()), -1)
             . $this->prettyPrint('\r\t' . implode(',\r\t', $args), 1, -1)
             . $this->prettyPrint(self::BLOCK_HELPER_CLOSE)
             . $this->prettyPrint($closingTag);
@@ -457,10 +445,10 @@ class Compiler
      * into a legitimate argument array.
      *
      * @param string $string The argument string.
-     * @return array
+     * @return ArgumentList
      * @throws Exception
      */
-    protected function parseArguments(string $string) : array
+    protected function parseArguments(string $string) : ArgumentList
     {
         $argParser = $this->argumentParserFactory->create($string);
         return $argParser->tokenise();
