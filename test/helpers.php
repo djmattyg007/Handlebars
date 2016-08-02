@@ -35,166 +35,102 @@ class Helpers extends \PHPUnit_Framework_TestCase
 
     public function testEach()
     {
-        // TODO: Store these in one big array so we can iterate over it and reduce testing code
-        //simple loop
-        $case1 = array(
-            '{{#each comments}}{{{this}}}{{/each}}',
-            array('comments' => array(1, 2, 3, 4)),
-            '1234'
+        $loop1 = '{{#each comments}}{{{this}}}{{/each}}';
+        $loop2 = '{{#each posts}}{{@index}}' . $loop1 . '{{/each}}';
+        $loop3 = '{{#each users}}{{@index}}' . $loop2 . '{{/each}}';
+        $loop4 = '{{foo}}{{#each comments}}{{../foo}}{{{this}}}{{/each}}';
+        $loop5 = '{{#each posts}}{{@index}}' . $loop4 . '{{/each}}';
+        $loop6 = '{{#each users}}{{@index}}' . $loop5 . '{{/each}}';
+        $data1 = array('comments' => array(1, 2, 3, 4));
+        $data2 = array('posts' => array($data1, $data1, $data1));
+        $data3 = array_merge($data1, array('foo' => 'bar'));
+        $data4 = array('posts' => array($data3, $data3, $data3));
+
+        $cases = array(
+            "simple loop" => array(
+                $loop1,
+                $data1,
+                '1234',
+            ),
+            "nested loop 1" => array(
+                $loop2,
+                $data2,
+                '012341123421234',
+            ),
+            "nested loop 2" => array(
+                $loop3,
+                array('users' => array($data2, $data2, $data2)),
+                '001234112342123410123411234212342012341123421234',
+            ),
+            "nested loop 3 ../" => array(
+                str_replace('{{{this}}}', '{{../../@index}}', $loop3),
+                array('users' => array($data2, $data2, $data2)),
+                '000000100002000010111111111211112022221222222222',
+            ),
+            "nested loop 3 ../ no results" => array(
+                str_replace('{{{this}}}', '{{../..nada}}', $loop3),
+                array('users' => array($data2, $data2, $data2)),
+                '001210122012',
+            ),
+            "simple loop ../" => array(
+                $loop4,
+                $data3,
+                'barbar1bar2bar3bar4',
+            ),
+            "nested loop 1 ../" => array(
+                $loop5,
+                $data4,
+                '0barbar1bar2bar3bar41barbar1bar2bar3bar42barbar1bar2bar3bar4',
+            ),
+            "nested loop 2 ../" => array(
+                $loop6,
+                array('users' => array($data4, $data4, $data4)),
+                '00barbar1bar2bar3bar41barbar1bar2bar3bar42barbar1bar2bar3bar410barbar' .
+                '1bar2bar3bar41barbar1bar2bar3bar42barbar1bar2bar3bar420barbar1bar2bar' .
+                '3bar41barbar1bar2bar3bar42barbar1bar2bar3bar4',
+            ),
+            "nested loop 3 ../../" => array(
+                str_replace('{{{this}}}', '{{../../@index}}', $loop6),
+                array('users' => array($data4, $data4, $data4)),
+                '00barbar0bar0bar0bar01barbar0bar0bar0bar02barbar' .
+                '0bar0bar0bar010barbar1bar1bar1bar11barbar1bar1bar' .
+                '1bar12barbar1bar1bar1bar120barbar2bar2bar2bar21bar' .
+                'bar2bar2bar2bar22barbar2bar2bar2bar2',
+            ),
+            "nested loop 3 ../../ no results" => array(
+                str_replace('{{{this}}}', '{{../../nada}}', $loop6),
+                array('users' => array($data4, $data4, $data4)),
+                '00barbarbarbarbar1barbarbarbarbar2barbarbarbarbar10barbarbar' .
+                'barbar1barbarbarbarbar2barbarbarbarbar20barbarbarbarbar1barbar' .
+                'barbarbar2barbarbarbarbar',
+            ),
+            "each else" => array(
+                '{{#each comments}}{{{this}}}{{else}}NO{{/each}}',
+                array(),
+                'NO',
+            ),
+            "private" => array(
+                '{{#each comments}}{{@index}}{{@key}}{{@first}}{{@last}}{{this}}{{/each}}',
+                array('comments' => array(1, 2, 3, 4)),
+                '00031110322203333034',
+            ),
+            "foreach" => array(
+                '{{#each comments as |value, key|}}{{key}}:{{value}},{{/each}}',
+                array('comments' => array(1, 2, 3, 4)),
+                '0:1,1:2,2:3,3:4,',
+            ),
+            "foreach value only" => array(
+                '{{#each comments as |value|}}{{value}},{{/each}}',
+                array('comments' => array(1, 2, 3, 4)),
+                '1,2,3,4,',
+            ),
         );
 
-        //nested loop 1
-        $case2 = array(
-            '{{#each posts}}{{@index}}' . $case1[0] . '{{/each}}',
-            array('posts' => array($case1[1], $case1[1], $case1[1])),
-            '012341123421234'
-        );
-
-        //nested loop 2
-        $case3 = array(
-            '{{#each users}}{{@index}}' . $case2[0] . '{{/each}}',
-            array('users' => array($case2[1], $case2[1], $case2[1])),
-            '001234112342123410123411234212342012341123421234'
-        );
-
-        //nested loop 3 ../
-        $case4 = array(
-            str_replace('{{{this}}}', '{{../../@index}}', $case3[0]),
-            array('users' => array($case2[1], $case2[1], $case2[1])),
-            '000000100002000010111111111211112022221222222222'
-        );
-
-        //nested loop 3 ../ no results
-        $case5 = array(
-            str_replace('{{{this}}}', '{{../../nada}}', $case3[0]),
-            array('users' => array($case2[1], $case2[1], $case2[1])),
-            '001210122012'
-        );
-
-        //simple loop ../
-        $case6 = array(
-            '{{foo}}{{#each comments}}{{../foo}}{{{this}}}{{/each}}',
-            array('foo' => 'bar', 'comments' => array(1, 2, 3, 4)),
-            'barbar1bar2bar3bar4'
-        );
-
-        //nested loop 1 ../
-        $case7 = array(
-            '{{#each posts}}{{@index}}' . $case6[0] . '{{/each}}',
-            array('posts' => array($case6[1], $case6[1], $case6[1])),
-            '0barbar1bar2bar3bar41barbar1bar2bar3bar42barbar1bar2bar3bar4'
-        );
-
-        //nested loop 2 ../
-        $case8 = array(
-            '{{#each users}}{{@index}}' . $case7[0] . '{{/each}}',
-            array('users' => array($case7[1], $case7[1], $case7[1])),
-            '00barbar1bar2bar3bar41barbar1bar2bar3bar42barbar1bar2bar3bar410barbar'.
-            '1bar2bar3bar41barbar1bar2bar3bar42barbar1bar2bar3bar420barbar1bar2bar'.
-            '3bar41barbar1bar2bar3bar42barbar1bar2bar3bar4'
-        );
-
-        //nested loop 3 ../../
-        $case9 = array(
-            str_replace('{{{this}}}', '{{../../@index}}', $case8[0]),
-            array('users' => array($case7[1], $case7[1], $case7[1])),
-            '00barbar0bar0bar0bar01barbar0bar0bar0bar02barbar'.
-            '0bar0bar0bar010barbar1bar1bar1bar11barbar1bar1bar'.
-            '1bar12barbar1bar1bar1bar120barbar2bar2bar2bar21bar'.
-            'bar2bar2bar2bar22barbar2bar2bar2bar2'
-        );
-
-        //nested loop 3 ../../ no results
-        $case10 = array(
-            str_replace('{{{this}}}', '{{../../nada}}', $case8[0]),
-            array('users' => array($case7[1], $case7[1], $case7[1])),
-            '00barbarbarbarbar1barbarbarbarbar2barbarbarbarbar10barbarbar'.
-            'barbar1barbarbarbarbar2barbarbarbarbar20barbarbarbarbar1barbar'.
-            'barbarbar2barbarbarbarbar'
-        );
-
-        //each else
-        $case11 = array(
-            '{{#each comments}}{{{this}}}{{else}}NO{{/each}}',
-            array(),
-            'NO'
-        );
-
-        //private
-        $case12 = array(
-            '{{#each comments}}{{@index}}{{@key}}{{@first}}{{@last}}{{this}}{{/each}}',
-            array('comments' => array(1, 2, 3, 4)),
-            '00031110322203333034'
-        );
-
-        //foreach
-        $case13 = array(
-            '{{#each comments as |value, key|}}{{key}}:{{value}},{{/each}}',
-            array('comments' => array(1, 2, 3, 4)),
-            '0:1,1:2,2:3,3:4,'
-        );
-
-        $case14 = array(
-            '{{#each comments as |value|}}{{value}},{{/each}}',
-            array('comments' => array(1, 2, 3, 4)),
-            '1,2,3,4,'
-        );
-
-        $template = $this->handlebars->compile($case1[0]);
-        $results = $template($case1[1]);
-        $this->assertEquals($case1[2], $results);
-
-        $template = $this->handlebars->compile($case2[0]);
-        $results = $template->render($case2[1]);
-        $this->assertEquals($case2[2], $results);
-
-        $template = $this->handlebars->compile($case3[0]);
-        $results = $template($case3[1]);
-        $this->assertEquals($case3[2], $results);
-
-        $template = $this->handlebars->compile($case4[0]);
-        $results = $template->render($case4[1]);
-        $this->assertEquals($case4[2], $results);
-
-        $template = $this->handlebars->compile($case5[0]);
-        $results = $template($case5[1]);
-        $this->assertEquals($case5[2], $results);
-
-        $template = $this->handlebars->compile($case6[0]);
-        $results = $template->render($case6[1]);
-        $this->assertEquals($case6[2], $results);
-
-        $template = $this->handlebars->compile($case7[0]);
-        $results = $template($case7[1]);
-        $this->assertEquals($case7[2], $results);
-
-        $template = $this->handlebars->compile($case8[0]);
-        $results = $template->render($case8[1]);
-        $this->assertEquals($case8[2], $results);
-
-        $template = $this->handlebars->compile($case9[0]);
-        $results = $template($case9[1]);
-        $this->assertEquals($case9[2], $results);
-
-        $template = $this->handlebars->compile($case10[0]);
-        $results = $template->render($case10[1]);
-        $this->assertEquals($case10[2], $results);
-
-        $template = $this->handlebars->compile($case11[0]);
-        $results = $template($case11[1]);
-        $this->assertEquals($case11[2], $results);
-
-        $template = $this->handlebars->compile($case12[0]);
-        $results = $template->render($case12[1]);
-        $this->assertEquals($case12[2], $results);
-
-        $template = $this->handlebars->compile($case13[0]);
-        $results = $template($case13[1]);
-        $this->assertEquals($case13[2], $results);
-
-        $template = $this->handlebars->compile($case14[0]);
-        $results = $template->render($case14[1]);
-        $this->assertEquals($case14[2], $results);
+        foreach ($cases as $case) {
+            $template = $this->handlebars->compile($case[0]);
+            $results = $template($case[1]);
+            $this->assertEquals($case[2], $results);
+        }
     }
 
     public function testIf()
