@@ -135,77 +135,68 @@ class Helpers extends \PHPUnit_Framework_TestCase
 
     public function testIf()
     {
-        // simple if
-        $case1 = array(
-            '{{#if comments}}YES{{else}}NO{{/if}}',
-            array('comments' => array(1, 2, 3, 4)),
-            'YES'
+        $cases = array(
+            "simple if" => array(
+                '{{#if comments}}YES{{else}}NO{{/if}}',
+                array('comments' => array(1, 2, 3, 4)),
+                'YES',
+            ),
+            "simple else" => array(
+                '{{#if comments}}YES{{else}}NO{{/if}}',
+                array(),
+                'NO',
+            ),
+            "nested if" => array(
+                '{{#if foo}}{{#if bar}}{{foo}} {{bar}}{{/if}}{{foo}}{{/if}}',
+                array('foo' => 'bar', 'bar' => 'foo'),
+                'bar foobar',
+            ),
         );
 
-        // simple else
-        $case2 = array(
-            '{{#if comments}}YES{{else}}NO{{/if}}',
-            array(),
-            'NO'
-        );
-
-        // nested if
-        $case3 = array(
-            '{{#if foo}}{{#if bar}}{{foo}} {{bar}}{{/if}}{{foo}}{{/if}}',
-            array('foo' => 'bar', 'bar' => 'foo'),
-            'bar foobar'
-        );
-
-        $template = $this->handlebars->compile($case1[0]);
-        $results = $template($case1[1]);
-        $this->assertEquals($case1[2], $results);
-
-        $template = $this->handlebars->compile($case2[0]);
-        $results = $template($case2[1]);
-        $this->assertEquals($case2[2], $results);
-
-        $template = $this->handlebars->compile($case3[0]);
-        $results = $template($case3[1]);
-        $this->assertEquals($case3[2], $results);
+        foreach ($cases as $case) {
+            $template = $this->handlebars->compile($case[0]);
+            $results = $template($case[1]);
+            $this->assertEquals($case[2], $results);
+        }
     }
 
     public function testUnless()
     {
-        //simple unless
-        $case1 = array(
-            '{{#unless comments}}YES{{else}}NO{{/unless}}',
-            array('comments' => array(1, 2, 3, 4)),
-            'NO'
+        $cases = array(
+            "simple unless" => array(
+                '{{#unless comments}}YES{{else}}NO{{/unless}}',
+                array('comments' => array(1, 2, 3, 4)),
+                'NO',
+            ),
+            "simple else" => array(
+                '{{#unless comments}}YES{{else}}NO{{/unless}}',
+                array(),
+                'YES',
+            ),
         );
 
-        //simple else
-        $case2 = array(
-            '{{#unless comments}}YES{{else}}NO{{/unless}}',
-            array(),
-            'YES'
-        );
-
-        $template = $this->handlebars->compile($case1[0]);
-        $results = $template($case1[1]);
-        $this->assertEquals($case1[2], $results);
-
-        $template = $this->handlebars->compile($case2[0]);
-        $results = $template($case2[1]);
-        $this->assertEquals($case2[2], $results);
+        foreach ($cases as $case) {
+            $template = $this->handlebars->compile($case[0]);
+            $results = $template($case[1]);
+            $this->assertEquals($case[2], $results);
+        }
     }
 
     public function testWith()
     {
-        //simple with
-        $case1 = array(
-            '{{#with comments}}{{this.[1]}}{{/with}}',
-            array('comments' => array(1, 2, 3, 4)),
-            '2'
+        $cases = array(
+            "simple with" => array(
+                '{{#with comments}}{{this.[1]}}{{/with}}',
+                array('comments' => array(1, 2, 3, 4)),
+                '2',
+            ),
         );
 
-        $template = $this->handlebars->compile($case1[0]);
-        $results = $template($case1[1]);
-        $this->assertEquals($case1[2], $results);
+        foreach ($cases as $case) {
+            $template = $this->handlebars->compile($case[0]);
+            $results = $template($case[1]);
+            $this->assertEquals($case[2], $results);
+        }
     }
 
     public function testCombinations()
