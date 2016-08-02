@@ -8,5 +8,6 @@ return array(
     "unless" => new Helper\UnlessHelper(),
     "with" => new Helper\WithHelper(),
     "each" => new Helper\EachHelper(),
+    "concat" => new Helper\ConcatHelper(),
     "noop" => new Helper\NoopHelper(),
 );

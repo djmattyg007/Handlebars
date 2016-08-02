@@ -199,6 +199,43 @@ class Helpers extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testConcat()
+    {
+        $cases = array(
+            "two string literals" => array(
+                '{{concat "foo" "bar"}}',
+                array(),
+                'foobar',
+            ),
+            "five string literals" => array(
+                '{{concat "a" \'b\' "c" \'d\' "e"}}',
+                array(),
+                'abcde',
+            ),
+            "string literal plus variable" => array(
+                '{{concat "abc" xyz}}',
+                array('xyz' => 'def'),
+                'abcdef',
+            ),
+            "two variables plus literal" => array(
+                '{{concat person.firstname " " person.lastname}}',
+                array('person' => array('firstname' => 'John', 'lastname' => 'Smith')),
+                'John Smith',
+            ),
+            "single item" => array(
+                '{{concat \'  __  \'}}',
+                array(),
+                '  __  ',
+            ),
+        );
+
+        foreach ($cases as $case) {
+            $template = $this->handlebars->compile($case[0]);
+            $results = $template($case[1]);
+            $this->assertEquals($case[2], $results);
+        }
+    }
+
     public function testCombinations()
     {
         $contents = '{{#if merchants.length~}}
