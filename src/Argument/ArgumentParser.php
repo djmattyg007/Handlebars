@@ -78,7 +78,7 @@ finishTokenise:
     }
 
     /**
-     * @return array|string
+     * @return Argument|array
      * @throws Exception
      */
     protected function gatherArgument()
