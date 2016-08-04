@@ -346,6 +346,7 @@ class Compiler
     /**
      * @param array $node
      * @return string
+     * @throws Exception
      */
     protected function generatePartial(array $node) : string
     {
