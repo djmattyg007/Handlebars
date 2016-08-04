@@ -227,6 +227,21 @@ class Helpers extends \PHPUnit_Framework_TestCase
                 array(),
                 '  __  ',
             ),
+            "nested concat" => array(
+                '{{concat "abc" (concat def "ghi") "jkl"}}',
+                array('def' => 'def'),
+                'abcdefghijkl',
+            ),
+            "open nested concat" => array(
+                '{{#if (concat "abc" "def")}}test{{/if}}',
+                array(),
+                'test',
+            ),
+            /*"double nested concat" => array(
+                '{{concat abc (concat "def" ( concat ghi "jkl")) "mno"}}',
+                array('abc' => 'abc', 'ghi' => 'ghi'),
+                'abcdefghijklmno',
+            ),*/
         );
 
         foreach ($cases as $case) {

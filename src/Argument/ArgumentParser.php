@@ -84,6 +84,9 @@ finishTokenise:
     protected function gatherArgument()
     {
         $firstChar = $this->curChar();
+        if ($firstChar === "(") {
+            return $this->gatherHelperArgument();
+        }
         $quoteStart = $firstChar === "'" || $firstChar === '"';
         $value = "";
 
@@ -138,6 +141,68 @@ finishTokenise:
         } else {
             return new VariableArgument($value);
         }
+    }
+
+    /**
+     * @return HelperArgument
+     */
+    protected function gatherHelperArgument() : HelperArgument
+    {
+        $startIndex = $this->index;
+
+        // Cycle through the name of the helper
+        $startOfNameReached = false;
+        $endOfNameReached = false;
+        while ($endOfNameReached === false && $this->nextChar() === true) {
+            $isWhitespace = $this->isWhitespace();
+            if ($startOfNameReached === true && $isWhitespace === true) {
+                $endOfNameReached = true;
+            } elseif ($this->curChar() === ")") {
+                // When there are no arguments to the helper
+                goto finishHelperScan;
+            } elseif ($startOfNameReached === false && $isWhitespace === true) {
+                continue;
+            } elseif ($startOfNameReached === false && $isWhitespace === false) {
+                $startOfNameReached = true;
+            }
+        }
+
+        $this->nextChar();
+        $curChar = $this->curChar();
+        if ($curChar === ")") {
+            goto finishHelperScan;
+        } elseif ($curChar === "'" || $curChar === '"') {
+            $currentQuote = $curChar;
+        } else {
+            $currentQuote = null;
+        }
+
+        // TODO: Add depth counter for () pairs to support doubly-nested helpers
+        while ($this->nextChar() === true) {
+            $curChar = $this->curChar();
+            $isWhitespace = $this->isWhitespace();
+            if ($currentQuote === null && $curChar === ")") {
+                break;
+            } elseif ($currentQuote === null && $isWhitespace === true) {
+                $this->nextChar();
+                $curChar = $this->curChar();
+                if ($curChar === ")") {
+                    goto finishHelperScan;
+                } elseif ($curChar === "'" || $curChar === '"') {
+                    $currentQuote = $curChar;
+                }
+            } elseif ($currentQuote !== null && $curChar === "\\") {
+                $this->nextChar();
+            } elseif ($currentQuote !== null && $curChar === $currentQuote) {
+                $currentQuote = null;
+            }
+        }
+
+finishHelperScan:
+        $endIndex = $this->index;
+        $helperArgString = mb_substr($this->string, $startIndex + 1, $endIndex - $startIndex - 1);
+        $helperArgParser = new static($helperArgString, $this->argumentListFactory);
+        return new HelperArgument($helperArgString, $helperArgParser->tokenise());
     }
 
     /**

@@ -14,6 +14,7 @@ namespace MattyG\Handlebars;
 use MattyG\Handlebars\Argument\Argument;
 use MattyG\Handlebars\Argument\ArgumentList;
 use MattyG\Handlebars\Argument\ArgumentParserFactory;
+use MattyG\Handlebars\Argument\HelperArgument;
 use MattyG\Handlebars\Argument\StringArgument;
 
 class Compiler
@@ -28,6 +29,9 @@ class Compiler
     const BLOCK_HELPER_CLOSE = '\r\t);';
     const BLOCK_HELPER_VARIABLE_RESULTCHECK = '\r\t$buffer .= $helperResult instanceof SafeString ? $helperResult : htmlspecialchars($helperResult, ENT_COMPAT, \'UTF-8\');\r';
     const BLOCK_HELPER_ESCAPE_RESULTCHECK = '\r\t$buffer .= $helperResult;\r';
+
+    const BLOCK_HELPERARG_OPEN = '$this->runtime->getHelper(\'%s\')(';
+    const BLOCK_HELPERARG_CLOSE = '\r\t)';
 
     const BLOCK_ESCAPE_HELPER_OPEN = '\r\t$buffer .= $this->runtime->getHelper(\'%s\')(';
     const BLOCK_ESCAPE_HELPER_CLOSE = '\r\t);\r';
@@ -280,7 +284,13 @@ class Compiler
             $argumentList = $this->parseArguments($node['value']);
         }
 
-        $args = array_map(function(Argument $arg) { return $arg->getValue(); }, $argumentList->getArguments());
+        $helperGen = array($this, "generateNestedHelper");
+        $args = array_map(function(Argument $arg) use ($helperGen) {
+            if ($arg instanceof HelperArgument) {
+                return $helperGen($arg->getArgumentList(), $arg->getValue());
+            }
+            return $arg->getValue();
+        }, $argumentList->getArguments());
 
         $hash = array();
         foreach ($argumentList->getNamedArguments() as $key => $value) {
@@ -420,25 +430,72 @@ class Compiler
      */
     protected function generateHelper(ArgumentList $argumentList, string $nodeValue, string $closingTag) : string
     {
-        $args = array_map(function(Argument $arg) { return $arg->getValue(); }, $argumentList->getArguments());
+        $helperGen = array($this, "generateNestedHelper");
+        $args = array_map(function(Argument $arg) use ($helperGen) {
+            if ($arg instanceof HelperArgument) {
+                return $helperGen($arg->getArgumentList(), $arg->getValue());
+            }
+            return $arg->getValue();
+        }, $argumentList->getArguments());
 
         $hash = array();
         foreach ($argumentList->getNamedArguments() as $key => $value) {
             $hash[$key] = sprintf(self::BLOCK_OPTIONS_HASH_KEY_VALUE, $key, $value->getValue());
         }
 
-        $args[] = $this->prettyPrint(self::BLOCK_OPTIONS_OPEN, 0, 2)
-            . $this->prettyPrint(sprintf(self::BLOCK_OPTIONS_NAME, $argumentList->getName()))
-            . $this->prettyPrint(sprintf(self::BLOCK_OPTIONS_ARGS, str_replace("'", '\\\'', $nodeValue)))
-            . $this->prettyPrint(sprintf(self::BLOCK_OPTIONS_HASH, implode(', \r\t', $hash)))
-            . $this->prettyPrint(self::BLOCK_OPTIONS_FN_EMPTY)
-            . $this->prettyPrint(self::BLOCK_OPTIONS_INVERSE_EMPTY)
-            . $this->prettyPrint(self::BLOCK_OPTIONS_CLOSE, -1);
+        $args[] = $this->generateHelperOptions($argumentList->getName(), $nodeValue, $hash);
 
         return $this->prettyPrint(sprintf(self::BLOCK_HELPER_OPEN, $argumentList->getName()), -1)
             . $this->prettyPrint('\r\t' . implode(',\r\t', $args), 1, -1)
             . $this->prettyPrint(self::BLOCK_HELPER_CLOSE)
             . $this->prettyPrint($closingTag);
+    }
+
+    /**
+     * @param ArgumentList $argumentList
+     * @param string $nodeValue
+     * @param int $depth
+     * @return string
+     */
+    protected function generateNestedHelper(ArgumentList $argumentList, string $nodeValue, int $depth = 0) : string
+    {
+        $helperGen = array($this, "generateNestedHelper");
+        $args = array_map(function(Argument $arg) use ($helperGen, $depth) {
+            if ($arg instanceof HelperArgument) {
+                return $helperGen($arg->getArgumentList(), $arg->getValue(), $depth + 1);
+            }
+            return $arg->getValue();
+        }, $argumentList->getArguments());
+
+        $hash = array();
+        foreach ($argumentList->getNamedArguments() as $key => $value) {
+            $hash[$key] = sprintf(self::BLOCK_OPTIONS_HASH_KEY_VALUE, $key, $value->getValue());
+        }
+
+        $args[] = $this->generateHelperOptions($argumentList->getName(), $nodeValue, $hash, $depth + 1);
+
+        // TODO: Fix indentation when using doubly-nested helpers
+        return $this->prettyPrint(sprintf(self::BLOCK_HELPERARG_OPEN, $argumentList->getName()), -1)
+            . $this->prettyPrint('\r\t' . implode(',\r\t', $args), 1, -1)
+            . $this->prettyPrint(self::BLOCK_HELPERARG_CLOSE, 0, -1);
+    }
+
+    /**
+     * @param string $name
+     * @param string $nodeValue
+     * @param array $hash
+     * @param int $depth
+     * @return string
+     */
+    protected function generateHelperOptions(string $name, string $nodeValue, array $hash, int $depth = 0) : string
+    {
+        return $this->prettyPrint(self::BLOCK_OPTIONS_OPEN, $depth, 2)
+            . $this->prettyPrint(sprintf(self::BLOCK_OPTIONS_NAME, $name))
+            . $this->prettyPrint(sprintf(self::BLOCK_OPTIONS_ARGS, str_replace("'", '\\\'', $nodeValue)))
+            . $this->prettyPrint(sprintf(self::BLOCK_OPTIONS_HASH, implode(', \r\t', $hash)))
+            . $this->prettyPrint(self::BLOCK_OPTIONS_FN_EMPTY)
+            . $this->prettyPrint(self::BLOCK_OPTIONS_INVERSE_EMPTY)
+            . $this->prettyPrint(self::BLOCK_OPTIONS_CLOSE, -1);
     }
 
     /**
