@@ -49,6 +49,7 @@ class Tokenizer
     public function __construct(string $source)
     {
         $this->source = $this->trim($source);
+        $this->strlen = mb_strlen($this->source);
         $this->reset();
     }
 
@@ -73,39 +74,37 @@ class Tokenizer
             $callback = function() {};
         }
 
-        $length = strlen($this->source);
-
-        for ($line = 1, $i = 0; $i < $length; $i++) {
-            if ($this->source[$i] == "\n") {
+        for ($line = 1, $i = 0; $i < $this->strlen; $i++) {
+            if (mb_substr($this->source, $i, 1) === "\n") {
                 $line++;
             }
 
             switch (true) {
                 //section
-                case substr($this->source, $i, 3) == '{{{#':
+                case mb_substr($this->source, $i, 3) == '{{{#':
                     $i = $this->addNode($i, self::TYPE_SECTION_OPEN, $line, 4, 6, $callback);
                     break;
-                case substr($this->source, $i, 3) == '{{#':
+                case mb_substr($this->source, $i, 3) == '{{#':
                     $i = $this->addNode($i, self::TYPE_SECTION_OPEN, $line, 3, 5, $callback);
                     break;
-                case substr($this->source, $i, 3) == '{{{/':
+                case mb_substr($this->source, $i, 3) == '{{{/':
                     $i = $this->addNode($i, self::TYPE_SECTION_CLOSE, $line, 4, 6, $callback);
                     break;
-                case substr($this->source, $i, 3) == '{{/':
+                case mb_substr($this->source, $i, 3) == '{{/':
                     $i = $this->addNode($i, self::TYPE_SECTION_CLOSE, $line, 3, 5, $callback);
                     break;
 
                 //variable
-                case substr($this->source, $i, 3) == '{{{':
+                case mb_substr($this->source, $i, 3) == '{{{':
                     $i = $this->addNode($i, self::TYPE_VARIABLE_ESCAPE, $line, 3, 6, $callback);
                     break;
-                case substr($this->source, $i, 2) == '{{':
+                case mb_substr($this->source, $i, 2) == '{{':
                     $i = $this->addNode($i, self::TYPE_VARIABLE_UNESCAPE, $line, 2, 4, $callback);
                     break;
 
                 //text
                 default:
-                    $this->buffer .= $this->source[$i];
+                    $this->buffer .= mb_substr($this->source, $i, 1);
                     break;
             }
         }
@@ -152,7 +151,7 @@ class Tokenizer
             'start' => $start,
             'end'   => $end,
             'level' => $this->level,
-            'value' => substr($this->source, $start + $offset1, $end - $start - $offset2)
+            'value' => mb_substr($this->source, $start + $offset1, $end - $start - $offset2)
         ), $this->source);
 
         if ($type === self::TYPE_SECTION_OPEN) {
@@ -173,13 +172,13 @@ class Tokenizer
      */
     protected function flushText(int $i, $callback)
     {
-        if ($this->type !== self::TYPE_TEXT || !strlen($this->buffer)) {
+        if ($this->type !== self::TYPE_TEXT || !mb_strlen($this->buffer)) {
             return $this;
         }
 
         call_user_func($callback, array(
             'type'  => $this->type,
-            'start' => $i - strlen($this->buffer),
+            'start' => $i - mb_strlen($this->buffer),
             'end'   => $i - 1,
             'level' => $this->level,
             'value' => $this->buffer
@@ -203,10 +202,10 @@ class Tokenizer
     {
         $close = ($escape === true ? '}}}' : '}}');
 
-        for (; substr($this->source, $i, strlen($close)) !== $close; $i++) {
+        for (; mb_substr($this->source, $i, mb_strlen($close)) !== $close; $i++) {
         }
 
-        return $i + strlen($close);
+        return $i + mb_strlen($close);
     }
 
     /**

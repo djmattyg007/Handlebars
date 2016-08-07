@@ -72,7 +72,7 @@ class Data
                 if ($node === 'length') {
                     //is it a string?
                     if (is_string($current)) {
-                        return strlen($current);
+                        return mb_strlen($current);
                     }
 
                     //is it an array?
