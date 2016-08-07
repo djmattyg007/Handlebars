@@ -21,14 +21,6 @@ class HelperArgument extends Argument
     }
 
     /**
-     * @return string
-     */
-    public function getValue() : string
-    {
-        return "(" . $this->rawValue . ")";
-    }
-
-    /**
      * @return ArgumentList
      */
     public function getArgumentList() : ArgumentList

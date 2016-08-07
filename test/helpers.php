@@ -242,6 +242,11 @@ class Helpers extends \PHPUnit_Framework_TestCase
                 array('abc' => 'abc', 'ghi' => 'ghi'),
                 'abcdefghijklmno',
             ),
+            "many nested concat" => array(
+                '{{ concat (concat   "abc"  (  concat "def" ghi   (concat "jkl" ) ) (concat "mno" "pqr")  )   (concat "stu" "vw" (concat xyz) ) "test"   }}',
+                array('ghi' => 'ghi', 'xyz' => 'xyz'),
+                'abcdefghijklmnopqrstuvwxyztest',
+            ),
         );
 
         foreach ($cases as $case) {
