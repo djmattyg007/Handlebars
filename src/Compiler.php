@@ -474,10 +474,9 @@ class Compiler
 
         $args[] = $this->generateHelperOptions($argumentList->getName(), $nodeValue, $hash, $depth + 1);
 
-        // TODO: Fix indentation when using doubly-nested helpers
         return $this->prettyPrint(sprintf(self::BLOCK_HELPERARG_OPEN, $argumentList->getName()), -1)
             . $this->prettyPrint('\r\t' . implode(',\r\t', $args), 1, -1)
-            . $this->prettyPrint(self::BLOCK_HELPERARG_CLOSE, 0, -1);
+            . $this->prettyPrint(self::BLOCK_HELPERARG_CLOSE, 0, -1 - $depth);
     }
 
     /**

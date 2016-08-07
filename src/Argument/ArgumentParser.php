@@ -34,7 +34,7 @@ class ArgumentParser
     public function __construct(string $string, ArgumentListFactory $argumentListFactory)
     {
         $this->string = trim($string);
-        $this->strlen = mb_strlen($string);
+        $this->strlen = mb_strlen($this->string);
         $this->argumentListFactory = $argumentListFactory;
     }
 
@@ -177,20 +177,16 @@ finishTokenise:
             $currentQuote = null;
         }
 
-        // TODO: Add depth counter for () pairs to support doubly-nested helpers
-        while ($this->nextChar() === true) {
+        $depth = 1;
+        while ($depth > 0 && $this->nextChar() === true) {
             $curChar = $this->curChar();
             $isWhitespace = $this->isWhitespace();
-            if ($currentQuote === null && $curChar === ")") {
-                break;
+            if ($currentQuote === null && $curChar === "(") {
+                $depth++;
+            } elseif ($currentQuote === null && $curChar === ")") {
+                $depth--;
             } elseif ($currentQuote === null && $isWhitespace === true) {
-                $this->nextChar();
-                $curChar = $this->curChar();
-                if ($curChar === ")") {
-                    goto finishHelperScan;
-                } elseif ($curChar === "'" || $curChar === '"') {
-                    $currentQuote = $curChar;
-                }
+                continue;
             } elseif ($currentQuote !== null && $curChar === "\\") {
                 $this->nextChar();
             } elseif ($currentQuote !== null && $curChar === $currentQuote) {
