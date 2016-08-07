@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace MattyG\Handlebars;
 
+use Countable;
+
 class Data
 {
     /**
@@ -74,7 +76,7 @@ class Data
                     }
 
                     //is it an array?
-                    if (is_array($current) || $current instanceof \Countable) {
+                    if (is_array($current) || $current instanceof Countable) {
                         return count($current);
                     }
 
