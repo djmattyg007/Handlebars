@@ -9,6 +9,6 @@ class ConcatHelper
     {
         $args = func_get_args();
         $options = array_pop($args);
-        return array_reduce($args, function($carry, $item) { return $carry . $item; }, "");
+        return implode("", $args);
     }
 }
