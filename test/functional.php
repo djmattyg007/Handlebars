@@ -93,7 +93,7 @@ class Functional extends \PHPUnit_Framework_TestCase
     {
         $template = $this->handlebars->compile('{{foo.length}}');
         $result = $template(array('foo' => array(1, 2, 3)));
-        $this->assertEquals(3, $result);
+        $this->assertEquals('3', $result);
     }
 
     public function testMustache()

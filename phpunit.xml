@@ -18,6 +18,7 @@
       <file>test/Data.php</file>
       <file>test/Handlebars.php</file>
       <file>test/Runtime.php</file>
+      <file>test/SafeString.php</file>
       <file>test/Tokenizer.php</file>
       <file>test/functional.php</file>
       <file>test/helpers.php</file>

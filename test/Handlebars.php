@@ -59,6 +59,19 @@ class HandlebarsTest extends \PHPUnit_Framework_TestCase
 
     public function testRegisterHelper2()
     {
+        $this->handlebars->registerHelper('pathjoin', function() {
+            $args = func_get_args();
+            $options = array_pop($args);
+            return implode(DIRECTORY_SEPARATOR, $args);
+        });
+
+        $template = $this->handlebars->compile('/{{ pathjoin (concat prefix "/bin") "php" }}');
+        $result = $template->render(array("prefix" => "usr" . DIRECTORY_SEPARATOR . "local"));
+        $this->assertEquals('/usr/local/bin/php', $result);
+    }
+
+    public function testRegisterHelper3()
+    {
         $found = false;
         $this->handlebars->registerHelper('foo', function(
             $bar, 
@@ -84,7 +97,7 @@ class HandlebarsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(5, $result);
     }
 
-    public function testRegisterHelper3()
+    public function testRegisterHelper4()
     {
         $found = false;
         $this->handlebars->registerHelper('foo', function(
@@ -107,7 +120,7 @@ class HandlebarsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('some"thi " ng'."some'thi ' ng", $result);
     }
 
-    public function testRegisterHelper4()
+    public function testRegisterHelper5()
     {
         //attributes test
         $found = false;
