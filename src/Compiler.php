@@ -215,7 +215,7 @@ class Compiler
         }
 
         //lookout for partials
-        if (substr($node["value"], 0, 2) === "> ") {
+        if (mb_substr($node["value"], 0, 2) === "> ") {
             return $this->generatePartial($node);
         }
 
