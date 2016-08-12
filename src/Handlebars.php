@@ -13,7 +13,7 @@ namespace MattyG\Handlebars;
 
 class Handlebars
 {
-    const VERSION = "7.0.0";
+    const VERSION = "7.0.1";
 
     const COMPILE_ERROR = "%s on line %s \n```\n%s\n```\n";
 
@@ -61,6 +61,7 @@ class Handlebars
     /**
      * @param Runtime $runtime
      * @param Compiler $compiler
+     * @param DataFactory $dataFactory
      */
     public function __construct(Runtime $runtime, Compiler $compiler, DataFactory $dataFactory)
     {

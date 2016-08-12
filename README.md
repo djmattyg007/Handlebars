@@ -30,13 +30,25 @@ $runtime = new Runtime();
 $helperlessRuntime = new Runtime(false);
 ```
 
-The Compiler has two dependencies: the Runtime, and a factory to produce Tokenizers. Each time a
-new Template is compiled, a new Tokenizer is created using the Tokernizer factory.
+Next, we need a factory to generate Argument Parsers. This itself requires a factory to generate
+Argument Lists.
+
+```php
+use MattyG\Handlebars\Argument\ArgumentListFactory;
+use MattyG\Handlebars\Argument\ArgumentParserFactory;
+$argumentParserFactory = new ArgumentParserFactory(new ArgumentListFactory());
+
+```
+
+The Compiler has three dependencies: the Runtime, a factory to produce Tokenizers, and a factory to
+produce Argument Parsers. Each time a new Template is compiled, a new Tokenizer is created using
+the Tokernizer factory. While a template is being compiled, a new Argument Parser is created using
+the Argumetn Parser factory whenever a non-partial tag is found in the template.
 
 ```php
 use MattyG\Handlebars\Compiler;
 use MattyG\Handlebars\TokenizerFactory;
-$compiler = new Compiler($runtime, new TokenizerFactory());
+$compiler = new Compiler($runtime, new TokenizerFactory(), $argumentParserFactory);
 ```
 
 Finally, we instanstiate the actual Handlebars object. This is the object you'll be interacting
