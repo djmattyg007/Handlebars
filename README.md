@@ -110,8 +110,6 @@ echo $template->render(array('foo' => 'BAR'));
      - unless
      - with
 
-====
-
 ## Production Ready
 
 When your templates are ready for a production (live) environment, it is recommended that caching be used. To enable cache:
@@ -119,8 +117,6 @@ When your templates are ready for a production (live) environment, it is recomme
  - Create a cache folder and make sure permissions are properly set for handlebars to write files to it.
  - Enable cache by using `$handlebars->setCachePath(__DIR__ . '/your/cache/folder/location');`
  - The code will not attempt to create the specified folder if it doesn't exist.
-
-====
 
 ## API
 
@@ -148,8 +144,6 @@ $template = $handlebars->compile('{{foo}} {{bar}}');
 echo $template->render(array('foo' => 'FOO', 'bar' => 'BAR'));
 // result: 'FOO BAR'
 ```
-
-==== 
 
 ### registerHelper
 
@@ -185,12 +179,10 @@ echo $template(array('foo' => 'FOO'));
 ```php
 use MattyG\Handlebars\SafeString;
 $handlebars->registerHelper('safehelper', function($value) { return new SafeString($value . '&BAZ'); });
-$template = $handlebars->compile('{foo}} {{safehelper 'BAR'}}');
+$template = $handlebars->compile('{{foo}} {{safehelper 'BAR'}}');
 echo $template->render(array('foo' => 'FOO'));
 // result: 'FOO BAR&BAZ'
 ```
-
-==== 
 
 ### registerPartial
 
@@ -216,8 +208,6 @@ echo $template->render(array('result' => 3));
 // result: '1 + 2 = 3'
 ```
 
-==== 
-
 ### setCachePath
 
 Enables caching of compiled templates.
@@ -237,8 +227,6 @@ $handlebars->setCachePath(string $cachePath);
 ```php
 $handlebars->setCachePath('/path/to/cache/folder');
 ```
-
-====  
 
 ### setNamePrefix
 
@@ -261,6 +249,6 @@ $handlebars->setNamePrefix(string $namePrefix);
 $handlebars->setNamePrefix('special-template-');
 ```
 
-#Contributing
+## Contributing
 
 All contributions are welcome. Ideally, all code contributions will come with new or updated tests :)
