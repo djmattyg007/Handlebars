@@ -15,7 +15,7 @@ namespace MattyG\Handlebars\Test;
 use MattyG\Handlebars;
 use PHPUnit\Framework\TestCase;
 
-class Data extends TestCase
+class DataTest extends TestCase
 {
     public function testFind()
     {

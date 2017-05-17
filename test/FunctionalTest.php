@@ -15,7 +15,7 @@ namespace MattyG\Handlebars\Test;
 use MattyG\Handlebars;
 use PHPUnit\Framework\TestCase;
 
-class Functional extends TestCase
+class FunctionalTest extends TestCase
 {
     /**
      * @var Handlebars\Handlebars

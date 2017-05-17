@@ -15,7 +15,7 @@ namespace MattyG\Handlebars\Test;
 use MattyG\Handlebars;
 use PHPUnit\Framework\TestCase;
  
-class Runtime extends TestCase
+class RuntimeTest extends TestCase
 {
     /**
      * @var callable

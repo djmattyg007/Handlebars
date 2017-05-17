@@ -6,7 +6,7 @@ namespace MattyG\Handlebars\Test\Argument;
 use MattyG\Handlebars;
 use PHPUnit\Framework\TestCase;
 
-class ArgumentParser extends TestCase
+class ArgumentParserTest extends TestCase
 {
     /**
      * @var Handlebars\Argument\ArgumentParserFactory

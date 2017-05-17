@@ -15,7 +15,7 @@ namespace MattyG\Handlebars\Test;
 use MattyG\Handlebars;
 use PHPUnit\Framework\TestCase;
 
-class Tokenizer extends TestCase
+class TokenizerTest extends TestCase
 {
     public function testTokenize()
     {

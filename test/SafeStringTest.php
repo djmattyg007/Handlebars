@@ -6,7 +6,7 @@ namespace MattyG\Handlebars\Test;
 use MattyG\Handlebars;
 use PHPUnit\Framework\TestCase;
 
-class SafeString extends TestCase
+class SafeStringTest extends TestCase
 {
     /**
      * @var Handlebars\Runtime
