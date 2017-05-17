@@ -4,8 +4,9 @@ declare(strict_types=1);
 namespace MattyG\Handlebars\Test\Argument;
 
 use MattyG\Handlebars;
+use PHPUnit\Framework\TestCase;
 
-class ArgumentParser extends \PHPUnit_Framework_TestCase
+class ArgumentParser extends TestCase
 {
     /**
      * @var Handlebars\Argument\ArgumentParserFactory

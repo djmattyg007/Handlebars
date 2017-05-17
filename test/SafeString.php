@@ -4,8 +4,9 @@ declare(strict_types=1);
 namespace MattyG\Handlebars\Test;
 
 use MattyG\Handlebars;
+use PHPUnit\Framework\TestCase;
 
-class SafeString extends \PHPUnit_Framework_TestCase
+class SafeString extends TestCase
 {
     /**
      * @var Handlebars\Runtime

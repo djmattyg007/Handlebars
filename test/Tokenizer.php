@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 /**
  * This file was formerly part of the Eden PHP Library.
  * (c) 2014-2016 Openovate Labs
@@ -9,11 +8,14 @@ declare(strict_types=1);
  * distributed with this package.
  */
 
+declare(strict_types=1);
+
 namespace MattyG\Handlebars\Test;
 
 use MattyG\Handlebars;
+use PHPUnit\Framework\TestCase;
 
-class Tokenizer extends \PHPUnit_Framework_TestCase
+class Tokenizer extends TestCase
 {
     public function testTokenize()
     {
