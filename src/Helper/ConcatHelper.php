@@ -5,9 +5,8 @@ namespace MattyG\Handlebars\Helper;
 
 class ConcatHelper
 {
-    public function __invoke()
+    public function __invoke(...$args)
     {
-        $args = func_get_args();
         $options = array_pop($args);
         return implode("", $args);
     }
