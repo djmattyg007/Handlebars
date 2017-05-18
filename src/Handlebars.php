@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace MattyG\Handlebars;
 
+use MattyG\Handlebars\Argument;
+
 class Handlebars
 {
     const VERSION = "7.0.1";
@@ -73,6 +75,18 @@ class Handlebars
         if (is_null(self::$layout)) {
             self::$layout = file_get_contents(__DIR__ . '/layout.template');
         }
+    }
+
+    /**
+     * @param bool $addDefaultHelpers
+     * @return Handlebars
+     */
+    public static function newInstance(bool $addDefaultHelpers = true)
+    {
+        $runtime = new Runtime($addDefaultHelpers);
+        $argumentParserFactory = new Argument\ArgumentParserFactory(new Argument\ArgumentListFactory());
+        $compiler = new Compiler($runtime, new TokenizerFactory(), $argumentParserFactory);
+        return new static($runtime, $compiler, new DataFactory());
     }
 
     /**

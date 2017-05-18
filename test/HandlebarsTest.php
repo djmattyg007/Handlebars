@@ -35,6 +35,12 @@ class HandlebarsTest extends TestCase
         $this->handlebars = null;
     }
 
+    public function testNewInstance()
+    {
+        $handlebars = Handlebars\Handlebars::newInstance();
+        $this->assertInstanceOf(Handlebars\Handlebars::class, $handlebars);
+    }
+
     public function testCompile() 
     {
         $template = $this->handlebars->compile('{{foo}}{{{foo}}}');

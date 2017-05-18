@@ -66,6 +66,17 @@ It is recommended that you use a dependency injection system to handle construct
 Handlebars object, so that the only part you need to worry about is registering your helpers and
 partials, and actually compiling your templates.
 
+Alternatively, you can use a new convenience function for when you don't care about swapping out
+any of the components:
+
+```php
+use MattyG\Handlebars\Handlebars;
+$handlebars = Handlebars::newInstance();
+```
+
+The `newInstance()` method accepts the same boolean parameter as the `Runtime` constructor, so you
+can still easily prevent the automatic addition of the default helpers.
+
 #### Rendering 
 
 ```php
