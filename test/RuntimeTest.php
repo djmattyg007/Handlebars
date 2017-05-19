@@ -152,8 +152,8 @@ class RuntimeTest extends TestCase
     }
 
     /**
-     * @expectedException MattyG\Handlebars\Exception
-     * @expectedExceptionMessage All Handlebars helpers must be callable
+     * @expectedException TypeError
+     * @expectedExceptionMessage Argument 2 passed to MattyG\Handlebars\Runtime::addHelper() must be callable, integer given
      */
     public function testAddNonCallableHelper()
     {

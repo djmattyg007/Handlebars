@@ -31,7 +31,7 @@ class ArgumentList
     /**
      * @return string
      */
-    public function getName() : string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -47,7 +47,7 @@ class ArgumentList
     /**
      * @return Argument[]
      */
-    public function getArguments() : array
+    public function getArguments(): array
     {
         return $this->args;
     }
@@ -64,7 +64,7 @@ class ArgumentList
     /**
      * @return Argument[]
      */
-    public function getNamedArguments() : array
+    public function getNamedArguments(): array
     {
         return $this->hash;
     }

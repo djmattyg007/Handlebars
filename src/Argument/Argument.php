@@ -21,7 +21,7 @@ class Argument
     /**
      * @return string
      */
-    public function getValue() : string
+    public function getValue(): string
     {
         return $this->rawValue;
     }
@@ -29,7 +29,7 @@ class Argument
     /**
      * @return string
      */
-    public function getRawValue() : string
+    public function getRawValue(): string
     {
         return $this->rawValue;
     }

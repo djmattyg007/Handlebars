@@ -117,7 +117,7 @@ class Compiler
      * @param int $startingOffset
      * @return string
      */
-    public function compile(string $source, int $startingOffset = 1) : string
+    public function compile(string $source, int $startingOffset = 1): string
     {
         $this->offset = $startingOffset;
         $tokenizer = $this->tokenizerFactory->create($source);
@@ -168,7 +168,7 @@ class Compiler
      * @param array $open
      * @return string
      */
-    protected function generateText(array $node) : string
+    protected function generateText(array $node): string
     {
         $buffer = '';
 
@@ -196,7 +196,7 @@ class Compiler
      * @param array $open
      * @return string
      */
-    protected function generateVariable(array $node, array &$open) : string
+    protected function generateVariable(array $node, array &$open): string
     {
         $node['value'] = trim($node['value']);
 
@@ -240,7 +240,7 @@ class Compiler
      * @param array $open
      * @return string
      */
-    protected function generateEscape(array $node, array &$open) : string
+    protected function generateEscape(array $node, array &$open): string
     {
         $node['value'] = trim($node['value']);
 
@@ -269,7 +269,7 @@ class Compiler
      * @param array $open
      * @return string
      */
-    protected function generateOpen(array $node, array &$open) : string
+    protected function generateOpen(array $node, array &$open): string
     {
         $node['value'] = trim($node['value']);
 
@@ -319,7 +319,7 @@ class Compiler
      * @param array $open
      * @return string
      */
-    protected function generateClose(array $node, array &$open) : string
+    protected function generateClose(array $node, array &$open): string
     {
         $node['value'] = trim($node['value']);
 
@@ -359,7 +359,7 @@ class Compiler
      * @return string
      * @throws Exception
      */
-    protected function generatePartial(array $node) : string
+    protected function generatePartial(array $node): string
     {
         $argumentList = $this->parseArguments($node['value']);
         $args = $argumentList->getArguments();
@@ -429,7 +429,7 @@ class Compiler
      * @param string $closingTag
      * @return string
      */
-    protected function generateHelper(ArgumentList $argumentList, string $nodeValue, string $closingTag) : string
+    protected function generateHelper(ArgumentList $argumentList, string $nodeValue, string $closingTag): string
     {
         $helperGen = array($this, "generateNestedHelper");
         $args = array_map(function(Argument $arg) use ($helperGen) {
@@ -458,7 +458,7 @@ class Compiler
      * @param int $depth
      * @return string
      */
-    protected function generateNestedHelper(ArgumentList $argumentList, string $nodeValue, int $depth = 0) : string
+    protected function generateNestedHelper(ArgumentList $argumentList, string $nodeValue, int $depth = 0): string
     {
         $helperGen = array($this, "generateNestedHelper");
         $args = array_map(function(Argument $arg) use ($helperGen, $depth) {
@@ -487,7 +487,7 @@ class Compiler
      * @param int $depth
      * @return string
      */
-    protected function generateHelperOptions(string $name, string $nodeValue, array $hash, int $depth = 0) : string
+    protected function generateHelperOptions(string $name, string $nodeValue, array $hash, int $depth = 0): string
     {
         return $this->prettyPrint(self::BLOCK_OPTIONS_OPEN, $depth, 2)
             . $this->prettyPrint(sprintf(self::BLOCK_OPTIONS_NAME, $name))
@@ -506,7 +506,7 @@ class Compiler
      * @return ArgumentList
      * @throws Exception
      */
-    protected function parseArguments(string $string) : ArgumentList
+    protected function parseArguments(string $string): ArgumentList
     {
         $argParser = $this->argumentParserFactory->create($string);
         return $argParser->tokenise();
@@ -520,7 +520,7 @@ class Compiler
      * @param int $after Used to set the token after spacing
      * @return string
      */
-    protected function prettyPrint(string $code, int $before = 0, int $after = 0) : string
+    protected function prettyPrint(string $code, int $before = 0, int $after = 0): string
     {
         $this->offset += $before;
 

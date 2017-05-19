@@ -22,7 +22,7 @@ class ArgumentListFactory
      * @param string $name
      * @return ArgumentList
      */
-    public function create(string $name) : ArgumentList
+    public function create(string $name): ArgumentList
     {
         $classname = $this->classname;
         return new $classname($name);

@@ -22,7 +22,7 @@ class DataFactory
      * @param array $data
      * @return Data
      */
-    public function create(array $data) : Data
+    public function create(array $data): Data
     {   
         $classname = $this->classname;
         return new $classname($data);

@@ -81,7 +81,7 @@ class Handlebars
      * @param bool $addDefaultHelpers
      * @return Handlebars
      */
-    public static function newInstance(bool $addDefaultHelpers = true)
+    public static function newInstance(bool $addDefaultHelpers = true): Handlebars
     {
         $runtime = new Runtime($addDefaultHelpers);
         $argumentParserFactory = new Argument\ArgumentParserFactory(new Argument\ArgumentListFactory());
@@ -95,7 +95,7 @@ class Handlebars
      * @param string $source The template string
      * @return callable The template binding handler
      */
-    public function compile(string $source) : callable
+    public function compile(string $source): callable
     {
         $name = $this->namePrefix . md5(self::VERSION . $source);
 
@@ -122,7 +122,7 @@ returner:
      * @param string $filename
      * @return bool
      */
-    protected function loadCache(string $filename) : bool
+    protected function loadCache(string $filename): bool
     {
         if ($this->cachePath === null) {
             return false;
@@ -162,7 +162,7 @@ returner:
      * @param callable $helper The helper handler
      * @return Handlebars
      */
-    public function registerHelper(string $name, $helper) : Handlebars
+    public function registerHelper(string $name, callable $helper): Handlebars
     {
         $this->runtime->addHelper($name, $helper);
         return $this;
@@ -176,7 +176,7 @@ returner:
      * @param string $partial
      * @return Handlebars
      */
-    public function registerPartial(string $name, string $partial) : Handlebars
+    public function registerPartial(string $name, string $partial): Handlebars
     {
         $this->runtime->addPartial($name, $partial);
         return $this;
@@ -189,7 +189,7 @@ returner:
      * @param string $cachePath The cache path
      * @return Handlebars
      */
-    public function setCachePath(string $cachePath) : Handlebars
+    public function setCachePath(string $cachePath): Handlebars
     {
         $this->cachePath = $cachePath;
         return $this;
@@ -201,7 +201,7 @@ returner:
      * @param string $namePrefix
      * @return Handlebars
      */
-    public function setNamePrefix(string $namePrefix) : Handlebars
+    public function setNamePrefix(string $namePrefix): Handlebars
     {
         $this->namePrefix = $namePrefix;
         return $this;

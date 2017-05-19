@@ -30,6 +30,7 @@ class ArgumentParser
 
     /**
      * @param string $string The string to be tokenised.
+     * @param ArgumentListFactory $argumentListFactory
      */
     public function __construct(string $string, ArgumentListFactory $argumentListFactory)
     {
@@ -42,7 +43,7 @@ class ArgumentParser
      * @return ArgumentList
      * @throws Exception
      */
-    public function tokenise() : ArgumentList
+    public function tokenise(): ArgumentList
     {
         $this->index = 0;
 
@@ -146,7 +147,7 @@ finishTokenise:
     /**
      * @return HelperArgument
      */
-    protected function gatherHelperArgument() : HelperArgument
+    protected function gatherHelperArgument(): HelperArgument
     {
         $startIndex = $this->index;
 
@@ -202,9 +203,9 @@ finishHelperScan:
     }
 
     /**
-     * @return string
+     * @return string Always a string of length 1
      */
-    protected function curChar() : string
+    protected function curChar(): string
     {
         return mb_substr($this->string, $this->index, 1);
     }
@@ -215,7 +216,7 @@ finishHelperScan:
      *
      * @return bool
      */
-    protected function nextChar() : bool
+    protected function nextChar(): bool
     {
         if ($this->canNext() === true) {
             $this->index++;
@@ -228,7 +229,7 @@ finishHelperScan:
     /**
      * @return bool
      */
-    protected function canNext() : bool
+    protected function canNext(): bool
     {
         return $this->index + 1 < $this->strlen;
     }
@@ -238,7 +239,7 @@ finishHelperScan:
      *
      * @return bool
      */
-    protected function isWhiteSpace() : bool
+    protected function isWhiteSpace(): bool
     {
         $curChar = $this->curChar();
         return trim($curChar) !== $curChar;

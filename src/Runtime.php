@@ -45,11 +45,8 @@ class Runtime
      * @param string $name The name of the helper
      * @param callable $helper The helper
      */
-    public function addHelper(string $name, $helper)
+    public function addHelper(string $name, callable $helper)
     {
-        if (is_callable($helper) === false) {
-            throw new Exception("All Handlebars helpers must be callable");
-        }
         $this->helpers[$name] = $helper;
     }
 

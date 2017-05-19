@@ -23,7 +23,7 @@ class HelperArgument extends Argument
     /**
      * @return ArgumentList
      */
-    public function getArgumentList() : ArgumentList
+    public function getArgumentList(): ArgumentList
     {
         return $this->argumentList;
     }

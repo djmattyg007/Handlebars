@@ -13,7 +13,7 @@ class VariableArgument extends Argument
     /**
      * @return string
      */
-    public function getValue() : string
+    public function getValue(): string
     {
         $returnValue = str_replace("'", '\\\'', $this->rawValue);
         return sprintf(self::BLOCK_VARIABLE_ARGUMENT, $returnValue);

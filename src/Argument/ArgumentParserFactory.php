@@ -29,7 +29,7 @@ class ArgumentParserFactory
      * @param string $string
      * @return ArgumentParser
      */
-    public function create(string $string) : ArgumentParser
+    public function create(string $string): ArgumentParser
     {
         $classname = $this->classname;
         return new $classname($string, $this->argumentListFactory);

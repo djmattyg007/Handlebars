@@ -8,7 +8,7 @@ class StringArgument extends Argument
     /**
      * @return string
      */
-    public function getValue() : string
+    public function getValue(): string
     {
         return "'" . str_replace("'", '\\\'', $this->rawValue) . "'";
     }

@@ -171,7 +171,7 @@ class Tokenizer
      * @param callable $callback
      * @return Tokenizer
      */
-    protected function flushText(int $i, $callback)
+    protected function flushText(int $i, callable $callback): Tokenizer
     {
         if ($this->type !== self::TYPE_TEXT || !mb_strlen($this->buffer)) {
             return $this;
@@ -199,7 +199,7 @@ class Tokenizer
      * @param bool $escape
      * @return int
      */
-    protected function findVariable(int $i, bool $escape) : int
+    protected function findVariable(int $i, bool $escape): int
     {
         $close = ($escape === true ? '}}}' : '}}');
 
@@ -215,7 +215,7 @@ class Tokenizer
      * @param string $string
      * @return string
      */
-    protected function trim(string $string) : string
+    protected function trim(string $string): string
     {
         $string = preg_replace('#\s*\{\{\{\~\s*#is', '{{{', $string);
         $string = preg_replace('#\s*\~\}\}\}\s*#is', '}}}', $string);

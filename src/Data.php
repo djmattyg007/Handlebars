@@ -126,7 +126,7 @@ class Data
      * @param array $data
      * @return Data
      */
-    public function push(array $data)
+    public function push(array $data): Data
     {
         array_unshift($this->tree, $data);
         return $this;
@@ -137,7 +137,7 @@ class Data
      *
      * @return Data
      */
-    public function pop()
+    public function pop(): Data
     {
         array_shift($this->tree);
         return $this;

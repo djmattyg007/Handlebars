@@ -31,7 +31,7 @@ abstract class Template
      * @param array $context
      * @return string The rendered template
      */
-    public function __invoke(array $context = array()) : string
+    public function __invoke(array $context = array()): string
     {
         return $this->render($context);
     }
@@ -40,7 +40,7 @@ abstract class Template
      * @param array $context
      * @return string The rendered template
      */
-    public function render(array $context = array()) : string
+    public function render(array $context = array()): string
     {
         $data = $this->dataFactory->create($context);
         return $this->_render($data);
@@ -50,5 +50,5 @@ abstract class Template
      * @param Data $data
      * @return string
      */
-    abstract protected function _render(Data $data) : string;
+    abstract protected function _render(Data $data): string;
 }

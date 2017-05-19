@@ -22,7 +22,7 @@ class TokenizerFactory
      * @param string $source
      * @return Tokenizer
      */
-    public function create(string $source) : Tokenizer
+    public function create(string $source): Tokenizer
     {   
         $classname = $this->classname;
         return new $classname($source);
