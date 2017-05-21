@@ -59,7 +59,7 @@ class RuntimeTest extends TestCase
         $template = $handlebars->compile('{{root}}/bower_components/eve-font-awesome/awesome.css');
 
         $result = $template();
-        $this->assertEquals('/some/root/bower_components/eve-font-awesome/awesome.css', $result);
+        $this->assertSame('/some/root/bower_components/eve-font-awesome/awesome.css', $result);
     }
 
     public function testAddHelper2()
@@ -74,12 +74,12 @@ class RuntimeTest extends TestCase
             $false,
             $zoo
         ) use (&$found) {
-            $this->assertEquals('', $bar);
-            $this->assertEquals(4, $four);
+            $this->assertSame(null, $bar);
+            $this->assertSame(4, $four);
             $this->assertTrue($true);
             $this->assertNull($null);
             $this->assertFalse($false);
-            $this->assertEquals('foobar', $zoo);
+            $this->assertSame('foobar', $zoo);
             $found = true;
             return $four + 1;
         });
@@ -87,9 +87,9 @@ class RuntimeTest extends TestCase
 
         $template = $handlebars->compile('{{foo bar 4 true null false zoo}}');
 
-        $result = $template(array('zoo' => 'foobar'));
+        $result = $template(array("zoo" => "foobar"));
         $this->assertTrue($found);
-        $this->assertEquals(5, $result);
+        $this->assertSame("5", $result);
     }
 
     public function testAddHelper3()
@@ -102,10 +102,10 @@ class RuntimeTest extends TestCase
             $number2, 
             $something2
         ) use (&$found) {
-            $this->assertEquals(4.5, $number);
-            $this->assertEquals(4, $number2);
-            $this->assertEquals('some"thi " ng', $something1);
-            $this->assertEquals("some'thi ' ng", $something2);
+            $this->assertSame(4.5, $number);
+            $this->assertSame(4, $number2);
+            $this->assertSame('some"thi " ng', $something1);
+            $this->assertSame("some'thi ' ng", $something2);
             $found = true;
             return $something1 . $something2;
         });
@@ -115,7 +115,7 @@ class RuntimeTest extends TestCase
 
         $result = $template();
         $this->assertTrue($found);
-        $this->assertEquals('some"thi " ng'."some'thi ' ng", $result);
+        $this->assertSame('some"thi " ng'."some'thi ' ng", $result);
     }
 
     public function testAddHelper4()
@@ -130,13 +130,13 @@ class RuntimeTest extends TestCase
             $something2,
             $options
         ) use (&$found) {
-            $this->assertEquals(4.5, $number);
-            $this->assertEquals(4, $number2);
-            $this->assertEquals('some"thi " ng', $something1);
-            $this->assertEquals("some'thi ' ng", $something2);
+            $this->assertSame(4.5, $number);
+            $this->assertSame(4, $number2);
+            $this->assertSame('some"thi " ng', $something1);
+            $this->assertSame("some'thi ' ng", $something2);
             $this->assertFalse($options['hash']['dog']);
-            $this->assertEquals('meow', $options['hash']['cat']);
-            $this->assertEquals('squeak squeak', $options['hash']['mouse']);
+            $this->assertSame('meow', $options['hash']['cat']);
+            $this->assertSame('squeak squeak', $options['hash']['mouse']);
             $found = true;
             return $number2 + 1;
         });
@@ -146,9 +146,9 @@ class RuntimeTest extends TestCase
             '{{foo 4bar4 4.5 \'some"thi " ng\' 4 "some\'thi \' ng" '
             .'dog=false cat="meow" mouse=\'squeak squeak\'}}');
 
-        $result = $template(array('zoo' => 'foobar'));
+        $result = $template(array("zoo" => "foobar"));
         $this->assertTrue($found);
-        $this->assertEquals(5, $result);
+        $this->assertSame("5", $result);
     }
 
     /**
@@ -180,7 +180,7 @@ class RuntimeTest extends TestCase
         $template = $handlebars->compile("{{> foo }} ... {{> bar }}");
 
         $result = $template->render(array("foo" => "FOO", "bar" => "BAR"));
-        $this->assertEquals("This is FOO ... Foo is not BAR", $result);
+        $this->assertSame("This is FOO ... Foo is not BAR", $result);
     }
 
     public function testAddPartial2()
@@ -193,7 +193,7 @@ class RuntimeTest extends TestCase
         $template = $handlebars->compile("{{> foo }} ... {{> bar zoo}}");
 
         $result = $template->render(array("foo" => "FOO", "bar" => "BAR", "zoo" => array("bar" => "ZOO")));
-        $this->assertEquals("This is FOO ... Foo is not ZOO", $result);
+        $this->assertSame("This is FOO ... Foo is not ZOO", $result);
     }
 
     public function testAddPartial3()
@@ -206,6 +206,6 @@ class RuntimeTest extends TestCase
         $template = $handlebars->compile("{{> foo }} ... {{> bar zoo something='Amazing'}}");
 
         $result = $template->render(array("foo" => "FOO", "bar" => "BAR", "zoo" => array("bar" => "ZOO")));
-        $this->assertEquals("This is FOO ... Foo is not Amazing", $result);
+        $this->assertSame("This is FOO ... Foo is not Amazing", $result);
     }
 }

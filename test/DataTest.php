@@ -30,11 +30,11 @@ class DataTest extends TestCase
         ));
 
         $this->assertInstanceOf(Handlebars\Data::class, $data);
-        $this->assertEquals(123, $data->find('product_id'));
-        $this->assertEquals('Hello World', $data->find('product_title'));
-        $this->assertEquals('this is good', $data->find('product_comments.comment1'));
-        $this->assertEquals('this is great', $data->find('product_comments.comment2'));
-        $this->assertEquals('this is nice', $data->find('product_comments.comment3'));
+        $this->assertSame(123, $data->find('product_id'));
+        $this->assertSame('Hello World', $data->find('product_title'));
+        $this->assertSame('this is good', $data->find('product_comments.comment1'));
+        $this->assertSame('this is great', $data->find('product_comments.comment2'));
+        $this->assertSame('this is nice', $data->find('product_comments.comment3'));
     }
 
     public function testGet()
@@ -50,11 +50,11 @@ class DataTest extends TestCase
         )))->get();
 
         $this->assertTrue(is_array($data));
-        $this->assertEquals(123, $data['product_id']);
-        $this->assertEquals('Hello World', $data['product_title']);
-        $this->assertEquals('this is good', $data['product_comments']['comment1']);
-        $this->assertEquals('this is great', $data['product_comments']['comment2']);
-        $this->assertEquals('this is nice', $data['product_comments']['comment3']);
+        $this->assertSame(123, $data['product_id']);
+        $this->assertSame('Hello World', $data['product_title']);
+        $this->assertSame('this is good', $data['product_comments']['comment1']);
+        $this->assertSame('this is great', $data['product_comments']['comment2']);
+        $this->assertSame('this is nice', $data['product_comments']['comment3']);
     }
 
     public function testPush()
@@ -80,10 +80,10 @@ class DataTest extends TestCase
         ));
 
         $this->assertInstanceOf(Handlebars\Data::class, $data);
-        $this->assertEquals('Hello World', $data->find('../../product_title'));
-        $this->assertEquals('this is good', $data->find('../comment1'));
-        $this->assertEquals('this is great', $data->find('../../product_comments.comment2'));
-        $this->assertEquals('this is epic', $data->find('comment6'));
+        $this->assertSame('Hello World', $data->find('../../product_title'));
+        $this->assertSame('this is good', $data->find('../comment1'));
+        $this->assertSame('this is great', $data->find('../../product_comments.comment2'));
+        $this->assertSame('this is epic', $data->find('comment6'));
 
         $this->assertEquals('Hello World', $data->find('.././../product_title'));
         $this->assertEquals('this is good', $data->find('./../comment1'));
@@ -115,12 +115,12 @@ class DataTest extends TestCase
         ->pop();
 
         $this->assertInstanceOf(Handlebars\Data::class, $data);
-        $this->assertEquals('Hello World', $data->find('../product_title'));
-        $this->assertEquals('this is good', $data->find('comment1'));
-        $this->assertEquals('this is great', $data->find('../product_comments.comment2'));
+        $this->assertSame('Hello World', $data->find('../product_title'));
+        $this->assertSame('this is good', $data->find('comment1'));
+        $this->assertSame('this is great', $data->find('../product_comments.comment2'));
 
-        $this->assertEquals('Hello World', $data->find('./../product_title'));
-        $this->assertEquals('this is good', $data->find('./comment1'));
-        $this->assertEquals('this is great', $data->find('.././product_comments.comment2'));
+        $this->assertSame('Hello World', $data->find('./../product_title'));
+        $this->assertSame('this is good', $data->find('./comment1'));
+        $this->assertSame('this is great', $data->find('.././product_comments.comment2'));
     }
 }

@@ -131,7 +131,7 @@ class HelpersTest extends TestCase
         foreach ($cases as $case) {
             $template = $this->handlebars->compile($case[0]);
             $results = $template($case[1]);
-            $this->assertEquals($case[2], $results);
+            $this->assertSame($case[2], $results);
         }
     }
 
@@ -158,7 +158,7 @@ class HelpersTest extends TestCase
         foreach ($cases as $case) {
             $template = $this->handlebars->compile($case[0]);
             $results = $template($case[1]);
-            $this->assertEquals($case[2], $results);
+            $this->assertSame($case[2], $results);
         }
     }
 
@@ -180,7 +180,7 @@ class HelpersTest extends TestCase
         foreach ($cases as $case) {
             $template = $this->handlebars->compile($case[0]);
             $results = $template($case[1]);
-            $this->assertEquals($case[2], $results);
+            $this->assertSame($case[2], $results);
         }
     }
 
@@ -197,7 +197,7 @@ class HelpersTest extends TestCase
         foreach ($cases as $case) {
             $template = $this->handlebars->compile($case[0]);
             $results = $template($case[1]);
-            $this->assertEquals($case[2], $results);
+            $this->assertSame($case[2], $results);
         }
     }
 
@@ -254,7 +254,7 @@ class HelpersTest extends TestCase
         foreach ($cases as $case) {
             $template = $this->handlebars->compile($case[0]);
             $results = $template($case[1]);
-            $this->assertEquals($case[2], $results);
+            $this->assertSame($case[2], $results);
         }
     }
 
@@ -290,6 +290,6 @@ class HelpersTest extends TestCase
             'query' => array('profile_id' => '123', 'profile_name' => 'John')
         ));
 
-        $this->assertEquals('123JohnYes1JaneYes1JillYes1', $results);
+        $this->assertSame('123JohnYes1JaneYes1JillYes1', $results);
     }
 }
