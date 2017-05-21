@@ -3,19 +3,19 @@ declare(strict_types=1);
 
 namespace MattyG\Handlebars\Test\Argument;
 
-use MattyG\Handlebars;
+use MattyG\Handlebars\Argument;
 use PHPUnit\Framework\TestCase;
 
 class ArgumentParserTest extends TestCase
 {
     /**
-     * @var Handlebars\Argument\ArgumentParserFactory
+     * @var Argument\ArgumentParserFactory
      */
     protected $argumentParserFactory;
 
     protected function setUp()
     {
-        $this->argumentParserFactory = new Handlebars\Argument\ArgumentParserFactory(new Handlebars\Argument\ArgumentListFactory());
+        $this->argumentParserFactory = new Argument\ArgumentParserFactory(new Argument\ArgumentListFactory());
     }
 
     protected function tearDown()
@@ -32,10 +32,10 @@ class ArgumentParserTest extends TestCase
 
         $args = $argumentList->getArguments();
         $this->assertCount(2, $args);
-        $this->assertInstanceOf(Handlebars\Argument\StringArgument::class, $args[0]);
+        $this->assertInstanceOf(Argument\StringArgument::class, $args[0]);
         $this->assertSame("'merchant'", $args[0]->getValue());
         $this->assertSame('merchant', $args[0]->getRawValue());
-        $this->assertInstanceOf(Handlebars\Argument\VariableArgument::class, $args[1]);
+        $this->assertInstanceOf(Argument\VariableArgument::class, $args[1]);
         $this->assertSame('$data->find(\'query.profile_type\')', $args[1]->getValue());
         $this->assertSame('query.profile_type', $args[1]->getRawValue());
 
@@ -52,31 +52,31 @@ class ArgumentParserTest extends TestCase
 
         $args = $argumentList->getArguments();
         $this->assertCount(5, $args);
-        $this->assertInstanceOf(Handlebars\Argument\VariableArgument::class, $args[0]);
+        $this->assertInstanceOf(Argument\VariableArgument::class, $args[0]);
         $this->assertSame('$data->find(\'4bar4\')', $args[0]->getValue());
         $this->assertSame('4bar4', $args[0]->getRawValue());
-        $this->assertInstanceOf(Handlebars\Argument\Argument::class, $args[1]);
+        $this->assertInstanceOf(Argument\Argument::class, $args[1]);
         $this->assertSame('4.5', $args[1]->getValue());
         $this->assertSame('4.5', $args[1]->getRawValue());
-        $this->assertInstanceOf(Handlebars\Argument\StringArgument::class, $args[2]);
+        $this->assertInstanceOf(Argument\StringArgument::class, $args[2]);
         $this->assertSame("'some\"thi \" ng'", $args[2]->getValue());
         $this->assertSame("some\"thi \" ng", $args[2]->getRawValue());
-        $this->assertInstanceOf(Handlebars\Argument\Argument::class, $args[3]);
+        $this->assertInstanceOf(Argument\Argument::class, $args[3]);
         $this->assertSame('4', $args[3]->getValue());
         $this->assertSame('4', $args[3]->getRawValue());
-        $this->assertInstanceOf(Handlebars\Argument\StringArgument::class, $args[4]);
+        $this->assertInstanceOf(Argument\StringArgument::class, $args[4]);
         $this->assertSame("'some\\'thi \\' ng'", $args[4]->getValue());
         $this->assertSame("some'thi ' ng", $args[4]->getRawValue());
 
         $hash = $argumentList->getNamedArguments();
         $this->assertCount(3, $hash);
-        $this->assertInstanceOf(Handlebars\Argument\Argument::class, $hash['dog']);
+        $this->assertInstanceOf(Argument\Argument::class, $hash['dog']);
         $this->assertSame('false', $hash['dog']->getValue());
         $this->assertSame('false', $hash['dog']->getRawValue());
-        $this->assertInstanceOf(Handlebars\Argument\StringArgument::class, $hash['cat']);
+        $this->assertInstanceOf(Argument\StringArgument::class, $hash['cat']);
         $this->assertSame("'meow'", $hash['cat']->getValue());
         $this->assertSame("meow", $hash['cat']->getRawValue());
-        $this->assertInstanceOf(Handlebars\Argument\StringArgument::class, $hash['mouse']);
+        $this->assertInstanceOf(Argument\StringArgument::class, $hash['mouse']);
         $this->assertSame("'squeak squeak'", $hash['mouse']->getValue());
         $this->assertSame("squeak squeak", $hash['mouse']->getRawValue());
     }
@@ -90,13 +90,13 @@ class ArgumentParserTest extends TestCase
 
         $args = $argumentList->getArguments();
         $this->assertCount(3, $args);
-        $this->assertInstanceOf(Handlebars\Argument\StringArgument::class, $args[0]);
+        $this->assertInstanceOf(Argument\StringArgument::class, $args[0]);
         $this->assertSame("'TODAY\\'S'", $args[0]->getValue());
         $this->assertSame("TODAY'S", $args[0]->getRawValue());
-        $this->assertInstanceOf(Handlebars\Argument\VariableArgument::class, $args[1]);
+        $this->assertInstanceOf(Argument\VariableArgument::class, $args[1]);
         $this->assertSame('$data->find(\'BEST\')', $args[1]->getValue());
         $this->assertSame("BEST", $args[1]->getRawValue());
-        $this->assertInstanceOf(Handlebars\Argument\VariableArgument::class, $args[2]);
+        $this->assertInstanceOf(Argument\VariableArgument::class, $args[2]);
         $this->assertSame('$data->find(\'DEALS\\\'\')', $args[2]->getValue());
         $this->assertSame("DEALS'", $args[2]->getRawValue());
 
@@ -129,19 +129,19 @@ class ArgumentParserTest extends TestCase
 
         $args = $argumentList->getArguments();
         $this->assertCount(3, $args);
-        $this->assertInstanceOf(Handlebars\Argument\VariableArgument::class, $args[0]);
+        $this->assertInstanceOf(Argument\VariableArgument::class, $args[0]);
         $this->assertEquals('$data->find(\'a\')', $args[0]->getValue());
         $this->assertEquals("a", $args[0]->getRawValue());
-        $this->assertInstanceOf(Handlebars\Argument\StringArgument::class, $args[1]);
+        $this->assertInstanceOf(Argument\StringArgument::class, $args[1]);
         $this->assertEquals("'b'", $args[1]->getValue());
         $this->assertEquals("b", $args[1]->getRawValue());
-        $this->assertInstanceOf(Handlebars\Argument\VariableArgument::class, $args[2]);
+        $this->assertInstanceOf(Argument\VariableArgument::class, $args[2]);
         $this->assertEquals('$data->find(\'cd\')', $args[2]->getValue());
         $this->assertEquals("cd", $args[2]->getRawValue());
 
         $hash = $argumentList->getNamedArguments();
         $this->assertCount(1, $hash);
-        $this->assertInstanceOf(Handlebars\Argument\VariableArgument::class, $hash['hash']);
+        $this->assertInstanceOf(Argument\VariableArgument::class, $hash['hash']);
         $this->assertEquals('$data->find(\'hashed\')', $hash['hash']->getValue());
         $this->assertEquals("hashed", $hash['hash']->getRawValue());
     }
@@ -155,19 +155,19 @@ class ArgumentParserTest extends TestCase
 
         $args = $argumentList->getArguments();
         $this->assertCount(1, $args);
-        $this->assertInstanceOf(Handlebars\Argument\VariableArgument::class, $args[0]);
+        $this->assertInstanceOf(Argument\VariableArgument::class, $args[0]);
         $this->assertEquals('$data->find(\'m\')', $args[0]->getValue());
         $this->assertEquals("m", $args[0]->getRawValue());
 
         $hash = $argumentList->getNamedArguments();
         $this->assertCount(3, $hash);
-        $this->assertInstanceOf(Handlebars\Argument\VariableArgument::class, $hash['herp']);
+        $this->assertInstanceOf(Argument\VariableArgument::class, $hash['herp']);
         $this->assertEquals('$data->find(\'derp\')', $hash['herp']->getValue());
         $this->assertEquals("derp", $hash['herp']->getRawValue());
-        $this->assertInstanceOf(Handlebars\Argument\Argument::class, $hash['test']);
+        $this->assertInstanceOf(Argument\Argument::class, $hash['test']);
         $this->assertEquals("4", $hash['test']->getValue());
         $this->assertEquals("4", $hash['test']->getRawValue());
-        $this->assertInstanceOf(Handlebars\Argument\StringArgument::class, $hash['rofl']);
+        $this->assertInstanceOf(Argument\StringArgument::class, $hash['rofl']);
         $this->assertEquals("'copter'", $hash['rofl']->getValue());
         $this->assertEquals("copter", $hash['rofl']->getRawValue());
     }
@@ -181,16 +181,16 @@ class ArgumentParserTest extends TestCase
 
         $args = $argumentList->getArguments();
         $this->assertCount(1, $args);
-        $this->assertInstanceOf(Handlebars\Argument\Argument::class, $args[0]);
+        $this->assertInstanceOf(Argument\Argument::class, $args[0]);
         $this->assertEquals('null', $args[0]->getValue());
         $this->assertEquals('null', $args[0]->getRawValue());
 
         $hash = $argumentList->getNamedArguments();
         $this->assertCount(2, $hash);
-        $this->assertInstanceOf(Handlebars\Argument\VariableArgument::class, $hash['he"rp']);
+        $this->assertInstanceOf(Argument\VariableArgument::class, $hash['he"rp']);
         $this->assertEquals('$data->find(\'de\\\'rp\')', $hash['he"rp']->getValue());
         $this->assertEquals("de'rp", $hash['he"rp']->getRawValue());
-        $this->assertInstanceOf(Handlebars\Argument\Argument::class, $hash["be'ep"]);
+        $this->assertInstanceOf(Argument\Argument::class, $hash["be'ep"]);
         $this->assertEquals('true', $hash["be'ep"]->getValue());
         $this->assertEquals('true', $hash["be'ep"]->getRawValue());
     }
@@ -204,13 +204,13 @@ class ArgumentParserTest extends TestCase
 
         $args = $argumentList->getArguments();
         $this->assertCount(3, $args);
-        $this->assertInstanceOf(Handlebars\Argument\StringArgument::class, $args[0]);
+        $this->assertInstanceOf(Argument\StringArgument::class, $args[0]);
         $this->assertEquals("'aaa'", $args[0]->getValue());
         $this->assertEquals('aaa', $args[0]->getRawValue());
-        $this->assertInstanceOf(Handlebars\Argument\HelperArgument::class, $args[1]);
+        $this->assertInstanceOf(Argument\HelperArgument::class, $args[1]);
         $this->assertEquals(' mnop  "bbb"  4 test1  ', $args[1]->getValue());
         $this->assertEquals(' mnop  "bbb"  4 test1  ', $args[1]->getRawValue());
-        $this->assertInstanceOf(Handlebars\Argument\VariableArgument::class, $args[2]);
+        $this->assertInstanceOf(Argument\VariableArgument::class, $args[2]);
         $this->assertEquals('$data->find(\'test2\')', $args[2]->getValue());
         $this->assertEquals('test2', $args[2]->getRawValue());
 
@@ -218,13 +218,13 @@ class ArgumentParserTest extends TestCase
         $this->assertEquals('mnop', $helper1ArgList->getName());
         $helper1Args = $helper1ArgList->getArguments();
         $this->assertCount(3, $helper1Args);
-        $this->assertInstanceOf(Handlebars\Argument\StringArgument::class, $helper1Args[0]);
+        $this->assertInstanceOf(Argument\StringArgument::class, $helper1Args[0]);
         $this->assertEquals("'bbb'", $helper1Args[0]->getValue());
         $this->assertEquals('bbb', $helper1Args[0]->getRawValue());
-        $this->assertInstanceOf(Handlebars\Argument\Argument::class, $helper1Args[1]);
+        $this->assertInstanceOf(Argument\Argument::class, $helper1Args[1]);
         $this->assertEquals('4', $helper1Args[1]->getValue());
         $this->assertEquals('4', $helper1Args[1]->getRawValue());
-        $this->assertInstanceOf(Handlebars\Argument\VariableArgument::class, $helper1Args[2]);
+        $this->assertInstanceOf(Argument\VariableArgument::class, $helper1Args[2]);
         $this->assertEquals('$data->find(\'test1\')', $helper1Args[2]->getValue());
         $this->assertEquals('test1', $helper1Args[2]->getRawValue());
         $helper1Hash = $helper1ArgList->getNamedArguments();
@@ -243,13 +243,13 @@ class ArgumentParserTest extends TestCase
 
         $args = $argumentList->getArguments();
         $this->assertCount(3, $args);
-        $this->assertInstanceOf(Handlebars\Argument\HelperArgument::class, $args[0]);
+        $this->assertInstanceOf(Argument\HelperArgument::class, $args[0]);
         $this->assertEquals("pqrst ghikl beep='honk'", $args[0]->getValue());
         $this->assertEquals("pqrst ghikl beep='honk'", $args[0]->getRawValue());
-        $this->assertInstanceOf(Handlebars\Argument\StringArgument::class, $args[1]);
+        $this->assertInstanceOf(Argument\StringArgument::class, $args[1]);
         $this->assertEquals("'hello world '", $args[1]->getValue());
         $this->assertEquals('hello world ', $args[1]->getRawValue());
-        $this->assertInstanceOf(Handlebars\Argument\Argument::class, $args[2]);
+        $this->assertInstanceOf(Argument\Argument::class, $args[2]);
         $this->assertEquals('9.0', $args[2]->getValue());
         $this->assertEquals('9.0', $args[2]->getRawValue());
 
@@ -257,12 +257,12 @@ class ArgumentParserTest extends TestCase
         $this->assertEquals('pqrst', $helper1ArgList->getName());
         $helper1Args = $helper1ArgList->getArguments();
         $this->assertCount(1, $helper1Args);
-        $this->assertInstanceOf(Handlebars\Argument\VariableArgument::class, $helper1Args[0]);
+        $this->assertInstanceOf(Argument\VariableArgument::class, $helper1Args[0]);
         $this->assertEquals('$data->find(\'ghikl\')', $helper1Args[0]->getValue());
         $this->assertEquals('ghikl', $helper1Args[0]->getRawValue());
         $helper1Hash = $helper1ArgList->getNamedArguments();
         $this->assertCount(1, $helper1Hash);
-        $this->assertInstanceOf(Handlebars\Argument\StringArgument::class, $helper1Hash['beep']);
+        $this->assertInstanceOf(Argument\StringArgument::class, $helper1Hash['beep']);
         $this->assertEquals("'honk'", $helper1Hash['beep']->getValue());
         $this->assertEquals('honk', $helper1Hash['beep']->getRawValue());
 
@@ -279,10 +279,10 @@ class ArgumentParserTest extends TestCase
 
         $args = $argumentList->getArguments();
         $this->assertCount(2, $args);
-        $this->assertInstanceOf(Handlebars\Argument\HelperArgument::class, $args[0]);
+        $this->assertInstanceOf(Argument\HelperArgument::class, $args[0]);
         $this->assertEquals('a1 b1=b2  (c3 "gh\'i" lmnop) 4', $args[0]->getValue());
         $this->assertEquals('a1 b1=b2  (c3 "gh\'i" lmnop) 4', $args[0]->getRawValue());
-        $this->assertInstanceOf(Handlebars\Argument\HelperArgument::class, $args[1]);
+        $this->assertInstanceOf(Argument\HelperArgument::class, $args[1]);
         $this->assertEquals('yeah "ha" ha', $args[1]->getValue());
         $this->assertEquals('yeah "ha" ha', $args[1]->getRawValue());
 
@@ -290,15 +290,15 @@ class ArgumentParserTest extends TestCase
         $this->assertEquals('a1', $helper1ArgList->getName());
         $helper1Args = $helper1ArgList->getArguments();
         $this->assertCount(2, $helper1Args);
-        $this->assertInstanceOf(Handlebars\Argument\HelperArgument::class, $helper1Args[0]);
+        $this->assertInstanceOf(Argument\HelperArgument::class, $helper1Args[0]);
         $this->assertEquals('c3 "gh\'i" lmnop', $helper1Args[0]->getValue());
         $this->assertEquals('c3 "gh\'i" lmnop', $helper1Args[0]->getRawValue());
-        $this->assertInstanceOf(Handlebars\Argument\Argument::class, $helper1Args[1]);
+        $this->assertInstanceOf(Argument\Argument::class, $helper1Args[1]);
         $this->assertEquals('4', $helper1Args[1]->getValue());
         $this->assertEquals('4', $helper1Args[1]->getRawValue());
         $helper1Hash = $helper1ArgList->getNamedArguments();
         $this->assertCount(1, $helper1Hash);
-        $this->assertInstanceOf(Handlebars\Argument\VariableArgument::class, $helper1Hash['b1']);
+        $this->assertInstanceOf(Argument\VariableArgument::class, $helper1Hash['b1']);
         $this->assertEquals('$data->find(\'b2\')', $helper1Hash['b1']->getValue());
         $this->assertEquals('b2', $helper1Hash['b1']->getRawValue());
 
@@ -306,10 +306,10 @@ class ArgumentParserTest extends TestCase
         $this->assertEquals('c3', $helper2ArgList->getName());
         $helper2Args = $helper2ArgList->getArguments();
         $this->assertCount(2, $helper2Args);
-        $this->assertInstanceOf(Handlebars\Argument\StringArgument::class, $helper2Args[0]);
+        $this->assertInstanceOf(Argument\StringArgument::class, $helper2Args[0]);
         $this->assertEquals("'gh\\'i'", $helper2Args[0]->getValue());
         $this->assertEquals('gh\'i', $helper2Args[0]->getRawValue());
-        $this->assertInstanceOf(Handlebars\Argument\VariableArgument::class, $helper2Args[1]);
+        $this->assertInstanceOf(Argument\VariableArgument::class, $helper2Args[1]);
         $this->assertEquals('$data->find(\'lmnop\')', $helper2Args[1]->getValue());
         $this->assertEquals('lmnop', $helper2Args[1]->getRawValue());
         $helper2Hash = $helper2ArgList->getNamedArguments();
@@ -328,13 +328,13 @@ class ArgumentParserTest extends TestCase
 
         $args = $argumentList->getArguments();
         $this->assertCount(1, $args);
-        $this->assertInstanceOf(Handlebars\Argument\StringArgument::class, $args[0]);
+        $this->assertInstanceOf(Argument\StringArgument::class, $args[0]);
         $this->assertEquals("'abc'", $args[0]->getValue());
         $this->assertEquals('abc', $args[0]->getRawValue());
 
         $hash = $argumentList->getNamedArguments();
         $this->assertCount(1, $hash);
-        $this->assertInstanceOf(Handlebars\Argument\HelperArgument::class, $hash['test1']);
+        $this->assertInstanceOf(Argument\HelperArgument::class, $hash['test1']);
         $this->assertEquals('test2 1 "xyz"', $hash['test1']->getValue());
         $this->assertEquals('test2 1 "xyz"', $hash['test1']->getRawValue());
 
@@ -342,10 +342,10 @@ class ArgumentParserTest extends TestCase
         $this->assertEquals('test2', $helper1ArgList->getName());
         $helper1Args = $helper1ArgList->getArguments();
         $this->assertCount(2, $helper1Args);
-        $this->assertInstanceOf(Handlebars\Argument\Argument::class, $helper1Args[0]);
+        $this->assertInstanceOf(Argument\Argument::class, $helper1Args[0]);
         $this->assertEquals('1', $helper1Args[0]->getValue());
         $this->assertEquals('1', $helper1Args[0]->getRawValue());
-        $this->assertInstanceOf(Handlebars\Argument\StringArgument::class, $helper1Args[1]);
+        $this->assertInstanceOf(Argument\StringArgument::class, $helper1Args[1]);
         $this->assertEquals("'xyz'", $helper1Args[1]->getValue());
         $this->assertEquals('xyz', $helper1Args[1]->getRawValue());
         $helper1Hash = $helper1ArgList->getNamedArguments();
