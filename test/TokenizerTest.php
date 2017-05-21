@@ -68,7 +68,7 @@ class TokenizerTest extends TestCase
             // Currently we don't test all of the tokens in tokenizer.html, but there's no easy way to stop
             // the tokenizer half-way. This achieves that effect in a somewhat haphazard manner.
             if (isset($tests[$i])) {
-                $this->assertEquals($tests[$i], $node['value']);
+                $this->assertSame($tests[$i], $node['value']);
             }
 
             $i++;

@@ -47,7 +47,7 @@ class CompilerTest extends TestCase
         $template = file_get_contents(__DIR__ . '/assets/template.php');
 
         $code = $this->compiler->compile($source);
-        $this->assertEquals($template, $code);
+        $this->assertSame($template, $code);
     }
 
     /**

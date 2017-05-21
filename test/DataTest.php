@@ -85,10 +85,10 @@ class DataTest extends TestCase
         $this->assertSame('this is great', $data->find('../../product_comments.comment2'));
         $this->assertSame('this is epic', $data->find('comment6'));
 
-        $this->assertEquals('Hello World', $data->find('.././../product_title'));
-        $this->assertEquals('this is good', $data->find('./../comment1'));
-        $this->assertEquals('this is great', $data->find('../.././product_comments.comment2'));
-        $this->assertEquals('this is epic', $data->find('./comment6'));    
+        $this->assertSame('Hello World', $data->find('.././../product_title'));
+        $this->assertSame('this is good', $data->find('./../comment1'));
+        $this->assertSame('this is great', $data->find('../.././product_comments.comment2'));
+        $this->assertSame('this is epic', $data->find('./comment6'));
     }
 
     public function testPop()
