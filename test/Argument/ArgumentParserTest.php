@@ -113,6 +113,7 @@ class ArgumentParserTest extends TestCase
 
         $args = $argumentList->getArguments();
         $this->assertCount(1, $args);
+        $this->assertInstanceOf(Argument\VariableArgument::class, $args[0]);
         $this->assertEquals('$data->find(\'x\')', $args[0]->getValue());
         $this->assertEquals("x", $args[0]->getRawValue());
 
