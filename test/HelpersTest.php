@@ -13,7 +13,11 @@ declare(strict_types=1);
 namespace MattyG\Handlebars\Test;
 
 use MattyG\Handlebars;
+use MattyG\Handlebars\Helper\LogHelper;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\AbstractLogger;
+use Psr\Log\InvalidArgumentException;
+use Psr\Log\LogLevel;
 
 class HelpersTest extends TestCase
 {
@@ -291,5 +295,59 @@ class HelpersTest extends TestCase
         ));
 
         $this->assertSame('123JohnYes1JaneYes1JillYes1', $results);
+    }
+
+    /**
+     * @dataProvider logHelperProvider
+     */
+    public function testLog(string $contents, array $context, string $expectedTemplateResult, array $logCalls)
+    {
+        $logger = $this->prophesize(AbstractLogger::class);
+        foreach ($logCalls as $logCall) {
+            $logger->log($logCall["level"], $logCall["message"], $logCall["context"] ?? array())->shouldBeCalledTimes($logCall["calls"]);
+        }
+
+        $logHelper = new LogHelper($logger->reveal());
+        $this->handlebars->registerHelper("log", $logHelper);
+
+        $template = $this->handlebars->compile($contents);
+        $result = $template($context);
+
+        $this->assertSame($expectedTemplateResult, $result);
+    }
+
+    /**
+     * @return array
+     */
+    public function logHelperProvider()
+    {
+        // template contents, template result, log level, log message, log context
+        return array(
+            array('abc{{log "Test Number One" level="warning"}}def', array(), "abcdef", array(
+                array("level" => LogLevel::WARNING, "message" => "Test Number One", "calls" => 1),
+            )),
+            array('123{{log "Test Number Two" level="warn" context1="yes we can" context2="no we can\'t"}}456', array(), "123456", array(
+                array("level" => LogLevel::WARNING, "message" => "Test Number Two", "calls" => 1, "context" => array("context1" => "yes we can", "context2" => "no we can't")),
+            )),
+            array('{{log "Test Three" level=loglevel1 context3=person.name}}{{log person.street}}', array("loglevel1" => "emergency", "person" => array("name" => "John Citizen", "street" => "123 Test Street")), "", array(
+                array("level" => LogLevel::EMERGENCY, "message" => "Test Three", "calls" => 1, "context" => array("context3" => "John Citizen")),
+                array("level" => LogLevel::INFO, "message" => "123 Test Street", "calls" => 1),
+            )),
+        );
+    }
+
+    /**
+     * @expectedException Psr\Log\InvalidArgumentException
+     * @expectedExceptionMessage Unknown log level 'emerg' specified.
+     */
+    public function testLogWithUnknownLevel()
+    {
+        $logger = $this->getMockForAbstractClass(AbstractLogger::class);
+        $logHelper = new LogHelper($logger);
+        $this->handlebars->registerHelper("log", $logHelper);
+
+        $contents = '{{log "Test Log Message" level="emerg"}}';
+        $template = $this->handlebars->compile($contents);
+        $template();
     }
 }
