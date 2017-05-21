@@ -44,7 +44,7 @@ class FunctionalTest extends TestCase
         $template = $this->handlebars->compile('{{zoo 4.5}} {{./zoo}}');
 
         $result = $template(array('zoo' => 'foobar'));
-        $this->assertEquals('5.5 foobar', $result);
+        $this->assertSame('5.5 foobar', $result);
 
         //helper vs property rd2
         $this->handlebars->registerHelper('query', function($keyword) {
@@ -53,7 +53,7 @@ class FunctionalTest extends TestCase
         $template = $this->handlebars->compile('{{query \'keyword\'}} {{query.keyword}}');
 
         $result = $template->render(array('query' => array('keyword' => 'foobar')));
-        $this->assertEquals('foobar foobar', $result);
+        $this->assertSame('foobar foobar', $result);
     }
 
     public function testTrim()
@@ -77,31 +77,31 @@ class FunctionalTest extends TestCase
                 array('bar' => 'e'),
             )
         ));
-        $this->assertEquals('4456a 456b 456c 456d 456e ', $result);
+        $this->assertSame('4456a 456b 456c 456d 456e ', $result);
     }
 
     public function testComment()
     {
         $template = $this->handlebars->compile('{{!-- Some Comment --}}{{foo}}');
         $result = $template(array('foo' => 'bar'));
-        $this->assertEquals('bar', $result);
+        $this->assertSame('bar', $result);
 
         $template = $this->handlebars->compile('{{! Some Comment }}{{foo}}');
         $result = $template(array('foo' => 'bar'));
-        $this->assertEquals('bar', $result);
+        $this->assertSame('bar', $result);
     }
 
     public function testLength()
     {
         $template = $this->handlebars->compile('{{foo.length}}');
         $result = $template(array('foo' => array(1, 2, 3)));
-        $this->assertEquals('3', $result);
+        $this->assertSame('3', $result);
     }
 
     public function testMustache()
     {
         $template = $this->handlebars->compile('{{#foo}}{{this}}{{/foo}}');
         $result = $template(array('foo' => array(1, 2, 3)));
-        $this->assertEquals('123', $result);
+        $this->assertSame('123', $result);
     }
 }

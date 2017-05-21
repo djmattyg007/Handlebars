@@ -45,7 +45,7 @@ class HandlebarsTest extends TestCase
     {
         $template = $this->handlebars->compile('{{foo}}{{{foo}}}');
         $results = $template(array('foo' => '<strong>foo</strong>'));
-        $this->assertEquals('&lt;strong&gt;foo&lt;/strong&gt;<strong>foo</strong>', $results); 
+        $this->assertSame('&lt;strong&gt;foo&lt;/strong&gt;<strong>foo</strong>', $results);
     }
 
     public function testSetCachePath()
@@ -62,7 +62,7 @@ class HandlebarsTest extends TestCase
 
         $template = $this->handlebars->compile('{{root}}/bower_components/eve-font-awesome/awesome.css');
         $result = $template();
-        $this->assertEquals('/some/root/bower_components/eve-font-awesome/awesome.css', $result);
+        $this->assertSame('/some/root/bower_components/eve-font-awesome/awesome.css', $result);
     }
 
     public function testRegisterHelper2()
@@ -75,7 +75,7 @@ class HandlebarsTest extends TestCase
 
         $template = $this->handlebars->compile('/{{ pathjoin (concat prefix "/bin") "php" }}');
         $result = $template->render(array("prefix" => "usr" . DIRECTORY_SEPARATOR . "local"));
-        $this->assertEquals('/usr/local/bin/php', $result);
+        $this->assertSame('/usr/local/bin/php', $result);
     }
 
     public function testRegisterHelper3()
@@ -89,20 +89,20 @@ class HandlebarsTest extends TestCase
             $false,
             $zoo
         ) use (&$found) {
-            $this->assertEquals('', $bar);
-            $this->assertEquals(4, $four);
+            $this->assertSame(null, $bar);
+            $this->assertSame(4, $four);
             $this->assertTrue($true);
             $this->assertNull($null);
             $this->assertFalse($false);
-            $this->assertEquals('foobar', $zoo);
+            $this->assertSame('foobar', $zoo);
             $found = true;
             return $four + 1;
         });
         $template = $this->handlebars->compile('{{foo bar 4 true null false zoo}}');
 
-        $result = $template(array('zoo' => 'foobar'));
+        $result = $template(array("zoo" => "foobar"));
         $this->assertTrue($found);
-        $this->assertEquals(5, $result);
+        $this->assertSame("5", $result);
     }
 
     public function testRegisterHelper4()
@@ -114,10 +114,10 @@ class HandlebarsTest extends TestCase
             $number2, 
             $something2
         ) use (&$found) {
-            $this->assertEquals(4.5, $number);
-            $this->assertEquals(4, $number2);
-            $this->assertEquals('some"thi " ng', $something1);
-            $this->assertEquals("some'thi ' ng", $something2);
+            $this->assertSame(4.5, $number);
+            $this->assertSame(4, $number2);
+            $this->assertSame('some"thi " ng', $something1);
+            $this->assertSame("some'thi ' ng", $something2);
             $found = true;
             return $something1.$something2;
         });
@@ -125,7 +125,7 @@ class HandlebarsTest extends TestCase
 
         $result = $template();
         $this->assertTrue($found);
-        $this->assertEquals('some"thi " ng'."some'thi ' ng", $result);
+        $this->assertSame('some"thi " ng'."some'thi ' ng", $result);
     }
 
     public function testRegisterHelper5()
@@ -140,13 +140,13 @@ class HandlebarsTest extends TestCase
                 $something2,
                 $options
             ) use (&$found) {
-                $this->assertEquals(4.5, $number);
-                $this->assertEquals(4, $number2);
-                $this->assertEquals('some"thi " ng', $something1);
-                $this->assertEquals("some'thi ' ng", $something2);
+                $this->assertSame(4.5, $number);
+                $this->assertSame(4, $number2);
+                $this->assertSame('some"thi " ng', $something1);
+                $this->assertSame("some'thi ' ng", $something2);
                 $this->assertFalse($options['hash']['dog']);
-                $this->assertEquals('meow', $options['hash']['cat']);
-                $this->assertEquals('squeak squeak', $options['hash']['mouse']);
+                $this->assertSame('meow', $options['hash']['cat']);
+                $this->assertSame('squeak squeak', $options['hash']['mouse']);
                 $found = true;
                 return $number2 + 1;
             });
@@ -156,7 +156,7 @@ class HandlebarsTest extends TestCase
 
         $results = $template(array('zoo' => 'foobar'));
         $this->assertTrue($found);
-        $this->assertEquals(5, $results);
+        $this->assertSame("5", $results);
     }
 
     public function testRegisterPartial1()
@@ -167,7 +167,7 @@ class HandlebarsTest extends TestCase
 
         $template = $this->handlebars->compile('{{> foo }} ... {{> bar }}');
         $result = $template(array('foo' => 'FOO', 'bar' => 'BAR'));
-        $this->assertEquals('This is FOO ... Foo is not BAR', $result);
+        $this->assertSame('This is FOO ... Foo is not BAR', $result);
     }
 
     public function testRegisterPartial2()
@@ -178,7 +178,7 @@ class HandlebarsTest extends TestCase
 
         $template = $this->handlebars->compile('{{> foo }} ... {{> bar zoo}}');
         $result = $template(array('foo' => 'FOO', 'bar' => 'BAR', 'zoo' => array('bar' => 'ZOO')));
-        $this->assertEquals('This is FOO ... Foo is not ZOO', $result);
+        $this->assertSame('This is FOO ... Foo is not ZOO', $result);
     }
 
     public function testRegisterPartial3()
@@ -189,7 +189,7 @@ class HandlebarsTest extends TestCase
 
         $template = $this->handlebars->compile('{{> foo }} ... {{> bar zoo something="Amazing"}}');
         $result = $template(array('foo' => 'FOO', 'bar' => 'BAR', 'zoo' => array('bar' => 'ZOO')));
-        $this->assertEquals('This is FOO ... Foo is not Amazing', $result);
+        $this->assertSame('This is FOO ... Foo is not Amazing', $result);
     }
 
     public function testSetNamePrefix()
