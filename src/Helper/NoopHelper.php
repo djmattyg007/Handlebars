@@ -5,9 +5,11 @@ namespace MattyG\Handlebars\Helper;
 
 class NoopHelper
 {
-    public function __invoke()
+    /**
+     * @param ...$args
+     */
+    public function __invoke(...$args)
     {
-        $args = func_get_args();
         $options = array_pop($args);
         $context = null;
 

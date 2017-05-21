@@ -67,8 +67,7 @@ class HandlebarsTest extends TestCase
 
     public function testRegisterHelper2()
     {
-        $this->handlebars->registerHelper('pathjoin', function() {
-            $args = func_get_args();
+        $this->handlebars->registerHelper('pathjoin', function(...$args) {
             $options = array_pop($args);
             return implode(DIRECTORY_SEPARATOR, $args);
         });
