@@ -5,6 +5,11 @@ namespace MattyG\Handlebars\Helper;
 
 class WithHelper
 {
+    /**
+     * @param mixed $value
+     * @param array $options
+     * @return string
+     */
     public function __invoke($value, $options)
     {
         if (!is_array($value)) {

@@ -23,6 +23,19 @@ class ArgumentParserTest extends TestCase
         $this->argumentParserFactory = null;
     }
 
+    /**
+     * @param Argument\Argument $arg
+     * @param string $type
+     * @param string $value
+     * @param string $rawValue
+     */
+    protected function assertArgumentValues(Argument\Argument $arg, string $type, string $value, string $rawValue)
+    {
+        $this->assertInstanceOf($type, $arg);
+        $this->assertSame($value, $arg->getValue());
+        $this->assertSame($rawValue, $arg->getRawValue());
+    }
+
     public function testTokenise1()
     {
         $argParser = $this->argumentParserFactory->create("foobar 'merchant' query.profile_type");
@@ -32,12 +45,8 @@ class ArgumentParserTest extends TestCase
 
         $args = $argumentList->getArguments();
         $this->assertCount(2, $args);
-        $this->assertInstanceOf(Argument\StringArgument::class, $args[0]);
-        $this->assertSame("'merchant'", $args[0]->getValue());
-        $this->assertSame('merchant', $args[0]->getRawValue());
-        $this->assertInstanceOf(Argument\VariableArgument::class, $args[1]);
-        $this->assertSame('$data->find(\'query.profile_type\')', $args[1]->getValue());
-        $this->assertSame('query.profile_type', $args[1]->getRawValue());
+        $this->assertArgumentValues($args[0], Argument\StringArgument::class, "'merchant'", 'merchant');
+        $this->assertArgumentValues($args[1], Argument\VariableArgument::class, '$data->find(\'query.profile_type\')', 'query.profile_type');
 
         $hash = $argumentList->getNamedArguments();
         $this->assertCount(0, $hash);
@@ -52,33 +61,17 @@ class ArgumentParserTest extends TestCase
 
         $args = $argumentList->getArguments();
         $this->assertCount(5, $args);
-        $this->assertInstanceOf(Argument\VariableArgument::class, $args[0]);
-        $this->assertSame('$data->find(\'4bar4\')', $args[0]->getValue());
-        $this->assertSame('4bar4', $args[0]->getRawValue());
-        $this->assertInstanceOf(Argument\Argument::class, $args[1]);
-        $this->assertSame('4.5', $args[1]->getValue());
-        $this->assertSame('4.5', $args[1]->getRawValue());
-        $this->assertInstanceOf(Argument\StringArgument::class, $args[2]);
-        $this->assertSame("'some\"thi \" ng'", $args[2]->getValue());
-        $this->assertSame("some\"thi \" ng", $args[2]->getRawValue());
-        $this->assertInstanceOf(Argument\Argument::class, $args[3]);
-        $this->assertSame('4', $args[3]->getValue());
-        $this->assertSame('4', $args[3]->getRawValue());
-        $this->assertInstanceOf(Argument\StringArgument::class, $args[4]);
-        $this->assertSame("'some\\'thi \\' ng'", $args[4]->getValue());
-        $this->assertSame("some'thi ' ng", $args[4]->getRawValue());
+        $this->assertArgumentValues($args[0], Argument\VariableArgument::class, '$data->find(\'4bar4\')', '4bar4');
+        $this->assertArgumentValues($args[1], Argument\Argument::class, '4.5', '4.5');
+        $this->assertArgumentValues($args[2], Argument\StringArgument::class, "'some\"thi \" ng'", "some\"thi \" ng");
+        $this->assertArgumentValues($args[3], Argument\Argument::class, '4', '4');
+        $this->assertArgumentValues($args[4], Argument\StringArgument::class, "'some\\'thi \\' ng'", "some'thi ' ng");
 
         $hash = $argumentList->getNamedArguments();
         $this->assertCount(3, $hash);
-        $this->assertInstanceOf(Argument\Argument::class, $hash['dog']);
-        $this->assertSame('false', $hash['dog']->getValue());
-        $this->assertSame('false', $hash['dog']->getRawValue());
-        $this->assertInstanceOf(Argument\StringArgument::class, $hash['cat']);
-        $this->assertSame("'meow'", $hash['cat']->getValue());
-        $this->assertSame("meow", $hash['cat']->getRawValue());
-        $this->assertInstanceOf(Argument\StringArgument::class, $hash['mouse']);
-        $this->assertSame("'squeak squeak'", $hash['mouse']->getValue());
-        $this->assertSame("squeak squeak", $hash['mouse']->getRawValue());
+        $this->assertArgumentValues($hash["dog"], Argument\Argument::class, "false", "false");
+        $this->assertArgumentValues($hash["cat"], Argument\StringArgument::class, "'meow'", "meow");
+        $this->assertArgumentValues($hash["mouse"], Argument\StringArgument::class, "'squeak squeak'", "squeak squeak");
     }
 
     public function testTokenise3()
@@ -90,15 +83,9 @@ class ArgumentParserTest extends TestCase
 
         $args = $argumentList->getArguments();
         $this->assertCount(3, $args);
-        $this->assertInstanceOf(Argument\StringArgument::class, $args[0]);
-        $this->assertSame("'TODAY\\'S'", $args[0]->getValue());
-        $this->assertSame("TODAY'S", $args[0]->getRawValue());
-        $this->assertInstanceOf(Argument\VariableArgument::class, $args[1]);
-        $this->assertSame('$data->find(\'BEST\')', $args[1]->getValue());
-        $this->assertSame("BEST", $args[1]->getRawValue());
-        $this->assertInstanceOf(Argument\VariableArgument::class, $args[2]);
-        $this->assertSame('$data->find(\'DEALS\\\'\')', $args[2]->getValue());
-        $this->assertSame("DEALS'", $args[2]->getRawValue());
+        $this->assertArgumentValues($args[0], Argument\StringArgument::class, "'TODAY\\'S'", "TODAY'S");
+        $this->assertArgumentValues($args[1], Argument\VariableArgument::class, '$data->find(\'BEST\')', "BEST");
+        $this->assertArgumentValues($args[2], Argument\VariableArgument::class, '$data->find(\'DEALS\\\'\')', "DEALS'");
 
         $hash = $argumentList->getNamedArguments();
         $this->assertCount(0, $hash);
@@ -113,9 +100,7 @@ class ArgumentParserTest extends TestCase
 
         $args = $argumentList->getArguments();
         $this->assertCount(1, $args);
-        $this->assertInstanceOf(Argument\VariableArgument::class, $args[0]);
-        $this->assertEquals('$data->find(\'x\')', $args[0]->getValue());
-        $this->assertEquals("x", $args[0]->getRawValue());
+        $this->assertArgumentValues($args[0], Argument\VariableArgument::class, '$data->find(\'x\')', "x");
 
         $hash = $argumentList->getNamedArguments();
         $this->assertCount(0, $hash);
