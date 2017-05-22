@@ -243,6 +243,15 @@ class ArgumentParserTest extends TestCase
         $helper2Hash = $helper2ArgList->getNamedArguments();
         $this->assertCount(0, $helper2Hash);
 
+        $helper3ArgList = $args[1]->getArgumentList();
+        $this->assertSame("yeah", $helper3ArgList->getName());
+        $helper3Args = $helper3ArgList->getArguments();
+        $this->assertCount(2, $helper3Args);
+        $this->assertArgumentValues($helper3Args[0], Argument\StringArgument::class, "'ha'", "ha");
+        $this->assertArgumentValues($helper3Args[1], Argument\VariableArgument::class, '$data->find(\'ha\')', "ha");
+        $helper3Hash = $helper3ArgList->getNamedArguments();
+        $this->assertCount(0, $helper3Hash);
+
         $hash = $argumentList->getNamedArguments();
         $this->assertCount(0, $hash);
     }
