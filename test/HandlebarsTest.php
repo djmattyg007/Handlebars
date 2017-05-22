@@ -191,6 +191,18 @@ class HandlebarsTest extends TestCase
         $this->assertSame('This is FOO ... Foo is not Amazing', $result);
     }
 
+    public function testRegisterPartial4()
+    {
+        $this->markTestSkipped("Dynamic partial lookups are not implemented yet");
+
+        // with dynamic lookup
+        $this->handlebars->registerPartial("foo", "This is a {{ foo }}");
+
+        $template = $this->handlebars->compile('{{> (concat bar)}}');
+        $result = $template->render(array("foo" => "cat", "bar" => "foo"));
+        $this->assertSame("This is a cat", $results);
+    }
+
     public function testSetNamePrefix()
     {
         $instance = $this->handlebars->setNamePrefix('foobar');
