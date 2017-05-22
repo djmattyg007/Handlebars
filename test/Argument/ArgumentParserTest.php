@@ -304,6 +304,63 @@ class ArgumentParserTest extends TestCase
         $this->assertCount(0, $helper1Hash);
     }
 
+    public function testTokenise12()
+    {
+        $argParser = $this->argumentParserFactory->create("matthew");
+        $argumentList = $argParser->tokenise();
+
+        $this->assertSame("matthew", $argumentList->getName());
+
+        $args = $argumentList->getArguments();
+        $this->assertCount(0, $args);
+        $hash = $argumentList->getNamedArguments();
+        $this->assertCount(0, $hash);
+    }
+
+    public function testTokenise13()
+    {
+        $argParser = $this->argumentParserFactory->create("matrix (neo)");
+        $argumentList = $argParser->tokenise();
+
+        $this->assertSame("matrix", $argumentList->getName());
+
+        $args = $argumentList->getArguments();
+        $this->assertCount(1, $args);
+        $this->assertArgumentValues($args[0], Argument\HelperArgument::class, "neo", "neo");
+
+        $helper1ArgList = $args[0]->getArgumentList();
+        $this->assertSame("neo", $helper1ArgList->getName());
+        $helper1Args = $helper1ArgList->getArguments();
+        $this->assertCount(0, $helper1Args);
+        $helper1Hash = $helper1ArgList->getNamedArguments();
+        $this->assertCount(0, $helper1Hash);
+
+        $hash = $argumentList->getNamedArguments();
+        $this->assertCount(0, $hash);
+    }
+
+    public function testTokenise14()
+    {
+        $argParser = $this->argumentParserFactory->create("potter spells=(book)");
+        $argumentList = $argParser->tokenise();
+
+        $this->assertSame("potter", $argumentList->getName());
+
+        $args = $argumentList->getArguments();
+        $this->assertCount(0, $args);
+
+        $hash = $argumentList->getNamedArguments();
+        $this->assertCount(1, $hash);
+        $this->assertArgumentValues($hash["spells"], Argument\HelperArgument::class, "book", "book");
+
+        $helper1ArgList = $hash["spells"]->getArgumentList();
+        $this->assertSame("book", $helper1ArgList->getName());
+        $helper1Args = $helper1ArgList->getArguments();
+        $this->assertCount(0, $helper1Args);
+        $helper1Hash = $helper1ArgList->getNamedArguments();
+        $this->assertCount(0, $helper1Hash);
+    }
+
     /**
      * @expectedException MattyG\Handlebars\Argument\Exception
      * @expectedExceptionMessage Non-whitespace character detected after string argument:
