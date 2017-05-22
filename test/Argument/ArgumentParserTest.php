@@ -361,6 +361,21 @@ class ArgumentParserTest extends TestCase
         $this->assertCount(0, $helper1Hash);
     }
 
+    public function testTokenise15()
+    {
+        $argParser = $this->argumentParserFactory->create("artemis '(test fakehelper)'");
+        $argumentList = $argParser->tokenise();
+
+        $this->assertSame("artemis", $argumentList->getName());
+
+        $args = $argumentList->getArguments();
+        $this->assertCount(1, $args);
+        $this->assertArgumentValues($args[0], Argument\StringArgument::class, "'(test fakehelper)'", "(test fakehelper)");
+
+        $hash = $argumentList->getNamedArguments();
+        $this->assertCount(0, $hash);
+    }
+
     /**
      * @expectedException MattyG\Handlebars\Argument\Exception
      * @expectedExceptionMessage Non-whitespace character detected after string argument:
