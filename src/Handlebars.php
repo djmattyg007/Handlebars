@@ -18,6 +18,7 @@ class Handlebars
 {
     const VERSION = "7.0.1";
 
+    // TODO: Remove this constant, it isn't used by our codebase now
     const COMPILE_ERROR = "%s on line %s \n```\n%s\n```\n";
 
     const DEFAULT_NAME_PREFIX = '__HANDLEBARS__';
@@ -92,6 +93,7 @@ class Handlebars
     /**
      * Returns a callback that binds the data with the template
      *
+     * TODO: Change return type declaration to Template
      * @param string $source The template string
      * @return callable The template binding handler
      */
