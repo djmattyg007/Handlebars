@@ -16,7 +16,7 @@ use MattyG\Handlebars\Argument;
 
 class Handlebars
 {
-    const VERSION = "7.0.1";
+    const VERSION = "7.1.0";
 
     // TODO: Remove this constant, it isn't used by our codebase now
     const COMPILE_ERROR = "%s on line %s \n```\n%s\n```\n";
